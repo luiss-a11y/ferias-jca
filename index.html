@@ -164,9 +164,35 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .colab-chip.recusado{background:var(--red-bg);border-color:#FFCDD2;color:var(--red)}
 .colab-chip.dobro{background:var(--yellow-bg);border-color:#FFE0B2;color:var(--yellow)}
 .colab-chip.validado{background:var(--green-bg);border-color:#A5D6A7;color:var(--green)}
+
+.depto-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+.depto-card-header{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.depto-card-title{font-size:14px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:10px}
+.depto-card-body{padding:16px 20px}
+.depto-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.depto-kpi{text-align:center;padding:12px 8px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.depto-kpi-val{font-size:15px;font-weight:700;color:var(--navy);line-height:1}
+.depto-kpi-val.green{color:#1B5E20}.depto-kpi-val.red{color:#B71C1C}.depto-kpi-val.gold{color:#E65100}
+.depto-kpi-label{font-size:10px;color:var(--muted);margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+.bar-wrap{margin-bottom:10px}
+.bar-label-row{display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px}
+.bar-label-name{font-weight:600;color:var(--navy)}.bar-label-val{color:var(--muted);font-family:"DM Mono",monospace}
+.bar-track{height:10px;background:var(--bg);border-radius:5px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:5px;transition:width .6s ease}
+.mes-btn{padding:10px 8px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:center;transition:all .15s;min-width:72px}
+.mes-btn:hover{border-color:var(--accent)}.mes-btn.active{background:var(--navy);border-color:var(--navy)}
+.mes-btn.active .mes-nome{color:white}.mes-btn.active .mes-val{color:var(--accent-light)}
+.mes-btn.has-data{border-color:#4A90D9}
+.mes-nome{font-size:12px;font-weight:700;color:var(--navy)}
+.mes-val{font-size:10px;color:#1B5E20;font-weight:600;margin-top:3px}
+.mes-val.empty{color:var(--muted)}
+.stat-card.gold::before{background:#F57F17}
+
 </style>
 </head>
+
 <body>
+
 <!-- LOGIN PRINCIPAL -->
 <div class="login-wrap" id="loginScreen">
   <div class="login-bg"></div>
@@ -176,10 +202,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     <div class="login-sub">Selecione seu acesso para continuar</div>
     <div class="dp-interno-card" id="dp-card" onclick="selectRole('dp')">
       <div style="font-size:24px">🏢</div>
-      <div style="flex:1">
-        <div class="dp-info-name">Departamento Pessoal Interno</div>
-        <div class="dp-info-sub">Visão completa · Validações · Módulo Financeiro</div>
-      </div>
+      <div style="flex:1"><div class="dp-info-name">Departamento Pessoal Interno</div><div class="dp-info-sub">Visão completa · Validações · Módulo Financeiro · Indicadores</div></div>
       <div class="dp-badge">DP Gestor</div>
     </div>
     <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-label">Gestores Operacionais</div><div class="login-divider-line"></div></div>
@@ -187,10 +210,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-label">Centro de Serviços Compartilhados</div><div class="login-divider-line"></div></div>
     <div class="csc-card" id="csc-card" onclick="selectRole('csc_gateway')">
       <div style="font-size:24px">🏗️</div>
-      <div style="flex:1">
-        <div class="csc-name">CSC — Centro de Serviços Compartilhados</div>
-        <div class="csc-sub">Marketing · Financeiro · Tecnologia · Gente e Gestão · Legalização · Administrativo</div>
-      </div>
+      <div style="flex:1"><div class="csc-name">CSC — Centro de Serviços Compartilhados</div><div class="csc-sub">Marketing · Financeiro · Tecnologia · Gente e Gestão · Legalização · Administrativo</div></div>
     </div>
     <div style="height:14px"></div>
     <div class="pw-group">
@@ -209,10 +229,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   <div class="login-card">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
       <button onclick="voltarLogin()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;padding:0;line-height:1">←</button>
-      <div>
-        <div style="font-size:18px;font-weight:700;color:var(--navy)">CSC — Selecione seu Setor</div>
-        <div style="font-size:13px;color:var(--muted)">Centro de Serviços Compartilhados</div>
-      </div>
+      <div><div style="font-size:18px;font-weight:700;color:var(--navy)">CSC — Selecione seu Setor</div><div style="font-size:13px;color:var(--muted)">Centro de Serviços Compartilhados</div></div>
     </div>
     <div class="login-roles" id="cscRoles"></div>
     <div class="pw-group" style="margin-top:8px">
@@ -239,6 +256,8 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   </div>
   <div class="nav-tabs" id="navTabs"></div>
   <div class="main">
+
+    <!-- PAINEL -->
     <div class="section" id="sec-painel">
       <div class="page-header">
         <div><div class="page-title">Painel Geral</div><div class="page-sub">Visão consolidada de todos os departamentos</div></div>
@@ -258,6 +277,8 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         </tr></thead><tbody id="painelBody"></tbody></table></div>
       </div>
     </div>
+
+    <!-- MEU DEPARTAMENTO -->
     <div class="section" id="sec-setor">
       <div class="page-header"><div><div class="page-title" id="setorTitle">Meu Departamento</div><div class="page-sub" id="setorSub">—</div></div></div>
       <div class="cards-row cols-3" id="setorCards"></div>
@@ -272,6 +293,8 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         </tr></thead><tbody id="setorBody"></tbody></table></div>
       </div>
     </div>
+
+    <!-- CALENDÁRIO -->
     <div class="section" id="sec-calendario">
       <div class="page-header"><div><div class="page-title">Calendário de Férias</div><div class="page-sub" id="calSub">—</div></div></div>
       <div class="cal-wrap">
@@ -290,6 +313,8 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         <div class="cal-grid"><div class="cal-dow" id="calDow"></div><div class="cal-days" id="calDays"></div></div>
       </div>
     </div>
+
+    <!-- VALIDAÇÕES PENDENTES -->
     <div class="section" id="sec-validar">
       <div class="page-header"><div><div class="page-title">Validações Pendentes</div><div class="page-sub">Indicações aguardando análise do DP Interno</div></div></div>
       <div class="table-wrap">
@@ -299,32 +324,271 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         </tr></thead><tbody id="validarBody"></tbody></table></div>
       </div>
     </div>
+
+    <!-- VALIDAÇÕES APROVADAS -->
+    <div class="section" id="sec-aprovadas">
+      <div class="page-header">
+        <div><div class="page-title">Validações Aprovadas</div><div class="page-sub">Períodos validados ou comunicados pelo DP Interno</div></div>
+        <button class="btn btn-primary btn-sm" onclick="exportAprovadasCSV()">↓ Exportar CSV</button>
+      </div>
+      <div class="cards-row cols-3" id="aprovadasCards"></div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title" id="aprovadasCount">—</span>
+          <div style="display:flex;gap:8px">
+            <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterAprovadas(this.value)"/></div>
+          </div>
+        </div>
+        <div class="filter-row" id="aprovadasFilters"></div>
+        <div style="overflow-x:auto"><table><thead><tr>
+          <th>Nome</th><th>Departamento</th><th>Conceder Até</th>
+          <th>P1 Início</th><th>P1 Fim</th><th>Status P1</th>
+          <th>P2 Início</th><th>P2 Fim</th><th>Status P2</th>
+          <th>Situação</th>
+        </tr></thead><tbody id="aprovadasBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- FINANCEIRO -->
     <div class="section" id="sec-financeiro">
       <div class="page-header">
         <div><div class="page-title">Módulo Financeiro</div><div class="page-sub">Provisão mensal, custo projetado e datas de pagamento — apenas DP Interno</div></div>
         <button class="btn btn-primary btn-sm" onclick="exportFinCSV()">↓ Exportar CSV</button>
       </div>
       <div class="cards-row cols-4" id="finCards"></div>
-      <div class="table-wrap">
-        <div class="table-header"><span class="table-title">Projeção de Pagamentos por Mês (pagamento ocorre 2 dias antes do início)</span></div>
-        <div style="overflow-x:auto"><table><thead><tr>
-          <th>Mês</th><th>Qtd. Pagamentos</th><th>Total Salários</th><th>Total 1/3</th><th>Total a Pagar</th><th>Provisão Acumulada</th>
-        </tr></thead><tbody id="finMesesBody"></tbody></table></div>
+
+      <!-- Seletor de meses -->
+      <div class="table-wrap" style="margin-bottom:20px">
+        <div class="table-header" style="flex-wrap:wrap;gap:8px">
+          <span class="table-title">Selecionar Mês — Custo por Departamento</span>
+          <button class="btn btn-outline btn-sm" id="btnLimparMes" onclick="setFinMes(-1)" style="display:none">✕ Limpar filtro</button>
+        </div>
+        <div style="padding:16px 20px;display:flex;gap:8px;flex-wrap:wrap" id="finMesBtns"></div>
       </div>
-      <div class="table-wrap">
-        <div class="table-header"><span class="table-title" id="finDetCount">—</span>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
+
+      <!-- Detalhamento por departamento (exibido ao selecionar mês) -->
+      <div id="finDeptBreakdown" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div style="font-size:16px;font-weight:700;color:var(--navy)" id="finDeptMesTitle">—</div>
+        </div>
+        <div class="cards-row cols-4" id="finDeptCards"></div>
+        <div class="table-wrap" style="margin-bottom:16px">
+          <div class="table-header"><span class="table-title">Custo por Departamento</span></div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th>Departamento</th><th>Colaboradores</th><th>Total Salários</th><th>Total 1/3</th><th>Total a Pagar</th><th>% do Mês</th>
+          </tr></thead><tbody id="finDeptBody"></tbody></table></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header"><span class="table-title" id="finDeptDetTitle">Detalhamento Individual</span></div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th><th>Total Férias</th><th>Período</th><th>Data Pagamento</th>
+          </tr></thead><tbody id="finDeptDetBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- Tabela anual completa -->
+      <div id="finAnoWrap">
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title">Projeção Anual de Pagamentos</span>
+            <span style="font-size:12px;color:var(--muted)">Pagamento = 2 dias antes do início das férias</span>
+          </div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th>Mês</th><th>Qtd.</th><th>Total Salários</th><th>Total 1/3</th><th>Total a Pagar</th><th>Provisão Acumulada</th><th></th>
+          </tr></thead><tbody id="finMesesBody"></tbody></table></div>
+        </div>
+        <div class="table-wrap" style="margin-top:16px">
+          <div class="table-header">
+            <span class="table-title" id="finDetCount">—</span>
             <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterFin(this.value)"/></div>
           </div>
+          <div class="filter-row" id="finFilters"></div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th><th>Total Férias</th>
+            <th>P1 Início</th><th>Data Pgto P1</th><th>Mês Pgto P1</th>
+            <th>P2 Início</th><th>Data Pgto P2</th><th>Mês Pgto P2</th><th>Provisão/Mês</th>
+          </tr></thead><tbody id="finBody"></tbody></table></div>
         </div>
-        <div class="filter-row" id="finFilters"></div>
-        <div style="overflow-x:auto"><table><thead><tr>
-          <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th><th>Total Férias</th>
-          <th>P1 Início</th><th>Data Pgto P1</th><th>Mês Pgto P1</th>
-          <th>P2 Início</th><th>Data Pgto P2</th><th>Mês Pgto P2</th><th>Provisão/Mês</th>
-        </tr></thead><tbody id="finBody"></tbody></table></div>
       </div>
     </div>
+
+
+    <!-- PROVISÃO DETALHADA -->
+    <div class="section" id="sec-provisao">
+      <div class="page-header">
+        <div><div class="page-title">Provisão de Férias — Detalhamento</div><div class="page-sub">Amostragem mensal e anual por colaborador e departamento</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="exportProvCSV()">↓ Exportar CSV</button>
+        </div>
+      </div>
+
+      <!-- Cards gerais -->
+      <div class="cards-row cols-4" id="provCards"></div>
+
+      <!-- Seletor de visualização -->
+      <div class="table-wrap" style="margin-bottom:20px">
+        <div class="table-header">
+          <span class="table-title">Tipo de Visualização</span>
+        </div>
+        <div style="padding:14px 20px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="filter-btn active" id="provBtn-anual" onclick="setProvView('anual')">📅 Resumo Anual</button>
+          <button class="filter-btn" id="provBtn-mensal" onclick="setProvView('mensal')">📆 Detalhamento Mensal</button>
+          <button class="filter-btn" id="provBtn-colaborador" onclick="setProvView('colaborador')">👤 Por Colaborador</button>
+          <button class="filter-btn" id="provBtn-departamento" onclick="setProvView('departamento')">🏢 Por Departamento</button>
+        </div>
+      </div>
+
+      <!-- VIEW: RESUMO ANUAL -->
+      <div id="prov-view-anual">
+        <div class="table-wrap">
+          <div class="table-header"><span class="table-title">Resumo Anual — Provisão Acumulada vs Pagamentos Projetados</span></div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th>Mês</th>
+            <th>Provisão do Mês</th>
+            <th>Provisão Acumulada</th>
+            <th>Pgtos Previstos</th>
+            <th>Saldo Acumulado</th>
+            <th>Situação</th>
+          </tr></thead><tbody id="provAnualBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- VIEW: DETALHAMENTO MENSAL -->
+      <div id="prov-view-mensal" style="display:none">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="provMesBtns"></div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title" id="provMesTitle">Selecione um mês</span>
+          </div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th>Colaborador</th><th>Departamento</th><th>Salário</th><th>Provisão/Mês</th>
+            <th>Provisão Acum. até o Mês</th><th>Tem Pgto neste Mês?</th><th>Valor Pgto</th><th>Saldo após Pgto</th>
+          </tr></thead><tbody id="provMensalBody"></tbody></table></div>
+        </div>
+        <div class="cards-row cols-3" id="provMesCards" style="margin-top:16px"></div>
+      </div>
+
+      <!-- VIEW: POR COLABORADOR -->
+      <div id="prov-view-colaborador" style="display:none">
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title" id="provColabCount">—</span>
+            <div style="display:flex;gap:8px">
+              <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterProvColab(this.value)"/></div>
+            </div>
+          </div>
+          <div class="filter-row" id="provColabFilters"></div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th>Colaborador</th><th>Departamento</th><th>Salário</th><th>1/3</th>
+            <th>Total Férias</th><th>Provisão/Mês</th><th>Provisão Anual</th>
+            <th>P1 Início</th><th>Data Pgto P1</th><th>P2 Início</th><th>Data Pgto P2</th>
+            <th>Total Pgto Previsto</th>
+          </tr></thead><tbody id="provColabBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- VIEW: POR DEPARTAMENTO -->
+      <div id="prov-view-departamento" style="display:none">
+        <div class="table-wrap">
+          <div class="table-header"><span class="table-title">Provisão Anual por Departamento</span></div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th>Departamento</th><th>Colaboradores</th><th>Folha Total</th>
+            <th>Provisão Mensal</th><th>Provisão Anual</th>
+            <th>Pgto Projetado</th><th>% da Provisão Total</th>
+          </tr></thead><tbody id="provDeptBody"></tbody></table></div>
+        </div>
+        <div id="provDeptCards" style="margin-top:16px"></div>
+      </div>
+
+    </div>
+
+
+    <!-- APROVADAS GESTOR -->
+    <div class="section" id="sec-aprovadas-gestor">
+      <div class="page-header">
+        <div><div class="page-title">Férias Aprovadas</div><div class="page-sub" id="aprovadasGestorSub">Períodos validados ou comunicados pelo DP Interno no seu departamento</div></div>
+      </div>
+      <div class="cards-row cols-3" id="aprovadasGestorCards"></div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title" id="aprovadasGestorCount">—</span>
+          <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterAprovadasGestor(this.value)"/></div>
+        </div>
+        <div style="overflow-x:auto"><table><thead><tr>
+          <th>Nome</th><th>Conceder Até</th>
+          <th>P1 Início</th><th>P1 Fim</th><th>Status P1</th>
+          <th>P2 Início</th><th>P2 Fim</th><th>Status P2</th>
+          <th>Situação</th>
+        </tr></thead><tbody id="aprovadasGestorBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div class="section" id="sec-historico">
+      <div class="page-header">
+        <div><div class="page-title">Histórico de Alterações</div><div class="page-sub" id="historicoSub">Registro de todas as movimentações dos colaboradores do seu departamento</div></div>
+      </div>
+      <div class="cards-row cols-3" id="historicoCards"></div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title" id="historicoCount">—</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar colaborador..." oninput="filterHistorico(this.value)"/></div>
+          </div>
+        </div>
+        <div class="filter-row" id="historicoFilters"></div>
+        <div style="overflow-x:auto"><table><thead><tr>
+          <th>Data</th><th>Colaborador</th><th>Ação</th><th>Responsável</th><th>Detalhe</th>
+        </tr></thead><tbody id="historicoBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- INDICADORES -->
+    <div class="section" id="sec-depto">
+      <div class="page-header">
+        <div><div class="page-title">Indicadores</div><div class="page-sub">Visão consolidada das férias por departamento — apta para apresentação à Diretoria</div></div>
+        <button class="btn btn-primary btn-sm" onclick="exportDeptoCSV()">↓ Exportar CSV</button>
+      </div>
+      <div class="cards-row cols-4" id="deptoSumCards"></div>
+
+      <!-- Seletor de visualização -->
+      <div class="table-wrap" style="margin-bottom:20px">
+        <div class="table-header" style="flex-wrap:wrap;gap:8px">
+          <span class="table-title">Visualização</span>
+          <button class="btn btn-outline btn-sm" id="btnDeptoLimparMes" onclick="setDeptoMes(-1)" style="display:none">✕ Todos os meses</button>
+        </div>
+        <div style="padding:14px 20px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Filtrar por mês de férias</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="deptoMesBtns"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Geral: todos os departamentos -->
+      <div id="deptoGridWrap">
+        <div id="deptoGrid"></div>
+      </div>
+
+      <!-- Mensal: colaboradores com férias no mês selecionado -->
+      <div id="deptoMensalWrap" style="display:none">
+        <div class="cards-row cols-4" id="deptoMensalCards"></div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title" id="deptoMensalTitle">—</span>
+            <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterDeptoMensal(this.value)"/></div>
+          </div>
+          <div class="filter-row" id="deptoMensalFilters"></div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th>Colaborador</th><th>Departamento</th><th>Conceder Até</th>
+            <th>Período</th><th>Início</th><th>Fim</th><th>Dias</th>
+            <th>Status</th><th>Data Pgto</th><th>Estimativa Crédito</th>
+          </tr></thead><tbody id="deptoMensalBody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOQUEIOS -->
     <div class="section" id="sec-bloqueios">
       <div class="page-header"><div><div class="page-title">Períodos Bloqueados & Feriados</div><div class="page-sub">Referência de impedimentos</div></div></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -340,8 +604,10 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         </div>
       </div>
     </div>
+
   </div>
 </div>
+
 <!-- MODAL: INDICAR DATAS -->
 <div class="modal-overlay" id="modalDatas">
   <div class="modal">
@@ -425,6 +691,8 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   </div>
 </div>
 <div class="toast-container" id="toasts"></div>
+
+
 <script>
 const FERIADOS=[
   {d:"2027-01-01",nome:"Confraternização Universal"},{d:"2027-02-08",nome:"Carnaval (segunda-feira)"},
@@ -468,68 +736,74 @@ const DIAS_SEMANA=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 const MESES_NOME=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const MESES_CURTO=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 const ROLES_OP=[
-  {id:"fiscal_mtz",label:"Fiscal Matriz",icon:"📋",dept:"FISCAL MATRIZ",tabs:["setor","calendario","bloqueios"]},
-  {id:"fiscal_cx",label:"Fiscal Caxias",icon:"📋",dept:"FISCAL CAXIAS",tabs:["setor","calendario","bloqueios"]},
-  {id:"contabil_mtz",label:"Contábil Matriz",icon:"📊",dept:"CONTABIL MATRIZ",tabs:["setor","calendario","bloqueios"]},
-  {id:"contabil_cx",label:"Contábil Caxias",icon:"📊",dept:"CONTABIL CAXIAS",tabs:["setor","calendario","bloqueios"]},
-  {id:"pessoal_mtz",label:"Pessoal Matriz",icon:"👥",dept:"PESSOAL MATRIZ",tabs:["setor","calendario","bloqueios"]},
-  {id:"pessoal_cx",label:"Pessoal Caxias",icon:"👥",dept:"PESSOAL CAXIAS",tabs:["setor","calendario","bloqueios"]},
-  {id:"pequenos",label:"Peq. Negócios",icon:"🏪",dept:"PEQUENOS NEGOCIOS",tabs:["setor","calendario","bloqueios"]},
+  {id:"fiscal_mtz",label:"Fiscal Matriz",icon:"📋",dept:"FISCAL MATRIZ",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"fiscal_cx",label:"Fiscal Caxias",icon:"📋",dept:"FISCAL CAXIAS",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"contabil_mtz",label:"Contábil Matriz",icon:"📊",dept:"CONTABIL MATRIZ",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"contabil_cx",label:"Contábil Caxias",icon:"📊",dept:"CONTABIL CAXIAS",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"pessoal_mtz",label:"Pessoal Matriz",icon:"👥",dept:"PESSOAL MATRIZ",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"pessoal_cx",label:"Pessoal Caxias",icon:"👥",dept:"PESSOAL CAXIAS",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"pequenos",label:"Peq. Negócios",icon:"🏪",dept:"PEQUENOS NEGOCIOS",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
 ];
 const ROLES_CSC=[
-  {id:"csc_mkt",label:"Marketing",icon:"📣",dept:"CSC MARKETING",tabs:["setor","calendario","bloqueios"]},
-  {id:"csc_fin",label:"Financeiro",icon:"💰",dept:"CSC FINANCEIRO",tabs:["setor","calendario","bloqueios"]},
-  {id:"csc_tec",label:"Tecnologia",icon:"💻",dept:"CSC TECNOLOGIA",tabs:["setor","calendario","bloqueios"]},
-  {id:"csc_gg",label:"Gente e Gestão",icon:"🤝",dept:"CSC GENTE GESTAO",tabs:["setor","calendario","bloqueios"]},
-  {id:"csc_leg",label:"Legalização",icon:"⚖️",dept:"CSC LEGALIZACAO",tabs:["setor","calendario","bloqueios"]},
-  {id:"csc_adm",label:"Administrativo",icon:"🗂️",dept:"CSC ADMINISTRATIVO",tabs:["setor","calendario","bloqueios"]},
+  {id:"csc_mkt",label:"Marketing",icon:"📣",dept:"CSC MARKETING",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"csc_fin",label:"Financeiro",icon:"💰",dept:"CSC FINANCEIRO",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"csc_tec",label:"Tecnologia",icon:"💻",dept:"CSC TECNOLOGIA",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"csc_gg",label:"Gente e Gestão",icon:"🤝",dept:"CSC GENTE GESTAO",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"csc_leg",label:"Legalização",icon:"⚖️",dept:"CSC LEGALIZACAO",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
+  {id:"csc_adm",label:"Administrativo",icon:"🗂️",dept:"CSC ADMINISTRATIVO",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
 ];
-const ROLE_DP={id:"dp",label:"Departamento Pessoal Interno",dept:null,tabs:["painel","calendario","validar","financeiro","depto","bloqueios"]};
+const ROLE_DP={id:"dp",label:"Departamento Pessoal Interno",dept:null,
+  tabs:["painel","calendario","validar","aprovadas","financeiro","provisao","indicadores","bloqueios"]};
 const TAB_CONFIG={
   painel:{label:"📊 Painel Geral",sec:"sec-painel"},
   setor:{label:"👥 Meu Departamento",sec:"sec-setor"},
   calendario:{label:"📅 Calendário",sec:"sec-calendario"},
-  validar:{label:"✅ Validações Pendentes",sec:"sec-validar"},
+  validar:{label:"✅ Pendentes",sec:"sec-validar"},
+  aprovadas:{label:"✔ Aprovadas",sec:"sec-aprovadas"},
   financeiro:{label:"💰 Financeiro",sec:"sec-financeiro"},
-  bloqueios:{label:"🚫 Bloqueios & Feriados",sec:"sec-bloqueios"},
-  depto:{label:"📈 Por Departamento",sec:"sec-depto"},
+  indicadores:{label:"📈 Indicadores",sec:"sec-depto"},
+  "aprovadas-gestor":{label:"✔ Aprovadas",sec:"sec-aprovadas-gestor"},
+  historico:{label:"📋 Histórico",sec:"sec-historico"},
+  provisao:{label:"🗂️ Provisão",sec:"sec-provisao"},
+  bloqueios:{label:"🚫 Bloqueios",sec:"sec-bloqueios"},
 };
 const DEPT_COLORS={"FISCAL MATRIZ":"#EBF1FB","FISCAL CAXIAS":"#DCEEFB","CONTABIL MATRIZ":"#FFF3E0","CONTABIL CAXIAS":"#FFF8EC","PESSOAL MATRIZ":"#F3E5F5","PESSOAL CAXIAS":"#FAF0FF","PEQUENOS NEGOCIOS":"#E8F5E9","CSC MARKETING":"#FCE4EC","CSC FINANCEIRO":"#FFF9C4","CSC TECNOLOGIA":"#E8EAF6","CSC GENTE GESTAO":"#E0F2F1","CSC LEGALIZACAO":"#F9FBE7","CSC ADMINISTRATIVO":"#EFEBE9"};
 const DEPT_TEXT={"FISCAL MATRIZ":"#1E2761","FISCAL CAXIAS":"#0277BD","CONTABIL MATRIZ":"#E65100","CONTABIL CAXIAS":"#BF360C","PESSOAL MATRIZ":"#6A1B9A","PESSOAL CAXIAS":"#4A148C","PEQUENOS NEGOCIOS":"#1B5E20","CSC MARKETING":"#880E4F","CSC FINANCEIRO":"#F57F17","CSC TECNOLOGIA":"#283593","CSC GENTE GESTAO":"#004D40","CSC LEGALIZACAO":"#558B2F","CSC ADMINISTRATIVO":"#4E342E"};
 let colaboradores=[
-  {id:1,nome:"Ana Paula Ferreira",dept:"CONTABIL MATRIZ",salario:5200,admissao:"2019-03-15",pa_ini:"2026-03-15",pa_fim:"2027-03-14",conceder:"2027-09-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:2,nome:"Carlos Eduardo Lima",dept:"CONTABIL MATRIZ",salario:4800,admissao:"2021-07-01",pa_ini:"2026-07-01",pa_fim:"2027-06-30",conceder:"2027-12-31",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:3,nome:"Fernanda Costa Silva",dept:"CONTABIL MATRIZ",salario:5600,admissao:"2020-01-20",pa_ini:"2026-01-20",pa_fim:"2027-01-19",conceder:"2027-07-19",p1ini:"2027-02-02",p1fim:"2027-02-16",p2ini:"2027-03-15",p2fim:"2027-03-29",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:4,nome:"Gustavo Martins Souza",dept:"CONTABIL CAXIAS",salario:4500,admissao:"2022-05-10",pa_ini:"2026-05-10",pa_fim:"2027-05-09",conceder:"2027-11-09",p1ini:"2027-04-19",p1fim:"2027-05-03",p2ini:"",p2fim:"",obs:"",statusP1:"Recusado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"Período coincide com fechamento de impostos (01/04 a 15/04). Favor indicar datas após 16/04/2027.",motivoP2:""},
-  {id:5,nome:"Helena Ribeiro Nunes",dept:"CONTABIL CAXIAS",salario:6100,admissao:"2018-11-05",pa_ini:"2026-11-05",pa_fim:"2027-11-04",conceder:"2027-05-04",p1ini:"2027-03-08",p1fim:"2027-03-22",p2ini:"2027-04-19",p2fim:"2027-05-03",obs:"Preferência da colaboradora",statusP1:"Comunicado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:6,nome:"Igor Nascimento Santos",dept:"FISCAL MATRIZ",salario:4700,admissao:"2023-02-14",pa_ini:"2026-02-14",pa_fim:"2027-02-13",conceder:"2027-08-13",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:7,nome:"Juliana Alves Moreira",dept:"FISCAL MATRIZ",salario:5100,admissao:"2021-09-30",pa_ini:"2026-09-30",pa_fim:"2027-09-29",conceder:"2028-03-29",p1ini:"2027-07-06",p1fim:"2027-07-20",p2ini:"2027-08-03",p2fim:"2027-08-17",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:8,nome:"Lucas Pereira Gomes",dept:"FISCAL CAXIAS",salario:4300,admissao:"2020-06-22",pa_ini:"2026-06-22",pa_fim:"2027-06-21",conceder:"2027-12-21",p1ini:"2027-06-07",p1fim:"2027-06-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:9,nome:"Mariana Torres Campos",dept:"FISCAL CAXIAS",salario:4600,admissao:"2019-08-12",pa_ini:"2026-08-12",pa_fim:"2027-08-11",conceder:"2028-02-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:10,nome:"Nicolas Oliveira Dias",dept:"PESSOAL MATRIZ",salario:4900,admissao:"2022-11-01",pa_ini:"2026-11-01",pa_fim:"2027-10-31",conceder:"2028-04-30",p1ini:"2027-09-01",p1fim:"2027-09-15",p2ini:"2027-10-04",p2fim:"2027-10-18",obs:"",statusP1:"Validado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:11,nome:"Patrícia Mendes Rocha",dept:"PESSOAL MATRIZ",salario:4200,admissao:"2020-04-08",pa_ini:"2026-04-08",pa_fim:"2027-04-07",conceder:"2027-10-07",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:12,nome:"Rafael Cardoso Teixeira",dept:"PESSOAL CAXIAS",salario:4400,admissao:"2021-12-15",pa_ini:"2026-12-15",pa_fim:"2027-12-14",conceder:"2028-06-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:13,nome:"Sabrina Vieira Lopes",dept:"PESSOAL CAXIAS",salario:3900,admissao:"2023-03-20",pa_ini:"2026-03-20",pa_fim:"2027-03-19",conceder:"2027-09-19",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:14,nome:"Thiago Barbosa Cunha",dept:"FISCAL MATRIZ",salario:5800,admissao:"2018-07-03",pa_ini:"2025-07-03",pa_fim:"2026-07-02",conceder:"2027-01-02",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Férias em Dobro",motivoP1:"",motivoP2:""},
-  {id:15,nome:"Vanessa Castro Pinto",dept:"PEQUENOS NEGOCIOS",salario:3800,admissao:"2022-02-28",pa_ini:"2026-02-28",pa_fim:"2027-02-27",conceder:"2027-08-27",p1ini:"2027-04-07",p1fim:"2027-04-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:16,nome:"Willian Fernandes Cruz",dept:"PEQUENOS NEGOCIOS",salario:4100,admissao:"2020-10-14",pa_ini:"2026-10-14",pa_fim:"2027-10-13",conceder:"2028-04-13",p1ini:"2027-08-04",p1fim:"2027-08-18",p2ini:"2027-09-08",p2fim:"2027-09-22",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:17,nome:"Ximena Ramos Bastos",dept:"PEQUENOS NEGOCIOS",salario:3600,admissao:"2021-05-17",pa_ini:"2026-05-17",pa_fim:"2027-05-16",conceder:"2027-11-16",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:18,nome:"Yasmin Correia Melo",dept:"CONTABIL MATRIZ",salario:4800,admissao:"2019-01-09",pa_ini:"2026-01-09",pa_fim:"2027-01-08",conceder:"2027-07-08",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:19,nome:"Zuleide Amaral Santos",dept:"FISCAL CAXIAS",salario:4000,admissao:"2022-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:20,nome:"André Luis Monteiro",dept:"PESSOAL MATRIZ",salario:4600,admissao:"2023-06-12",pa_ini:"2026-06-12",pa_fim:"2027-06-11",conceder:"2027-12-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:21,nome:"Beatriz Souza Lima",dept:"CSC MARKETING",salario:5500,admissao:"2021-03-10",pa_ini:"2026-03-10",pa_fim:"2027-03-09",conceder:"2027-09-09",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:22,nome:"Diego Henrique Prado",dept:"CSC MARKETING",salario:4900,admissao:"2022-06-15",pa_ini:"2026-06-15",pa_fim:"2027-06-14",conceder:"2027-12-14",p1ini:"2027-05-03",p1fim:"2027-05-17",p2ini:"2027-06-16",p2fim:"2027-06-30",obs:"",statusP1:"Validado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:23,nome:"Eduarda Nunes Farias",dept:"CSC FINANCEIRO",salario:6200,admissao:"2019-09-01",pa_ini:"2026-09-01",pa_fim:"2027-08-31",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:24,nome:"Fábio Augusto Torres",dept:"CSC FINANCEIRO",salario:5800,admissao:"2020-11-20",pa_ini:"2026-11-20",pa_fim:"2027-11-19",conceder:"2028-05-19",p1ini:"2027-08-03",p1fim:"2027-08-17",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:25,nome:"Giovana Melo Carvalho",dept:"CSC TECNOLOGIA",salario:7800,admissao:"2021-04-05",pa_ini:"2026-04-05",pa_fim:"2027-04-04",conceder:"2027-10-04",p1ini:"2027-07-07",p1fim:"2027-07-21",p2ini:"2027-08-10",p2fim:"2027-08-24",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:26,nome:"Henrique Braga Costa",dept:"CSC TECNOLOGIA",salario:8200,admissao:"2020-02-18",pa_ini:"2026-02-18",pa_fim:"2027-02-17",conceder:"2027-08-17",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:27,nome:"Isabela Rocha Martins",dept:"CSC GENTE GESTAO",salario:6500,admissao:"2019-07-22",pa_ini:"2026-07-22",pa_fim:"2027-07-21",conceder:"2028-01-21",p1ini:"2027-03-01",p1fim:"2027-03-15",p2ini:"2027-04-07",p2fim:"2027-04-21",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:28,nome:"Jonas Ferreira Alves",dept:"CSC GENTE GESTAO",salario:5900,admissao:"2022-01-10",pa_ini:"2026-01-10",pa_fim:"2027-01-09",conceder:"2027-07-09",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:29,nome:"Karla Vieira Santos",dept:"CSC LEGALIZACAO",salario:5400,admissao:"2021-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
-  {id:30,nome:"Leonardo Paz Cardoso",dept:"CSC ADMINISTRATIVO",salario:4000,admissao:"2022-10-03",pa_ini:"2026-10-03",pa_fim:"2027-10-02",conceder:"2028-04-02",p1ini:"2027-09-08",p1fim:"2027-09-22",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:1,nome:"Ana Paula Ferreira",dept:"CONTABIL MATRIZ",salario:2085,admissao:"2019-03-15",pa_ini:"2026-03-15",pa_fim:"2027-03-14",conceder:"2027-09-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:2,nome:"Carlos Eduardo Lima",dept:"CONTABIL MATRIZ",salario:2228,admissao:"2021-07-01",pa_ini:"2026-07-01",pa_fim:"2027-06-30",conceder:"2027-12-31",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:3,nome:"Fernanda Costa Silva",dept:"CONTABIL MATRIZ",salario:2240,admissao:"2020-01-20",pa_ini:"2026-01-20",pa_fim:"2027-01-19",conceder:"2027-07-19",p1ini:"2027-02-02",p1fim:"2027-02-16",p2ini:"2027-03-15",p2fim:"2027-03-29",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"15/01/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 02/02 → 16/02 | P2: 15/03 → 29/03"},{dt:"20/01/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
+  {id:4,nome:"Gustavo Martins Souza",dept:"CONTABIL CAXIAS",salario:2458,admissao:"2022-05-10",pa_ini:"2026-05-10",pa_fim:"2027-05-09",conceder:"2027-11-09",p1ini:"2027-04-19",p1fim:"2027-05-03",p2ini:"",p2fim:"",obs:"",statusP1:"Recusado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"Período coincide com fechamento de impostos (01/04 a 15/04). Favor indicar datas após 16/04/2027.",motivoP2:"",hist:[{dt:"10/02/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 19/04 → 03/05"},{dt:"15/02/2027",acao:"Recusado pelo DP",user:"DP Interno",det:"P1 recusado — coincide com fechamento de impostos (01/04 a 15/04)"}]},
+  {id:5,nome:"Helena Ribeiro Nunes",dept:"CONTABIL CAXIAS",salario:2463,admissao:"2018-11-05",pa_ini:"2026-11-05",pa_fim:"2027-11-04",conceder:"2027-05-04",p1ini:"2027-03-08",p1fim:"2027-03-22",p2ini:"2027-04-19",p2fim:"2027-05-03",obs:"Preferência da colaboradora",statusP1:"Comunicado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"05/01/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 08/03 → 22/03 | P2: 19/04 → 03/05"},{dt:"10/01/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"},{dt:"15/01/2027",acao:"Comunicado",user:"DP Interno",det:"Colaboradora notificada com antecedência"}]},
+  {id:6,nome:"Igor Nascimento Santos",dept:"FISCAL MATRIZ",salario:2664,admissao:"2023-02-14",pa_ini:"2026-02-14",pa_fim:"2027-02-13",conceder:"2027-08-13",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:7,nome:"Juliana Alves Moreira",dept:"FISCAL MATRIZ",salario:2676,admissao:"2021-09-30",pa_ini:"2026-09-30",pa_fim:"2027-09-29",conceder:"2028-03-29",p1ini:"2027-07-06",p1fim:"2027-07-20",p2ini:"2027-08-03",p2fim:"2027-08-17",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"20/02/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 06/07 → 20/07 | P2: 03/08 → 17/08"},{dt:"25/02/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
+  {id:8,nome:"Lucas Pereira Gomes",dept:"FISCAL CAXIAS",salario:2883,admissao:"2020-06-22",pa_ini:"2026-06-22",pa_fim:"2027-06-21",conceder:"2027-12-21",p1ini:"2027-06-07",p1fim:"2027-06-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:9,nome:"Mariana Torres Campos",dept:"FISCAL CAXIAS",salario:2918,admissao:"2019-08-12",pa_ini:"2026-08-12",pa_fim:"2027-08-11",conceder:"2028-02-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:10,nome:"Nicolas Oliveira Dias",dept:"PESSOAL MATRIZ",salario:3158,admissao:"2022-11-01",pa_ini:"2026-11-01",pa_fim:"2027-10-31",conceder:"2028-04-30",p1ini:"2027-09-01",p1fim:"2027-09-15",p2ini:"2027-10-04",p2fim:"2027-10-18",obs:"",statusP1:"Validado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"01/03/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 01/09 → 15/09 | P2: 04/10 → 18/10"},{dt:"05/03/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 validado"}]},
+  {id:11,nome:"Patrícia Mendes Rocha",dept:"PESSOAL MATRIZ",salario:3227,admissao:"2020-04-08",pa_ini:"2026-04-08",pa_fim:"2027-04-07",conceder:"2027-10-07",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:12,nome:"Rafael Cardoso Teixeira",dept:"PESSOAL CAXIAS",salario:3560,admissao:"2021-12-15",pa_ini:"2026-12-15",pa_fim:"2027-12-14",conceder:"2028-06-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:13,nome:"Sabrina Vieira Lopes",dept:"PESSOAL CAXIAS",salario:3789,admissao:"2023-03-20",pa_ini:"2026-03-20",pa_fim:"2027-03-19",conceder:"2027-09-19",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:14,nome:"Thiago Barbosa Cunha",dept:"FISCAL MATRIZ",salario:4134,admissao:"2018-07-03",pa_ini:"2025-07-03",pa_fim:"2026-07-02",conceder:"2027-01-02",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Férias em Dobro",motivoP1:"",motivoP2:"",hist:[]},
+  {id:15,nome:"Vanessa Castro Pinto",dept:"PEQUENOS NEGOCIOS",salario:4306,admissao:"2022-02-28",pa_ini:"2026-02-28",pa_fim:"2027-02-27",conceder:"2027-08-27",p1ini:"2027-04-07",p1fim:"2027-04-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:16,nome:"Willian Fernandes Cruz",dept:"PEQUENOS NEGOCIOS",salario:4478,admissao:"2020-10-14",pa_ini:"2026-10-14",pa_fim:"2027-10-13",conceder:"2028-04-13",p1ini:"2027-08-04",p1fim:"2027-08-18",p2ini:"2027-09-08",p2fim:"2027-09-22",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"10/04/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 04/08 → 18/08 | P2: 08/09 → 22/09"},{dt:"15/04/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
+  {id:17,nome:"Ximena Ramos Bastos",dept:"PEQUENOS NEGOCIOS",salario:4823,admissao:"2021-05-17",pa_ini:"2026-05-17",pa_fim:"2027-05-16",conceder:"2027-11-16",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:18,nome:"Yasmin Correia Melo",dept:"CONTABIL MATRIZ",salario:4995,admissao:"2019-01-09",pa_ini:"2026-01-09",pa_fim:"2027-01-08",conceder:"2027-07-08",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:19,nome:"Zuleide Amaral Santos",dept:"FISCAL CAXIAS",salario:5167,admissao:"2022-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:20,nome:"André Luis Monteiro",dept:"PESSOAL MATRIZ",salario:5511,admissao:"2023-06-12",pa_ini:"2026-06-12",pa_fim:"2027-06-11",conceder:"2027-12-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:21,nome:"Beatriz Souza Lima",dept:"CSC MARKETING",salario:5856,admissao:"2021-03-10",pa_ini:"2026-03-10",pa_fim:"2027-03-09",conceder:"2027-09-09",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:22,nome:"Diego Henrique Prado",dept:"CSC MARKETING",salario:6085,admissao:"2022-06-15",pa_ini:"2026-06-15",pa_fim:"2027-06-14",conceder:"2027-12-14",p1ini:"2027-05-03",p1fim:"2027-05-17",p2ini:"2027-06-16",p2fim:"2027-06-30",obs:"",statusP1:"Validado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"05/03/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 03/05 → 17/05 | P2: 16/06 → 30/06"},{dt:"10/03/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 validado"}]},
+  {id:23,nome:"Eduarda Nunes Farias",dept:"CSC FINANCEIRO",salario:6269,admissao:"2019-09-01",pa_ini:"2026-09-01",pa_fim:"2027-08-31",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:24,nome:"Fábio Augusto Torres",dept:"CSC FINANCEIRO",salario:6602,admissao:"2020-11-20",pa_ini:"2026-11-20",pa_fim:"2027-11-19",conceder:"2028-05-19",p1ini:"2027-08-03",p1fim:"2027-08-17",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:25,nome:"Giovana Melo Carvalho",dept:"CSC TECNOLOGIA",salario:6728,admissao:"2021-04-05",pa_ini:"2026-04-05",pa_fim:"2027-04-04",conceder:"2027-10-04",p1ini:"2027-07-07",p1fim:"2027-07-21",p2ini:"2027-08-10",p2fim:"2027-08-24",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"15/02/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 07/07 → 21/07 | P2: 10/08 → 24/08"},{dt:"20/02/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
+  {id:26,nome:"Henrique Braga Costa",dept:"CSC TECNOLOGIA",salario:7084,admissao:"2020-02-18",pa_ini:"2026-02-18",pa_fim:"2027-02-17",conceder:"2027-08-17",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:27,nome:"Isabela Rocha Martins",dept:"CSC GENTE GESTAO",salario:7485,admissao:"2019-07-22",pa_ini:"2026-07-22",pa_fim:"2027-07-21",conceder:"2028-01-21",p1ini:"2027-03-01",p1fim:"2027-03-15",p2ini:"2027-04-07",p2fim:"2027-04-21",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"10/01/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 01/03 → 15/03 | P2: 07/04 → 21/04"},{dt:"15/01/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
+  {id:28,nome:"Jonas Ferreira Alves",dept:"CSC GENTE GESTAO",salario:7899,admissao:"2022-01-10",pa_ini:"2026-01-10",pa_fim:"2027-01-09",conceder:"2027-07-09",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:29,nome:"Karla Vieira Santos",dept:"CSC LEGALIZACAO",salario:8244,admissao:"2021-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:30,nome:"Leonardo Paz Cardoso",dept:"CSC ADMINISTRATIVO",salario:3000,admissao:"2022-10-03",pa_ini:"2026-10-03",pa_fim:"2027-10-02",conceder:"2028-04-02",p1ini:"2027-09-08",p1fim:"2027-09-22",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
 ];
-let currentRole=null,currentColab=null,filterAtivo="Todos",filterFinAtivo="Todos",selectedCscRole=null;
+let currentRole=null,currentColab=null,filterAtivo="Todos",filterFinAtivo="Todos",filterAprAtivo="Todos",selectedCscRole=null,finMesSel=-1;
 let calYear=2027,calMonth=0;
+
 function buildLogin(){
   document.getElementById("loginRoles").innerHTML=ROLES_OP.map(r=>`<div class="role-card" onclick="selectRole('${r.id}')" id="role-${r.id}"><div class="role-card-icon">${r.icon}</div><div class="role-card-name">${r.label}</div></div>`).join("");
   document.getElementById("cscRoles").innerHTML=ROLES_CSC.map(r=>`<div class="role-card" onclick="selectRoleCsc('${r.id}')" id="role-${r.id}"><div class="role-card-icon">${r.icon}</div><div class="role-card-name">${r.label}</div></div>`).join("");
@@ -544,33 +818,26 @@ function selectRole(r){
   else document.getElementById("role-"+r)?.classList.add("selected");
   currentRole=r;
 }
-function selectRoleCsc(r){
-  document.querySelectorAll("#cscRoles .role-card").forEach(c=>c.classList.remove("selected"));
-  document.getElementById("role-"+r)?.classList.add("selected");
-  selectedCscRole=r;
-}
+function selectRoleCsc(r){document.querySelectorAll("#cscRoles .role-card").forEach(c=>c.classList.remove("selected"));document.getElementById("role-"+r)?.classList.add("selected");selectedCscRole=r;}
 function doLogin(){
-  if(!currentRole){showToast("Selecione um perfil de acesso","warn");return;}
-  const senha=document.getElementById("inputSenha").value;
-  const erroEl=document.getElementById("senhaErro");
-  if(senha!=="26170621"){erroEl.style.display="block";document.getElementById("inputSenha").style.borderColor="#B71C1C";document.getElementById("inputSenha").focus();return;}
-  erroEl.style.display="none";
+  if(!currentRole){showToast("Selecione um perfil","warn");return;}
+  const s=document.getElementById("inputSenha").value,e=document.getElementById("senhaErro");
+  if(s!=="26170621"){e.style.display="block";document.getElementById("inputSenha").style.borderColor="#B71C1C";document.getElementById("inputSenha").focus();return;}
+  e.style.display="none";
   if(currentRole==="csc_gateway"){document.getElementById("loginScreen").style.display="none";document.getElementById("cscScreen").style.display="flex";document.getElementById("inputSenhaCsc").value="";return;}
   entrarApp();
 }
 function voltarLogin(){document.getElementById("cscScreen").style.display="none";document.getElementById("loginScreen").style.display="flex";selectedCscRole=null;document.getElementById("inputSenha").value="";}
 function doLoginCsc(){
   if(!selectedCscRole){showToast("Selecione um setor","warn");return;}
-  const senha=document.getElementById("inputSenhaCsc").value;
-  const erroEl=document.getElementById("senhaErroCsc");
-  if(senha!=="2617"){erroEl.style.display="block";document.getElementById("inputSenhaCsc").style.borderColor="#B71C1C";document.getElementById("inputSenhaCsc").focus();return;}
-  erroEl.style.display="none";currentRole=selectedCscRole;document.getElementById("cscScreen").style.display="none";entrarApp();
+  const s=document.getElementById("inputSenhaCsc").value,e=document.getElementById("senhaErroCsc");
+  if(s!=="2617"){e.style.display="block";document.getElementById("inputSenhaCsc").style.borderColor="#B71C1C";document.getElementById("inputSenhaCsc").focus();return;}
+  e.style.display="none";currentRole=selectedCscRole;document.getElementById("cscScreen").style.display="none";entrarApp();
 }
 function entrarApp(){
   document.getElementById("loginScreen").style.display="none";document.getElementById("appScreen").style.display="block";
-  const all=[ROLE_DP,...ROLES_OP,...ROLES_CSC];
-  const cfg=all.find(r=>r.id===currentRole)||ROLE_DP;
-  document.getElementById("roleBadge").textContent=cfg.label;buildNav(cfg.tabs);switchTab(cfg.tabs[0]);
+  const all=[ROLE_DP,...ROLES_OP,...ROLES_CSC];const cfg=all.find(r=>r.id===currentRole)||ROLE_DP;
+  document.getElementById("roleBadge").textContent=cfg.label;buildNav(cfg.tabs);switchTab(cfg.tabs[0]);setTimeout(updateNavBadges,100);
 }
 function doLogout(){
   currentRole=null;selectedCscRole=null;
@@ -587,10 +854,20 @@ function switchTab(k){
   document.querySelectorAll(".nav-tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===k));
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   const sec=TAB_CONFIG[k]?.sec;if(sec)document.getElementById(sec)?.classList.add("active");
-  if(k==="painel")renderPainel();if(k==="setor")renderSetor();if(k==="calendario")renderCalendario();
-  if(k==="validar")renderValidar();if(k==="financeiro")renderFinanceiro();if(k==="bloqueios")renderBloqueios();
-  if(k==="depto")renderDepto();
+  if(k==="painel")renderPainel();
+  if(k==="setor")renderSetor();
+  if(k==="calendario")renderCalendario();
+  if(k==="validar")renderValidar();
+  if(k==="aprovadas")renderAprovadas();
+  if(k==="aprovadas-gestor")renderAprovadasGestor();
+  if(k==="historico")renderHistorico();
+  if(k==="financeiro")renderFinanceiro();
+  if(k==="indicadores")renderDepto();
+  if(k==="provisao")renderProvisao();
+  if(k==="bloqueios")renderBloqueios();
+  updateNavBadges();
 }
+// ── HELPERS ──────────────────────────────────────────────────
 function fmtDate(s){if(!s)return"—";const[y,m,d]=s.split("-");return`${d}/${m}/${y}`;}
 function fmtBRL(v){return"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});}
 function addDays(s,n){const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return d.toISOString().split("T")[0];}
@@ -602,9 +879,9 @@ function getHolidayName(s){return FERIADOS.find(f=>f.d===s)?.nome||"";}
 function isVencendo(d){if(!d)return false;return(new Date(d)-new Date())/86400000<60;}
 function getAllRoles(){return[ROLE_DP,...ROLES_OP,...ROLES_CSC];}
 function getCurrentCfg(){return getAllRoles().find(r=>r.id===currentRole)||ROLE_DP;}
+function calcFin(c){const t=c.salario/3,tot=c.salario+t,prov=tot/12,p1=c.p1ini?subDays(c.p1ini,2):null,p2=c.p2ini?subDays(c.p2ini,2):null;return{t,tot,prov,p1,p2,m1:p1?getMes(p1):-1,m2:p2?getMes(p2):-1};}
 function getDayBlockReason(dateStr,dept){
-  if(!dateStr)return null;
-  const dow=getWeekday(dateStr);
+  if(!dateStr)return null;const dow=getWeekday(dateStr);
   if(dow===0)return"Domingo — não é permitido iniciar férias.";
   if(dow===6)return"Sábado — não é permitido iniciar férias.";
   if(isHoliday(dateStr))return`Feriado nacional: ${getHolidayName(dateStr)}.`;
@@ -615,18 +892,10 @@ function getDayBlockReason(dateStr,dept){
   if(dept){const blk=BLOCKED.find(b=>b.dept===dept&&dateStr>=b.ini&&dateStr<=b.fim);if(blk)return`Período bloqueado: ${blk.motivo} (${fmtDate(blk.ini)} a ${fmtDate(blk.fim)}).`;}
   return null;
 }
-function deptBadge(dept){
-  const bg=DEPT_COLORS[dept]||"#ECEFF1",tc=DEPT_TEXT[dept]||"#546E7A";
-  const lb=dept.replace("PEQUENOS NEGOCIOS","PEQ.NEG").replace("GENTE GESTAO","G&G").replace("LEGALIZACAO","LEGAL").replace("ADMINISTRATIVO","ADM").replace("CSC ","CSC·");
-  return`<span class="badge" style="background:${bg};color:${tc};font-size:10px">${lb}</span>`;
-}
-function statusBadge(s){
-  if(!s||s==="Pendente")return`<span class="badge badge-yellow">Pendente</span>`;
-  if(s==="Validado")return`<span class="badge badge-green">✓ Validado</span>`;
-  if(s==="Recusado")return`<span class="badge badge-red">✗ Recusado</span>`;
-  if(s==="Comunicado")return`<span class="badge badge-blue">Comunicado</span>`;
-  return`<span class="badge badge-gray">${s}</span>`;
-}
+function deptBadge(dept){const bg=DEPT_COLORS[dept]||"#ECEFF1",tc=DEPT_TEXT[dept]||"#546E7A";const lb=dept.replace("PEQUENOS NEGOCIOS","PEQ.NEG").replace("GENTE GESTAO","G&G").replace("LEGALIZACAO","LEGAL").replace("ADMINISTRATIVO","ADM").replace("CSC ","CSC·");return`<span class="badge" style="background:${bg};color:${tc};font-size:10px">${lb}</span>`;}
+function statusBadge(s){if(!s||s==="Pendente")return`<span class="badge badge-yellow">Pendente</span>`;if(s==="Validado")return`<span class="badge badge-green">✓ Validado</span>`;if(s==="Recusado")return`<span class="badge badge-red">✗ Recusado</span>`;if(s==="Comunicado")return`<span class="badge badge-blue">Comunicado</span>`;return`<span class="badge badge-gray">${s}</span>`;}
+
+// ── PAINEL ───────────────────────────────────────────────────
 function renderPainel(){
   const stats=[{label:"Total",val:colaboradores.length,sub:"colaboradores",cls:""},{label:"Datas Indicadas",val:colaboradores.filter(c=>c.p1ini).length,sub:"P1 preenchido",cls:""},{label:"Validados ✓",val:colaboradores.filter(c=>c.statusP1==="Validado").length,sub:"P1 validado",cls:"green"},{label:"Férias em Dobro",val:colaboradores.filter(c=>c.situacao==="Férias em Dobro").length,sub:"atenção imediata",cls:"red"}];
   document.getElementById("painelCards").innerHTML=stats.map(s=>`<div class="stat-card ${s.cls}"><div class="stat-label">${s.label}</div><div class="stat-value">${s.val}</div><div class="stat-sub">${s.sub}</div></div>`).join("");
@@ -650,9 +919,11 @@ function renderPainelBody(q=""){
     <td><button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Editar</button></td>
   </tr>`).join("");
 }
+
+// ── SETOR ────────────────────────────────────────────────────
 function renderSetor(){
   const cfg=getCurrentCfg();const dept=cfg.dept;const list=colaboradores.filter(c=>c.dept===dept);
-  document.getElementById("setorTitle").textContent=`Departamento — ${dept.replace("PEQUENOS NEGOCIOS","Pequenos Negócios").replace("GENTE GESTAO","Gente e Gestão").replace("LEGALIZACAO","Legalização").replace(/\bCSC\b/,"CSC")}`;
+  document.getElementById("setorTitle").textContent=`Departamento — ${dept.replace("PEQUENOS NEGOCIOS","Pequenos Negócios").replace("GENTE GESTAO","Gente e Gestão").replace("LEGALIZACAO","Legalização")}`;
   document.getElementById("setorSub").textContent=`${list.length} colaboradores`;
   const pend=list.filter(c=>!c.p1ini).length,val=list.filter(c=>c.statusP1==="Validado").length,rec=list.filter(c=>c.statusP1==="Recusado"||c.statusP2==="Recusado").length;
   document.getElementById("setorCards").innerHTML=`<div class="stat-card"><div class="stat-label">Aguardando</div><div class="stat-value">${pend}</div><div class="stat-sub">sem datas</div></div><div class="stat-card green"><div class="stat-label">P1 Validado</div><div class="stat-value">${val}</div><div class="stat-sub">pelo DP Interno</div></div><div class="stat-card red"><div class="stat-label">Com Recusa</div><div class="stat-value">${rec}</div><div class="stat-sub">nova indicação</div></div>`;
@@ -673,6 +944,8 @@ function renderSetorBody(list){
   </tr>`).join("");
 }
 function filterSetor(q){const cfg=getCurrentCfg();renderSetorBody(colaboradores.filter(c=>c.dept===cfg.dept&&(!q||c.nome.toLowerCase().includes(q.toLowerCase()))));}
+
+// ── VALIDAÇÕES PENDENTES ─────────────────────────────────────
 function renderValidar(){
   const list=colaboradores.filter(c=>c.p1ini&&(c.statusP1==="Pendente"||(c.p2ini&&c.statusP2==="Pendente")));
   document.getElementById("validarCount").textContent=`${list.length} indicação(ões) pendente(s)`;
@@ -684,7 +957,59 @@ function renderValidar(){
     <td><button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Analisar</button></td>
   </tr>`).join(""):`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhuma validação pendente</td></tr>`;
 }
-function calcFin(c){const t=c.salario/3,tot=c.salario+t,prov=tot/12,p1=c.p1ini?subDays(c.p1ini,2):null,p2=c.p2ini?subDays(c.p2ini,2):null;return{t,tot,prov,p1,p2,m1:p1?getMes(p1):-1,m2:p2?getMes(p2):-1};}
+
+// ── VALIDAÇÕES APROVADAS ─────────────────────────────────────
+function renderAprovadas(){
+  const statusAprovados=["Validado","Comunicado"];
+  let src=colaboradores.filter(c=>statusAprovados.includes(c.statusP1)||(c.p2ini&&statusAprovados.includes(c.statusP2)));
+  const total=src.length;
+  const val=src.filter(c=>c.statusP1==="Validado").length;
+  const com=src.filter(c=>c.statusP1==="Comunicado").length;
+  document.getElementById("aprovadasCards").innerHTML=`
+    <div class="stat-card green"><div class="stat-label">Total Aprovados</div><div class="stat-value">${total}</div><div class="stat-sub">P1 validado ou comunicado</div></div>
+    <div class="stat-card green"><div class="stat-label">Validados ✓</div><div class="stat-value">${val}</div><div class="stat-sub">aprovados pelo DP</div></div>
+    <div class="stat-card"><div class="stat-label">Comunicados</div><div class="stat-value">${com}</div><div class="stat-sub">colaborador notificado</div></div>`;
+  const depts=["Todos",...new Set(src.map(c=>c.dept))];
+  document.getElementById("aprovadasFilters").innerHTML=depts.map(f=>`<button class="filter-btn${filterAprAtivo===f?" active":""}" onclick="setFilterApr('${f}')">${f}</button>`).join("");
+  renderAprovadasBody(src);
+}
+function setFilterApr(f){filterAprAtivo=f;renderAprovadas();}
+function filterAprovadas(q){
+  const src=colaboradores.filter(c=>["Validado","Comunicado"].includes(c.statusP1)||(c.p2ini&&["Validado","Comunicado"].includes(c.statusP2)));
+  const filtered=filterAprAtivo==="Todos"?src:src.filter(c=>c.dept===filterAprAtivo);
+  renderAprovadasBody(q?filtered.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase())):filtered);
+}
+function renderAprovadasBody(list){
+  const base=filterAprAtivo==="Todos"?list:list.filter(c=>c.dept===filterAprAtivo);
+  document.getElementById("aprovadasCount").textContent=`${base.length} colaboradores com férias aprovadas`;
+  document.getElementById("aprovadasBody").innerHTML=base.length?base.map(c=>`<tr>
+    <td><div class="td-name">${c.nome}</div></td><td>${deptBadge(c.dept)}</td>
+    <td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
+    <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
+    <td>${statusBadge(c.statusP1)}</td>
+    <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
+    <td>${c.p2ini?statusBadge(c.statusP2):"<span style='color:var(--muted);font-size:11px'>—</span>"}</td>
+    <td><span class="badge badge-gray" style="font-size:10px">${c.situacao}</span></td>
+  </tr>`).join(""):`<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--muted)">Nenhum registro aprovado ainda</td></tr>`;
+}
+function exportAprovadasCSV(){
+  const src=colaboradores.filter(c=>["Validado","Comunicado"].includes(c.statusP1)||(c.p2ini&&["Validado","Comunicado"].includes(c.statusP2)));
+  const rows=[["Nome","Departamento","Conceder Até","P1 Início","P1 Fim","Status P1","P2 Início","P2 Fim","Status P2","Situação"]];
+  src.forEach(c=>rows.push([c.nome,c.dept,fmtDate(c.conceder),fmtDate(c.p1ini),fmtDate(c.p1fim),c.statusP1,fmtDate(c.p2ini),fmtDate(c.p2fim),c.statusP2,c.situacao]));
+  const csv=rows.map(r=>r.join(";")).join("\n");
+  const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);a.download="aprovadas_2027.csv";a.click();showToast("CSV exportado!","success");
+}
+
+// ── FINANCEIRO ───────────────────────────────────────────────
+function buildMesesMap(){
+  const mm={};
+  colaboradores.forEach(c=>{
+    const f=calcFin(c);
+    if(f.p1!==null){if(!mm[f.m1])mm[f.m1]={q:0,s:0,t3:0,tot:0,colabs:[]};mm[f.m1].q++;mm[f.m1].s+=c.salario;mm[f.m1].t3+=f.t;mm[f.m1].tot+=f.tot;mm[f.m1].colabs.push({c,periodo:"P1",pgto:f.p1});}
+    if(f.p2!==null){if(!mm[f.m2])mm[f.m2]={q:0,s:0,t3:0,tot:0,colabs:[]};mm[f.m2].q++;mm[f.m2].s+=c.salario;mm[f.m2].t3+=f.t;mm[f.m2].tot+=f.tot;mm[f.m2].colabs.push({c,periodo:"P2",pgto:f.p2});}
+  });
+  return mm;
+}
 function renderFinanceiro(){
   const tSal=colaboradores.reduce((a,c)=>a+c.salario,0);
   const tProv=colaboradores.reduce((a,c)=>a+calcFin(c).prov,0);
@@ -696,26 +1021,101 @@ function renderFinanceiro(){
     <div class="stat-card gold"><div class="stat-label">Provisão Mensal</div><div class="stat-value" style="font-size:18px">${fmtBRL(tProv)}</div><div class="stat-sub">(sal + 1/3) ÷ 12</div></div>
     <div class="stat-card green"><div class="stat-label">Pgto Projetado</div><div class="stat-value" style="font-size:18px">${fmtBRL(tPgto)}</div><div class="stat-sub">${wd.length} colaboradores</div></div>
     <div class="stat-card red"><div class="stat-label">Férias em Dobro</div><div class="stat-value">${dobro}</div><div class="stat-sub">risco trabalhista</div></div>`;
-  const mm={};
-  colaboradores.forEach(c=>{const f=calcFin(c);
-    if(f.p1!==null){if(!mm[f.m1])mm[f.m1]={q:0,s:0,t3:0,tot:0};mm[f.m1].q++;mm[f.m1].s+=c.salario;mm[f.m1].t3+=f.t;mm[f.m1].tot+=f.tot;}
-    if(f.p2!==null){if(!mm[f.m2])mm[f.m2]={q:0,s:0,t3:0,tot:0};mm[f.m2].q++;mm[f.m2].s+=c.salario;mm[f.m2].t3+=f.t;mm[f.m2].tot+=f.tot;}
-  });
+  const mm=buildMesesMap();
+  // Month buttons
+  document.getElementById("finMesBtns").innerHTML=MESES_NOME.map((nome,m)=>{
+    const d=mm[m]||{q:0,tot:0};const hp=d.q>0;
+    const isAct=finMesSel===m;
+    return`<div class="mes-btn${hp?" has-data":""}${isAct?" active":""}" onclick="setFinMes(${m})">
+      <div class="mes-nome">${MESES_CURTO[m]}</div>
+      <div class="mes-val${hp?"":` empty`}">${hp?fmtBRL(d.tot):"—"}</div>
+    </div>`;
+  }).join("");
+  document.getElementById("btnLimparMes").style.display=finMesSel>=0?"inline-flex":"none";
+  // Annual table
   let html="",acum=0;
-  for(let m=0;m<12;m++){acum+=tProv;const d=mm[m]||{q:0,s:0,t3:0,tot:0};const hp=d.q>0;
-    html+=`<tr style="${hp?"font-weight:500":"color:var(--muted)"}"><td>${MESES_NOME[m]}</td><td style="text-align:center">${hp?d.q:"—"}</td><td class="td-mono">${hp?fmtBRL(d.s):"—"}</td><td class="td-mono">${hp?fmtBRL(d.t3):"—"}</td><td class="td-mono" style="color:${hp?"#1B5E20":"inherit"};font-weight:${hp?700:400}">${hp?fmtBRL(d.tot):"—"}</td><td class="td-mono">${fmtBRL(acum)}</td></tr>`;}
+  for(let m=0;m<12;m++){
+    acum+=tProv;const d=mm[m]||{q:0,s:0,t3:0,tot:0};const hp=d.q>0;
+    html+=`<tr style="${hp?"font-weight:500":"color:var(--muted)"}">
+      <td>${MESES_NOME[m]}</td><td style="text-align:center">${hp?d.q:"—"}</td>
+      <td class="td-mono">${hp?fmtBRL(d.s):"—"}</td><td class="td-mono">${hp?fmtBRL(d.t3):"—"}</td>
+      <td class="td-mono" style="color:${hp?"#1B5E20":"inherit"};font-weight:${hp?700:400}">${hp?fmtBRL(d.tot):"—"}</td>
+      <td class="td-mono">${fmtBRL(acum)}</td>
+      <td>${hp?`<button class="btn btn-outline btn-sm" onclick="setFinMes(${m})">Detalhar</button>`:"—"}</td>
+    </tr>`;
+  }
   const ttot=Object.values(mm).reduce((a,v)=>a+v.tot,0);
-  html+=`<tr style="background:var(--navy);color:white;font-weight:700"><td>TOTAL</td><td style="text-align:center">${wd.length}</td><td>—</td><td>—</td><td class="td-mono">${fmtBRL(ttot)}</td><td class="td-mono">${fmtBRL(tProv*12)}</td></tr>`;
+  html+=`<tr style="background:var(--navy);color:white;font-weight:700"><td>TOTAL ANUAL</td><td style="text-align:center">${wd.length}</td><td>—</td><td>—</td><td class="td-mono">${fmtBRL(ttot)}</td><td class="td-mono">${fmtBRL(tProv*12)}</td><td>—</td></tr>`;
   document.getElementById("finMesesBody").innerHTML=html;
+  // Dept filters + body
   const depts=["Todos",...new Set(colaboradores.map(c=>c.dept))];
   document.getElementById("finFilters").innerHTML=depts.map(f=>`<button class="filter-btn${filterFinAtivo===f?" active":""}" onclick="setFilterFin('${f}')">${f}</button>`).join("");
+  document.getElementById("finDetCount").textContent=`${colaboradores.length} colaboradores`;
   renderFinBody();
+  // Show/hide breakdown
+  document.getElementById("finDeptBreakdown").style.display=finMesSel>=0?"block":"none";
+  document.getElementById("finAnoWrap").style.display=finMesSel>=0?"none":"block";
+  if(finMesSel>=0)renderFinDeptBreakdown(finMesSel);
+}
+function setFinMes(m){
+  finMesSel=m;
+  document.getElementById("finDeptBreakdown").style.display=m>=0?"block":"none";
+  document.getElementById("finAnoWrap").style.display=m>=0?"none":"block";
+  document.getElementById("btnLimparMes").style.display=m>=0?"inline-flex":"none";
+  document.querySelectorAll("#finMesBtns .mes-btn").forEach((b,i)=>b.classList.toggle("active",i===m));
+  if(m>=0)renderFinDeptBreakdown(m);
+}
+function renderFinDeptBreakdown(m){
+  const mm=buildMesesMap();const mData=mm[m]||{q:0,s:0,t3:0,tot:0,colabs:[]};
+  const tProv=colaboradores.reduce((a,c)=>a+calcFin(c).prov,0);
+  document.getElementById("finDeptMesTitle").textContent=`${MESES_NOME[m]} 2027 — ${mData.q} pagamento${mData.q!==1?"s":""} · Total: ${fmtBRL(mData.tot)}`;
+  document.getElementById("finDeptDetTitle").textContent=`Detalhamento individual — ${MESES_NOME[m]}`;
+  document.getElementById("finDeptCards").innerHTML=`
+    <div class="stat-card"><div class="stat-label">Pagamentos em ${MESES_CURTO[m]}</div><div class="stat-value">${mData.q}</div><div class="stat-sub">colaboradores</div></div>
+    <div class="stat-card gold"><div class="stat-label">Total Salários</div><div class="stat-value" style="font-size:18px">${fmtBRL(mData.s)}</div><div class="stat-sub">base de cálculo</div></div>
+    <div class="stat-card green"><div class="stat-label">Total a Pagar</div><div class="stat-value" style="font-size:18px">${fmtBRL(mData.tot)}</div><div class="stat-sub">salário + 1/3</div></div>
+    <div class="stat-card"><div class="stat-label">Provisão Acumulada</div><div class="stat-value" style="font-size:18px">${fmtBRL(tProv*(m+1))}</div><div class="stat-sub">até ${MESES_CURTO[m]}</div></div>`;
+  // By dept
+  const byDept={};
+  mData.colabs.forEach(({c,periodo,pgto})=>{
+    if(!byDept[c.dept])byDept[c.dept]={q:0,s:0,t3:0,tot:0,colabs:[]};
+    const f=calcFin(c);byDept[c.dept].q++;byDept[c.dept].s+=c.salario;byDept[c.dept].t3+=f.t;byDept[c.dept].tot+=f.tot;byDept[c.dept].colabs.push({c,periodo,pgto});
+  });
+  document.getElementById("finDeptBody").innerHTML=Object.entries(byDept).sort((a,b)=>b[1].tot-a[1].tot).map(([dept,d])=>{
+    const bg=DEPT_COLORS[dept]||"#ECEFF1",tc=DEPT_TEXT[dept]||"#546E7A";
+    const pct=mData.tot>0?Math.round(d.tot/mData.tot*100):0;
+    return`<tr>
+      <td><span class="badge" style="background:${bg};color:${tc};font-size:10px">${dept}</span></td>
+      <td style="text-align:center">${d.q}</td>
+      <td class="td-mono">${fmtBRL(d.s)}</td><td class="td-mono">${fmtBRL(d.t3)}</td>
+      <td class="td-mono" style="font-weight:700;color:#1B5E20">${fmtBRL(d.tot)}</td>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;min-width:80px"><div style="height:100%;width:${pct}%;background:#4A90D9;border-radius:4px"></div></div>
+        <span style="font-size:11px;font-weight:700;color:var(--navy)">${pct}%</span>
+      </div></td>
+    </tr>`;
+  }).join("")||`<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Nenhum pagamento neste mês</td></tr>`;
+  document.getElementById("finDeptDetBody").innerHTML=mData.colabs.map(({c,periodo,pgto})=>{
+    const f=calcFin(c);const ini=periodo==="P1"?c.p1ini:c.p2ini;const fim=periodo==="P1"?c.p1fim:c.p2fim;
+    const bg=DEPT_COLORS[c.dept]||"#ECEFF1",tc=DEPT_TEXT[c.dept]||"#546E7A";
+    return`<tr>
+      <td><div class="td-name">${c.nome}</div></td>
+      <td><span class="badge" style="background:${bg};color:${tc};font-size:10px">${c.dept}</span></td>
+      <td class="td-mono">${fmtBRL(c.salario)}</td><td class="td-mono">${fmtBRL(f.t)}</td>
+      <td class="td-mono" style="font-weight:700;color:#1B5E20">${fmtBRL(f.tot)}</td>
+      <td class="td-mono"><span class="badge badge-blue" style="font-size:10px">${periodo}</span> ${fmtDate(ini)} → ${fmtDate(fim)}</td>
+      <td class="td-mono" style="font-weight:600">${fmtDate(pgto)}</td>
+    </tr>`;
+  }).join("")||`<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Nenhum registro</td></tr>`;
 }
 function setFilterFin(f){filterFinAtivo=f;renderFinanceiro();}
-function filterFin(q){renderFinBody(q);}
-function renderFinBody(q=""){
+function filterFin(q){
   let src=filterFinAtivo==="Todos"?colaboradores:colaboradores.filter(c=>c.dept===filterFinAtivo);
   if(q)src=src.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase()));
+  renderFinBody(src);
+}
+function renderFinBody(src){
+  if(!src)src=filterFinAtivo==="Todos"?colaboradores:colaboradores.filter(c=>c.dept===filterFinAtivo);
   document.getElementById("finDetCount").textContent=`${src.length} colaboradores`;
   document.getElementById("finBody").innerHTML=src.map(c=>{const f=calcFin(c);return`<tr>
     <td><div class="td-name">${c.nome}</div></td><td>${deptBadge(c.dept)}</td>
@@ -728,10 +1128,638 @@ function renderFinBody(q=""){
     <td class="td-mono" style="color:#F57F17;font-weight:600">${fmtBRL(f.prov)}</td>
   </tr>`;}).join("");
 }
+function exportFinCSV(){
+  const rows=[["Nome","Departamento","Salário","1/3","Total Férias","P1 Início","Data Pgto P1","Mês P1","P2 Início","Data Pgto P2","Mês P2","Provisão/Mês"]];
+  colaboradores.forEach(c=>{const f=calcFin(c);rows.push([c.nome,c.dept,c.salario.toFixed(2),f.t.toFixed(2),f.tot.toFixed(2),fmtDate(c.p1ini),f.p1?fmtDate(f.p1):"—",f.p1?MESES_CURTO[f.m1]:"—",fmtDate(c.p2ini),f.p2?fmtDate(f.p2):"—",f.p2?MESES_CURTO[f.m2]:"—",f.prov.toFixed(2)]);});
+  const csv=rows.map(r=>r.join(";")).join("\n");const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);a.download="financeiro_2027.csv";a.click();showToast("CSV exportado!","success");
+}
+
+
+// ── PROVISÃO DETALHADA ───────────────────────────────────────
+let provView = 'anual';
+let provMesSel = 0;
+let filterProvDept = 'Todos';
+
+function setProvView(v) {
+  provView = v;
+  ['anual','mensal','colaborador','departamento'].forEach(k => {
+    document.getElementById('prov-view-' + k).style.display = k === v ? 'block' : 'none';
+    const btn = document.getElementById('provBtn-' + k);
+    if(btn) btn.classList.toggle('active', k === v);
+  });
+  renderProvisaoView();
+}
+
+function renderProvisao() {
+  const tSal = colaboradores.reduce((a,c) => a + c.salario, 0);
+  const tProv = colaboradores.reduce((a,c) => a + calcFin(c).prov, 0);
+  const tAnual = tProv * 12;
+  const mm = buildMesesMap();
+  const tPgto = Object.values(mm).reduce((a,v) => a + v.tot, 0);
+
+  document.getElementById('provCards').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Provisão Mensal Total</div><div class="stat-value" style="font-size:18px">${fmtBRL(tProv)}</div><div class="stat-sub">todos os colaboradores</div></div>
+    <div class="stat-card gold"><div class="stat-label">Provisão Anual Total</div><div class="stat-value" style="font-size:18px">${fmtBRL(tAnual)}</div><div class="stat-sub">acumulado 12 meses</div></div>
+    <div class="stat-card green"><div class="stat-label">Pgto Total Projetado</div><div class="stat-value" style="font-size:18px">${fmtBRL(tPgto)}</div><div class="stat-sub">com datas indicadas</div></div>
+    <div class="stat-card"><div class="stat-label">Saldo Final Projetado</div><div class="stat-value" style="font-size:18px">${fmtBRL(tAnual - tPgto)}</div><div class="stat-sub">provisão − pagamentos</div></div>`;
+
+  // Month buttons for mensal view
+  document.getElementById('provMesBtns').innerHTML = MESES_CURTO.map((m,i) =>
+    `<button class="filter-btn${provMesSel===i?' active':''}" onclick="setProvMes(${i})">${m}</button>`
+  ).join('');
+
+  // Dept filters for colaborador view
+  const depts = ['Todos', ...new Set(colaboradores.map(c => c.dept))];
+  document.getElementById('provColabFilters').innerHTML = depts.map(f =>
+    `<button class="filter-btn${filterProvDept===f?' active':''}" onclick="setFilterProvDept('${f}')">${f}</button>`
+  ).join('');
+
+  setProvView(provView);
+}
+
+function renderProvisaoView() {
+  if(provView === 'anual')        renderProvAnual();
+  if(provView === 'mensal')       renderProvMensal(provMesSel);
+  if(provView === 'colaborador')  renderProvColab();
+  if(provView === 'departamento') renderProvDept();
+}
+
+function renderProvAnual() {
+  const mm = buildMesesMap();
+  const tProv = colaboradores.reduce((a,c) => a + calcFin(c).prov, 0);
+  let acum = 0, html = '';
+  for(let m = 0; m < 12; m++) {
+    acum += tProv;
+    const d = mm[m] || {tot:0, q:0};
+    const saldo = acum - d.tot;
+    const sit = d.tot === 0
+      ? `<span class="badge badge-gray">Sem pagamentos</span>`
+      : saldo >= 0
+        ? `<span class="badge badge-green">Provisionado ✓</span>`
+        : `<span class="badge badge-red">Insuficiente ⚠</span>`;
+    html += `<tr>
+      <td style="font-weight:600">${MESES_NOME[m]}</td>
+      <td class="td-mono">${fmtBRL(tProv)}</td>
+      <td class="td-mono" style="font-weight:700;color:#1E2761">${fmtBRL(acum)}</td>
+      <td class="td-mono" style="color:${d.tot>0?'#1B5E20':'var(--muted)'};font-weight:${d.tot>0?700:400}">${d.tot>0?fmtBRL(d.tot):'—'}</td>
+      <td class="td-mono" style="font-weight:700;color:${saldo>=0?'#1B5E20':'#C62828'}">${d.tot>0?fmtBRL(saldo):'—'}</td>
+      <td>${sit}</td>
+    </tr>`;
+  }
+  const tPgto = Object.values(mm).reduce((a,v) => a+v.tot, 0);
+  const saldoFinal = tProv*12 - tPgto;
+  html += `<tr style="background:var(--navy);color:white;font-weight:700">
+    <td>TOTAL ANUAL</td>
+    <td class="td-mono">${fmtBRL(tProv)}/mês</td>
+    <td class="td-mono">${fmtBRL(tProv*12)}</td>
+    <td class="td-mono">${fmtBRL(tPgto)}</td>
+    <td class="td-mono" style="color:${saldoFinal>=0?'#A5D6A7':'#EF9A9A'}">${fmtBRL(saldoFinal)}</td>
+    <td></td>
+  </tr>`;
+  document.getElementById('provAnualBody').innerHTML = html;
+}
+
+function setProvMes(m) {
+  provMesSel = m;
+  document.querySelectorAll('#provMesBtns .filter-btn').forEach((b,i) => b.classList.toggle('active', i===m));
+  renderProvMensal(m);
+}
+
+function renderProvMensal(m) {
+  const mm = buildMesesMap();
+  const tProv = colaboradores.reduce((a,c) => a + calcFin(c).prov, 0);
+  const mData = mm[m] || {colabs:[], tot:0};
+  const pgtoSet = new Set(mData.colabs.map(({c}) => c.id));
+
+  document.getElementById('provMesTitle').textContent =
+    `${MESES_NOME[m]} 2027 — Detalhamento individual`;
+
+  let tProvMes=0, tPgtoMes=0, tSaldoMes=0;
+  const rows = colaboradores.map(c => {
+    const f = calcFin(c);
+    const provAcum = f.prov * (m + 1);
+    const temPgto = pgtoSet.has(c.id);
+    const pgtoVal = temPgto ? f.tot : 0;
+    const saldo = provAcum - pgtoVal;
+    tProvMes += f.prov; tPgtoMes += pgtoVal; tSaldoMes += saldo;
+    return `<tr>
+      <td><div class="td-name">${c.nome}</div></td>
+      <td>${deptBadge(c.dept)}</td>
+      <td class="td-mono">${fmtBRL(c.salario)}</td>
+      <td class="td-mono" style="color:#F57F17;font-weight:600">${fmtBRL(f.prov)}</td>
+      <td class="td-mono" style="font-weight:700;color:#1E2761">${fmtBRL(provAcum)}</td>
+      <td style="text-align:center">${temPgto
+        ? `<span class="badge badge-green">✓ Sim</span>`
+        : `<span class="badge badge-gray">Não</span>`}</td>
+      <td class="td-mono" style="color:${temPgto?'#1B5E20':'var(--muted)'};font-weight:${temPgto?700:400}">${temPgto?fmtBRL(pgtoVal):'—'}</td>
+      <td class="td-mono" style="color:${saldo>=0?'#1B5E20':'#C62828'};font-weight:700">${fmtBRL(saldo)}</td>
+    </tr>`;
+  }).join('');
+
+  // Total row
+  const totalRow = `<tr style="background:var(--navy);color:white;font-weight:700">
+    <td colspan="3">TOTAL — ${MESES_NOME[m]}</td>
+    <td class="td-mono">${fmtBRL(tProvMes)}</td>
+    <td class="td-mono">${fmtBRL(tProvMes*(m+1)/colaboradores.length*colaboradores.length)}</td>
+    <td style="text-align:center">${mData.colabs.length} pgtos</td>
+    <td class="td-mono">${fmtBRL(tPgtoMes)}</td>
+    <td class="td-mono" style="color:${tSaldoMes>=0?'#A5D6A7':'#EF9A9A'}">${fmtBRL(tSaldoMes)}</td>
+  </tr>`;
+
+  document.getElementById('provMensalBody').innerHTML = rows + totalRow;
+
+  document.getElementById('provMesCards').innerHTML = `
+    <div class="stat-card gold"><div class="stat-label">Provisão do Mês</div><div class="stat-value" style="font-size:18px">${fmtBRL(tProvMes)}</div><div class="stat-sub">todos os colaboradores</div></div>
+    <div class="stat-card green"><div class="stat-label">Pagamentos em ${MESES_CURTO[m]}</div><div class="stat-value" style="font-size:18px">${fmtBRL(tPgtoMes)}</div><div class="stat-sub">${mData.colabs.length} colaboradores</div></div>
+    <div class="stat-card${tSaldoMes>=0?' green':' red'}"><div class="stat-label">Saldo após Pagamentos</div><div class="stat-value" style="font-size:18px">${fmtBRL(tSaldoMes)}</div><div class="stat-sub">${tSaldoMes>=0?'provisionado ✓':'insuficiente ⚠'}</div></div>`;
+}
+
+function setFilterProvDept(f) {
+  filterProvDept = f;
+  document.querySelectorAll('#provColabFilters .filter-btn').forEach(b => b.classList.toggle('active', b.textContent===f));
+  renderProvColab();
+}
+function filterProvColab(q) { renderProvColab(q); }
+function renderProvColab(q='') {
+  let src = filterProvDept==='Todos' ? colaboradores : colaboradores.filter(c=>c.dept===filterProvDept);
+  if(q) src = src.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('provColabCount').textContent = `${src.length} colaboradores`;
+  const mm = buildMesesMap();
+  document.getElementById('provColabBody').innerHTML = src.map(c => {
+    const f = calcFin(c);
+    const pgtoTotal = (c.p1ini?f.tot:0) + (c.p2ini?f.tot:0);
+    return `<tr>
+      <td><div class="td-name">${c.nome}</div></td>
+      <td>${deptBadge(c.dept)}</td>
+      <td class="td-mono">${fmtBRL(c.salario)}</td>
+      <td class="td-mono">${fmtBRL(f.t)}</td>
+      <td class="td-mono" style="font-weight:700;color:#1B5E20">${fmtBRL(f.tot)}</td>
+      <td class="td-mono" style="color:#F57F17;font-weight:600">${fmtBRL(f.prov)}</td>
+      <td class="td-mono" style="font-weight:700">${fmtBRL(f.prov*12)}</td>
+      <td class="td-mono">${fmtDate(c.p1ini)}</td>
+      <td class="td-mono">${f.p1?fmtDate(f.p1):'—'}</td>
+      <td class="td-mono">${fmtDate(c.p2ini)}</td>
+      <td class="td-mono">${f.p2?fmtDate(f.p2):'—'}</td>
+      <td class="td-mono" style="font-weight:700;color:${pgtoTotal>0?'#1B5E20':'var(--muted)'}">${pgtoTotal>0?fmtBRL(pgtoTotal):'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderProvDept() {
+  const depts = [...new Set(colaboradores.map(c=>c.dept))].sort();
+  const tProvGeral = colaboradores.reduce((a,c)=>a+calcFin(c).prov,0);
+  let html = '';
+  const mm = buildMesesMap();
+
+  depts.forEach((dept,i) => {
+    const list = colaboradores.filter(c=>c.dept===dept);
+    const folha = list.reduce((a,c)=>a+c.salario,0);
+    const prov = list.reduce((a,c)=>a+calcFin(c).prov,0);
+    const pgto = list.filter(c=>c.p1ini).reduce((a,c)=>{const f=calcFin(c);return a+f.tot*(c.p2ini?2:1);},0);
+    const pct = tProvGeral>0 ? Math.round(prov/tProvGeral*100) : 0;
+    const bg = DEPT_COLORS[dept]||'#ECEFF1', tc = DEPT_TEXT[dept]||'#546E7A';
+    const alt = i%2===0 ? 'background:var(--bg)' : '';
+    html += `<tr style="${alt}">
+      <td><span class="badge" style="background:${bg};color:${tc};font-size:10px">${dept}</span></td>
+      <td style="text-align:center">${list.length}</td>
+      <td class="td-mono">${fmtBRL(folha)}</td>
+      <td class="td-mono" style="color:#F57F17;font-weight:600">${fmtBRL(prov)}</td>
+      <td class="td-mono" style="font-weight:700">${fmtBRL(prov*12)}</td>
+      <td class="td-mono" style="color:#1B5E20;font-weight:600">${pgto>0?fmtBRL(pgto):'—'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;min-width:80px">
+            <div style="height:100%;width:${pct}%;background:${tc};border-radius:4px"></div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:var(--navy)">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  const tFolha = colaboradores.reduce((a,c)=>a+c.salario,0);
+  const tPgto = Object.values(mm).reduce((a,v)=>a+v.tot,0);
+  html += `<tr style="background:var(--navy);color:white;font-weight:700">
+    <td>TOTAL</td><td style="text-align:center">${colaboradores.length}</td>
+    <td class="td-mono">${fmtBRL(tFolha)}</td>
+    <td class="td-mono">${fmtBRL(tProvGeral)}</td>
+    <td class="td-mono">${fmtBRL(tProvGeral*12)}</td>
+    <td class="td-mono">${fmtBRL(tPgto)}</td>
+    <td>100%</td>
+  </tr>`;
+  document.getElementById('provDeptBody').innerHTML = html;
+}
+
+function exportProvCSV() {
+  const mm = buildMesesMap();
+  const tProv = colaboradores.reduce((a,c)=>a+calcFin(c).prov,0);
+  // Sheet 1: annual summary
+  const rows = [['=== RESUMO ANUAL ==='],['Mês','Provisão do Mês','Provisão Acumulada','Pagamentos Previstos','Saldo']];
+  let acum=0;
+  for(let m=0;m<12;m++){
+    acum+=tProv;const d=mm[m]||{tot:0};
+    rows.push([MESES_NOME[m],tProv.toFixed(2),acum.toFixed(2),(d.tot||0).toFixed(2),(acum-d.tot).toFixed(2)]);
+  }
+  rows.push([]);
+  rows.push(['=== DETALHAMENTO POR COLABORADOR ===']);
+  rows.push(['Nome','Departamento','Salário','1/3','Total Férias','Provisão/Mês','Provisão Anual','P1 Início','Data Pgto P1','P2 Início','Data Pgto P2','Total Pgto Previsto']);
+  colaboradores.forEach(c=>{
+    const f=calcFin(c);const pgto=(c.p1ini?f.tot:0)+(c.p2ini?f.tot:0);
+    rows.push([c.nome,c.dept,c.salario.toFixed(2),f.t.toFixed(2),f.tot.toFixed(2),f.prov.toFixed(2),(f.prov*12).toFixed(2),fmtDate(c.p1ini),f.p1?fmtDate(f.p1):'—',fmtDate(c.p2ini),f.p2?fmtDate(f.p2):'—',pgto>0?pgto.toFixed(2):'—']);
+  });
+  const csv=rows.map(r=>r.join(';')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='provisao_ferias_2027.csv';a.click();showToast('CSV exportado!','success');
+}
+
+
+// ── INDICADORES — filtro mensal ───────────────────────────────
+let deptoMesSel = -1;
+let deptoMensalDeptFiltro = 'Todos';
+
+function setDeptoMes(m) {
+  deptoMesSel = m;
+  document.querySelectorAll('#deptoMesBtns .filter-btn').forEach((b,i) => b.classList.toggle('active', i===m));
+  document.getElementById('btnDeptoLimparMes').style.display = m>=0 ? 'inline-flex' : 'none';
+  document.getElementById('deptoGridWrap').style.display = m>=0 ? 'none' : 'block';
+  document.getElementById('deptoMensalWrap').style.display = m>=0 ? 'block' : 'none';
+  if(m>=0) renderDeptoMensal(m);
+}
+
+function renderDeptoMensal(m) {
+  // Collaborators with P1 or P2 starting in month m
+  const list = colaboradores.filter(c => {
+    const m1 = c.p1ini ? parseInt(c.p1ini.split('-')[1])-1 : -1;
+    const m2 = c.p2ini ? parseInt(c.p2ini.split('-')[1])-1 : -1;
+    return m1===m || m2===m;
+  });
+
+  // Cards
+  const val = list.filter(c => {
+    const m1 = c.p1ini ? parseInt(c.p1ini.split('-')[1])-1 : -1;
+    const m2 = c.p2ini ? parseInt(c.p2ini.split('-')[1])-1 : -1;
+    return (m1===m && c.statusP1==='Validado') || (m2===m && c.statusP2==='Validado');
+  }).length;
+  const pend = list.filter(c => {
+    const m1 = c.p1ini ? parseInt(c.p1ini.split('-')[1])-1 : -1;
+    const m2 = c.p2ini ? parseInt(c.p2ini.split('-')[1])-1 : -1;
+    return (m1===m && c.statusP1==='Pendente') || (m2===m && c.statusP2==='Pendente');
+  }).length;
+  const totalCred = list.reduce((a,c) => {
+    const f = calcFin(c);
+    const m1 = c.p1ini ? parseInt(c.p1ini.split('-')[1])-1 : -1;
+    const m2 = c.p2ini ? parseInt(c.p2ini.split('-')[1])-1 : -1;
+    let v = 0;
+    if(m1===m) v += f.tot;
+    if(m2===m) v += f.tot;
+    return a + v;
+  }, 0);
+
+  document.getElementById('deptoMensalTitle').textContent =
+    `${MESES_NOME[m]} 2027 — ${list.length} colaborador${list.length!==1?'es':''} com férias`;
+
+  document.getElementById('deptoMensalCards').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Férias em ${MESES_CURTO[m]}</div><div class="stat-value">${list.length}</div><div class="stat-sub">colaboradores</div></div>
+    <div class="stat-card green"><div class="stat-label">Validados ✓</div><div class="stat-value">${val}</div><div class="stat-sub">pelo DP Interno</div></div>
+    <div class="stat-card"><div class="stat-label">Pendentes</div><div class="stat-value">${pend}</div><div class="stat-sub">aguardando validação</div></div>
+    <div class="stat-card gold"><div class="stat-label">Estimativa Crédito</div><div class="stat-value" style="font-size:18px">${fmtBRL(totalCred)}</div><div class="stat-sub">total do mês</div></div>`;
+
+  // Dept filter
+  const depts = ['Todos', ...new Set(list.map(c=>c.dept))];
+  document.getElementById('deptoMensalFilters').innerHTML = depts.map(f =>
+    `<button class="filter-btn${deptoMensalDeptFiltro===f?' active':''}" onclick="setDeptoMensalDept('${f}')">${f}</button>`
+  ).join('');
+
+  renderDeptoMensalBody(list, m);
+}
+
+function setDeptoMensalDept(f) {
+  deptoMensalDeptFiltro = f;
+  document.querySelectorAll('#deptoMensalFilters .filter-btn').forEach(b => b.classList.toggle('active', b.textContent===f));
+  const list = colaboradores.filter(c => {
+    const m1 = c.p1ini ? parseInt(c.p1ini.split('-')[1])-1 : -1;
+    const m2 = c.p2ini ? parseInt(c.p2ini.split('-')[1])-1 : -1;
+    return m1===deptoMesSel || m2===deptoMesSel;
+  });
+  renderDeptoMensalBody(list, deptoMesSel);
+}
+
+function filterDeptoMensal(q) {
+  let list = colaboradores.filter(c => {
+    const m1 = c.p1ini ? parseInt(c.p1ini.split('-')[1])-1 : -1;
+    const m2 = c.p2ini ? parseInt(c.p2ini.split('-')[1])-1 : -1;
+    return m1===deptoMesSel || m2===deptoMesSel;
+  });
+  if(deptoMensalDeptFiltro!=='Todos') list = list.filter(c=>c.dept===deptoMensalDeptFiltro);
+  if(q) list = list.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase()));
+  renderDeptoMensalBody(list, deptoMesSel);
+}
+
+function renderDeptoMensalBody(list, m) {
+  if(deptoMensalDeptFiltro!=='Todos') list = list.filter(c=>c.dept===deptoMensalDeptFiltro);
+  const rows = [];
+  list.forEach(c => {
+    const f = calcFin(c);
+    const m1 = c.p1ini ? parseInt(c.p1ini.split('-')[1])-1 : -1;
+    const m2 = c.p2ini ? parseInt(c.p2ini.split('-')[1])-1 : -1;
+    // Add row for each period in this month
+    if(m1===m) {
+      const pgto = f.p1 ? fmtDate(f.p1) : '—';
+      rows.push(`<tr>
+        <td><div class="td-name">${isVencendo(c.conceder)?'⏰ ':''}${c.nome}</div></td>
+        <td>${deptBadge(c.dept)}</td>
+        <td class="td-mono" style="color:${isVencendo(c.conceder)?'#B71C1C':'inherit'};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
+        <td><span class="badge badge-blue" style="font-size:10px">1º Período</span></td>
+        <td class="td-mono">${fmtDate(c.p1ini)}</td>
+        <td class="td-mono">${fmtDate(c.p1fim)}</td>
+        <td style="text-align:center">15</td>
+        <td>${statusBadge(c.statusP1)}</td>
+        <td class="td-mono" style="font-weight:600">${pgto}</td>
+        <td class="td-mono" style="font-weight:700;color:#1B5E20">${fmtBRL(f.tot)}</td>
+      </tr>`);
+    }
+    if(m2===m) {
+      const pgto = f.p2 ? fmtDate(f.p2) : '—';
+      rows.push(`<tr>
+        <td><div class="td-name">${c.nome}</div></td>
+        <td>${deptBadge(c.dept)}</td>
+        <td class="td-mono" style="color:${isVencendo(c.conceder)?'#B71C1C':'inherit'};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
+        <td><span class="badge badge-green" style="font-size:10px">2º Período</span></td>
+        <td class="td-mono">${fmtDate(c.p2ini)}</td>
+        <td class="td-mono">${fmtDate(c.p2fim)}</td>
+        <td style="text-align:center">15</td>
+        <td>${statusBadge(c.statusP2)}</td>
+        <td class="td-mono" style="font-weight:600">${pgto}</td>
+        <td class="td-mono" style="font-weight:700;color:#1B5E20">${fmtBRL(f.tot)}</td>
+      </tr>`);
+    }
+  });
+  document.getElementById('deptoMensalBody').innerHTML = rows.length
+    ? rows.join('')
+    : `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--muted)">Nenhuma férias indicada para ${MESES_NOME[m]}</td></tr>`;
+}
+
+// ── INDICADORES ──────────────────────────────────────────────
+function renderDepto(){
+  const depts=[...new Set(colaboradores.map(c=>c.dept))].sort();const hoje=new Date();
+
+  // Build month buttons — show only months with vacations
+  const mesesComFerias = new Set();
+  colaboradores.forEach(c=>{
+    if(c.p1ini) mesesComFerias.add(parseInt(c.p1ini.split('-')[1])-1);
+    if(c.p2ini) mesesComFerias.add(parseInt(c.p2ini.split('-')[1])-1);
+  });
+  document.getElementById('deptoMesBtns').innerHTML = MESES_CURTO.map((nome,m)=>{
+    const count = colaboradores.filter(c=>{
+      const m1=c.p1ini?parseInt(c.p1ini.split('-')[1])-1:-1;
+      const m2=c.p2ini?parseInt(c.p2ini.split('-')[1])-1:-1;
+      return m1===m||m2===m;
+    }).length;
+    return `<button class="filter-btn${deptoMesSel===m?' active':''}${count>0?' has-data':''}" onclick="setDeptoMes(${m})" ${count===0?'style="opacity:.45"':''}>
+      <span style="font-weight:600">${nome}</span>${count>0?`<span style="font-size:10px;color:#1B5E20;font-weight:600;display:block">${count}cx</span>`:`<span style="font-size:10px;color:var(--muted);display:block">—</span>`}
+    </button>`;
+  }).join('');
+
+  const total=colaboradores.length,comDatas=colaboradores.filter(c=>c.p1ini).length,validados=colaboradores.filter(c=>c.statusP1==="Validado").length;
+  const vencendo=colaboradores.filter(c=>{if(!c.conceder)return false;const d=(new Date(c.conceder)-hoje)/86400000;return d>=0&&d<=60;}).length;
+  const dobro=colaboradores.filter(c=>c.situacao==="Férias em Dobro").length;
+  document.getElementById("deptoSumCards").innerHTML=`
+    <div class="stat-card"><div class="stat-label">Total Colaboradores</div><div class="stat-value">${total}</div><div class="stat-sub">${depts.length} departamentos</div></div>
+    <div class="stat-card"><div class="stat-label">Com Datas Indicadas</div><div class="stat-value">${comDatas}</div><div class="stat-sub">${Math.round(comDatas/total*100)}% do total</div></div>
+    <div class="stat-card green"><div class="stat-label">Períodos Validados ✓</div><div class="stat-value">${validados}</div><div class="stat-sub">pelo DP Interno</div></div>
+    <div class="stat-card red"><div class="stat-label">Atenção Urgente ⚠</div><div class="stat-value">${dobro+vencendo}</div><div class="stat-sub">${dobro} dobro · ${vencendo} venc. 60d</div></div>`;
+  const grid=document.getElementById("deptoGrid");grid.innerHTML="";
+  depts.forEach(dept=>{
+    const list=colaboradores.filter(c=>c.dept===dept);
+    const bg=DEPT_COLORS[dept]||"#ECEFF1",tc=DEPT_TEXT[dept]||"#546E7A";
+    const dname=dept.replace("PEQUENOS NEGOCIOS","Pequenos Negócios").replace("GENTE GESTAO","Gente e Gestão").replace("LEGALIZACAO","Legalização");
+    const semDatas=list.filter(c=>!c.p1ini).length,pendente=list.filter(c=>c.p1ini&&c.statusP1==="Pendente").length;
+    const valDept=list.filter(c=>c.statusP1==="Validado").length,recusado=list.filter(c=>c.statusP1==="Recusado"||c.statusP2==="Recusado").length;
+    const comunicado=list.filter(c=>c.statusP1==="Comunicado").length,emDobro=list.filter(c=>c.situacao==="Férias em Dobro").length;
+    const venc60=list.filter(c=>{if(!c.conceder)return false;const d=(new Date(c.conceder)-hoje)/86400000;return d>=0&&d<=60;}).length;
+    const venc90=list.filter(c=>{if(!c.conceder)return false;const d=(new Date(c.conceder)-hoje)/86400000;return d>60&&d<=90;}).length;
+    const planPct=list.length>0?Math.round((list.length-semDatas)/list.length*100):0;
+    const valPct=list.length>0?Math.round(valDept/list.length*100):0;
+    const comDatasDept=list.filter(c=>c.p1ini);
+    const estimCredito=comDatasDept.reduce((a,c)=>{const f=calcFin(c);return a+f.tot*(c.p2ini?2:1);},0);
+    const mesesCobertos={};
+    list.forEach(c=>{if(c.p1ini){const m=parseInt(c.p1ini.split("-")[1])-1;mesesCobertos[m]=(mesesCobertos[m]||0)+1;}if(c.p2ini){const m=parseInt(c.p2ini.split("-")[1])-1;mesesCobertos[m]=(mesesCobertos[m]||0)+1;}});
+    const mesesHtml=Object.keys(mesesCobertos).sort((a,b)=>a-b).map(m=>`<span class="badge badge-blue" style="font-size:10px">${MESES_CURTO[m]}: ${mesesCobertos[m]}cx</span>`).join(" ");
+    const rowsHtml=list.map(c=>{
+      let al="";if(c.situacao==="Férias em Dobro")al=`<span title="Férias em Dobro" style="color:#C62828">⚠ </span>`;
+      else if(isVencendo(c.conceder))al=`<span title="Vence em breve" style="color:#E65100">⏰ </span>`;
+      const p1=c.p1ini?`${fmtDate(c.p1ini)} → ${fmtDate(c.p1fim)}`:"<span style='color:var(--muted)'>—</span>";
+      const p2=c.p2ini?`${fmtDate(c.p2ini)} → ${fmtDate(c.p2fim)}`:"<span style='color:var(--muted)'>—</span>";
+      const cred=c.p1ini?fmtBRL(calcFin(c).tot*(c.p2ini?2:1)):"<span style='color:var(--muted)'>—</span>";
+      const pgto1=c.p1ini?fmtDate(subDays(c.p1ini,2)):"—";
+      return`<tr><td><div class="td-name">${al}${c.nome}</div></td><td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td><td class="td-mono">${p1}</td><td class="td-mono">${p2}</td><td>${statusBadge(c.statusP1)}</td><td>${c.p2ini?statusBadge(c.statusP2):"<span style='color:var(--muted);font-size:11px'>—</span>"}</td><td class="td-mono" style="color:#1B5E20;font-weight:600">${cred}</td><td class="td-mono">${c.p1ini?pgto1:"—"}</td></tr>`;
+    }).join("");
+    const card=document.createElement("div");card.className="depto-card";
+    card.innerHTML=`<div class="depto-card-header">
+      <div class="depto-card-title"><span class="badge" style="background:${bg};color:${tc};font-size:12px">${dname}</span><span style="font-size:12px;color:var(--muted);font-weight:400">${list.length} colaborador${list.length>1?"es":""}</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${emDobro>0?`<span class="badge badge-red">⚠ ${emDobro} férias em dobro</span>`:""}
+        ${venc60>0?`<span class="badge badge-red">⏰ ${venc60} vence 60d</span>`:""}
+        ${venc90>0?`<span class="badge badge-yellow">⏰ ${venc90} vence 90d</span>`:""}
+        ${recusado>0?`<span class="badge badge-red">${recusado} recusado</span>`:""}
+      </div>
+    </div>
+    <div class="depto-card-body">
+      <div class="depto-kpis">
+        <div class="depto-kpi"><div class="depto-kpi-val">${semDatas}</div><div class="depto-kpi-label">Sem Datas</div></div>
+        <div class="depto-kpi"><div class="depto-kpi-val" style="color:#E65100">${pendente}</div><div class="depto-kpi-label">Aguard. Validação</div></div>
+        <div class="depto-kpi"><div class="depto-kpi-val green">${valDept}</div><div class="depto-kpi-label">Validados</div></div>
+        <div class="depto-kpi"><div class="depto-kpi-val" style="color:#0D47A1">${comunicado}</div><div class="depto-kpi-label">Comunicados</div></div>
+        <div class="depto-kpi"><div class="depto-kpi-val green" style="font-size:13px">${comDatasDept.length>0?fmtBRL(estimCredito):"—"}</div><div class="depto-kpi-label">Estimativa Crédito</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
+        <div>
+          <div class="bar-wrap"><div class="bar-label-row"><span class="bar-label-name">Planejamento</span><span class="bar-label-val">${planPct}% com datas</span></div><div class="bar-track"><div class="bar-fill" style="width:${planPct}%;background:${planPct>=80?"#2E7D32":planPct>=50?"#F57F17":"#C62828"}"></div></div></div>
+          <div class="bar-wrap"><div class="bar-label-row"><span class="bar-label-name">Validação DP</span><span class="bar-label-val">${valPct}% validados</span></div><div class="bar-track"><div class="bar-fill" style="width:${valPct}%;background:#4A90D9"></div></div></div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Meses com férias indicadas</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">${mesesHtml||"<span style='color:var(--muted);font-size:12px'>Nenhuma data indicada</span>"}</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto"><table><thead><tr>
+        <th>Colaborador</th><th>Conceder Até</th><th>1º Período</th><th>2º Período</th>
+        <th>Status P1</th><th>Status P2</th><th>Estimativa Crédito</th><th>Data Pgto P1</th>
+      </tr></thead><tbody>${rowsHtml}</tbody></table></div>
+    </div>`;
+    grid.appendChild(card);
+  });
+}
+function exportDeptoCSV(){
+  const depts=[...new Set(colaboradores.map(c=>c.dept))].sort();const hoje=new Date();
+  const rows=[["Departamento","Colaboradores","Sem Datas","Pendente","Validado","Recusado","Comunicado","Férias em Dobro","Vence 60d","Estimativa Crédito"]];
+  depts.forEach(dept=>{
+    const list=colaboradores.filter(c=>c.dept===dept);
+    const cred=list.filter(c=>c.p1ini).reduce((a,c)=>{const f=calcFin(c);return a+f.tot*(c.p2ini?2:1);},0);
+    rows.push([dept,list.length,list.filter(c=>!c.p1ini).length,list.filter(c=>c.p1ini&&c.statusP1==="Pendente").length,list.filter(c=>c.statusP1==="Validado").length,list.filter(c=>c.statusP1==="Recusado"||c.statusP2==="Recusado").length,list.filter(c=>c.statusP1==="Comunicado").length,list.filter(c=>c.situacao==="Férias em Dobro").length,list.filter(c=>{if(!c.conceder)return false;const d=(new Date(c.conceder)-hoje)/86400000;return d>=0&&d<=60;}).length,cred.toFixed(2)]);
+  });
+  const csv=rows.map(r=>r.join(";")).join("\n");const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);a.download="indicadores_2027.csv";a.click();showToast("CSV exportado!","success");
+}
+
+
+// ── APROVADAS GESTOR ─────────────────────────────────────────
+function renderAprovadasGestor(){
+  const cfg=getCurrentCfg();
+  const dept=cfg.dept;
+  const list=colaboradores.filter(c=>c.dept===dept&&(
+    ["Validado","Comunicado"].includes(c.statusP1)||
+    (c.p2ini&&["Validado","Comunicado"].includes(c.statusP2))
+  ));
+  const val=list.filter(c=>c.statusP1==="Validado").length;
+  const com=list.filter(c=>c.statusP1==="Comunicado").length;
+  const el=s=>document.getElementById(s);
+  el("aprovadasGestorSub").textContent=`Períodos validados ou comunicados pelo DP Interno — ${dept}`;
+  el("aprovadasGestorCards").innerHTML=`
+    <div class="stat-card green"><div class="stat-label">Total Aprovados</div><div class="stat-value">${list.length}</div><div class="stat-sub">no seu departamento</div></div>
+    <div class="stat-card green"><div class="stat-label">Validados ✓</div><div class="stat-value">${val}</div><div class="stat-sub">aprovados pelo DP</div></div>
+    <div class="stat-card"><div class="stat-label">Comunicados</div><div class="stat-value">${com}</div><div class="stat-sub">colaborador notificado</div></div>`;
+  el("aprovadasGestorCount").textContent=`${list.length} colaboradores com férias aprovadas`;
+  el("aprovadasGestorBody").innerHTML=list.length?list.map(c=>`<tr>
+    <td><div class="td-name">${c.nome}</div></td>
+    <td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
+    <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
+    <td>${statusBadge(c.statusP1)}</td>
+    <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
+    <td>${c.p2ini?statusBadge(c.statusP2):"<span style='color:var(--muted);font-size:11px'>—</span>"}</td>
+    <td><span class="badge badge-gray" style="font-size:10px">${c.situacao}</span></td>
+  </tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">Nenhuma aprovação ainda no seu departamento</td></tr>`;
+}
+function filterAprovadasGestor(q){
+  const cfg=getCurrentCfg();const dept=cfg.dept;
+  let list=colaboradores.filter(c=>c.dept===dept&&(["Validado","Comunicado"].includes(c.statusP1)||(c.p2ini&&["Validado","Comunicado"].includes(c.statusP2))));
+  if(q)list=list.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById("aprovadasGestorCount").textContent=`${list.length} colaboradores com férias aprovadas`;
+  document.getElementById("aprovadasGestorBody").innerHTML=list.length?list.map(c=>`<tr>
+    <td><div class="td-name">${c.nome}</div></td>
+    <td class="td-mono">${fmtDate(c.conceder)}</td>
+    <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
+    <td>${statusBadge(c.statusP1)}</td>
+    <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
+    <td>${c.p2ini?statusBadge(c.statusP2):"<span style='color:var(--muted);font-size:11px'>—</span>"}</td>
+    <td><span class="badge badge-gray" style="font-size:10px">${c.situacao}</span></td>
+  </tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">Nenhum resultado</td></tr>`;
+}
+
+// ── HISTÓRICO ────────────────────────────────────────────────
+let historicoFiltro="Todos";
+function renderHistorico(){
+  const cfg=getCurrentCfg();
+  const dept=cfg.dept;
+  const list=colaboradores.filter(c=>c.dept===dept);
+  const total=list.reduce((a,c)=>a+(c.hist||[]).length,0);
+  const recusas=list.reduce((a,c)=>a+(c.hist||[]).filter(h=>h.acao.includes("Recusado")).length,0);
+  const validacoes=list.reduce((a,c)=>a+(c.hist||[]).filter(h=>h.acao.includes("Validado")).length,0);
+  document.getElementById("historicoSub").textContent=`Registro de movimentações — ${dept}`;
+  document.getElementById("historicoCards").innerHTML=`
+    <div class="stat-card"><div class="stat-label">Total Registros</div><div class="stat-value">${total}</div><div class="stat-sub">no histórico</div></div>
+    <div class="stat-card green"><div class="stat-label">Validações</div><div class="stat-value">${validacoes}</div><div class="stat-sub">aprovadas pelo DP</div></div>
+    <div class="stat-card red"><div class="stat-label">Recusas</div><div class="stat-value">${recusas}</div><div class="stat-sub">pendentes de correção</div></div>`;
+  // Build filter buttons — use index as key to avoid name collision
+  const names=["Todos",...list.map(c=>c.nome)];
+  document.getElementById("historicoFilters").innerHTML=names.map((n,i)=>{
+    const isActive=historicoFiltro===n;
+    const label=i===0?"Todos":(n.split(" ")[0]+" "+n.split(" ")[1]);
+    const btn=document.createElement("button");
+    btn.className="filter-btn"+(isActive?" active":"");
+    btn.textContent=label;
+    btn.dataset.nome=n;
+    btn.onclick=()=>setHistoricoFiltro(n);
+    return btn.outerHTML;
+  }).join("");
+  // Re-attach event listeners since outerHTML loses them
+  document.querySelectorAll("#historicoFilters .filter-btn").forEach(b=>{
+    b.onclick=()=>setHistoricoFiltro(b.dataset.nome);
+  });
+  document.getElementById("historicoCount").textContent=`${total} registro${total!==1?"s":""} de alteração`;
+  renderHistoricoBody(list,dept);
+}
+function setHistoricoFiltro(n){
+  historicoFiltro=n;
+  document.querySelectorAll("#historicoFilters .filter-btn").forEach(b=>{
+    const label=n==="Todos"?"Todos":(n.split(" ")[0]+" "+n.split(" ")[1]);
+    b.classList.toggle("active",b.textContent.trim()===label||b.textContent.trim()==="Todos"&&n==="Todos");
+  });
+  const cfg=getCurrentCfg();const dept=cfg.dept;
+  renderHistoricoBody(colaboradores.filter(c=>c.dept===dept),dept);
+}
+function filterHistorico(q){
+  const cfg=getCurrentCfg();const dept=cfg.dept;
+  const list=colaboradores.filter(c=>c.dept===dept&&(!q||c.nome.toLowerCase().includes(q.toLowerCase())));
+  renderHistoricoBody(list,dept);
+}
+function renderHistoricoBody(list,dept){
+  // Apply name filter
+  let filtered=list;
+  if(historicoFiltro!=="Todos") filtered=list.filter(c=>c.nome===historicoFiltro);
+  // Flatten all hist entries
+  const entries=[];
+  filtered.forEach(c=>(c.hist||[]).forEach(h=>entries.push({dt:h.dt,acao:h.acao,user:h.user,det:h.det,nome:c.nome})));
+  // Sort by date desc
+  entries.sort((a,b)=>{
+    const pa=a.dt.split("/").reverse().join(""),pb=b.dt.split("/").reverse().join("");
+    return pb.localeCompare(pa);
+  });
+  if(!entries.length){
+    document.getElementById("historicoBody").innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted)">Nenhum registro de histórico ainda</td></tr>`;
+    return;
+  }
+  document.getElementById("historicoBody").innerHTML=entries.map(h=>{
+    let cls="badge-gray",icon="📝";
+    if(h.acao.includes("Validado")){cls="badge-green";icon="✅";}
+    else if(h.acao.includes("Recusado")){cls="badge-red";icon="❌";}
+    else if(h.acao.includes("Comunicado")){cls="badge-blue";icon="📣";}
+    else if(h.acao.includes("indicadas")){cls="badge-yellow";icon="📅";}
+    return`<tr>
+      <td class="td-mono" style="white-space:nowrap">${h.dt}</td>
+      <td><div class="td-name">${h.nome}</div></td>
+      <td><span class="badge ${cls}">${icon} ${h.acao}</span></td>
+      <td style="font-size:12px;color:${h.user.includes("DP")?"var(--navy)":"var(--muted)"};font-weight:${h.user.includes("DP")?600:400}">${h.user}</td>
+      <td style="font-size:12px;color:var(--muted)">${h.det}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── NOTIFICAÇÃO VISUAL DE RECUSA ──────────────────────────────
+function updateNavBadges(){
+  const cfg=getCurrentCfg();
+  const dept=cfg?cfg.dept:null;
+  if(!dept) return; // DP não precisa de badge — tem painel completo
+  const recusas=colaboradores.filter(c=>c.dept===dept&&(c.statusP1==="Recusado"||c.statusP2==="Recusado")).length;
+  const temRecusaHist=colaboradores.filter(c=>c.dept===dept&&(c.hist||[]).some(h=>h.acao.includes("Recusado"))).length;
+  document.querySelectorAll(".nav-tab").forEach(tab=>{
+    // Remove existing badges
+    tab.querySelectorAll(".nav-badge").forEach(b=>b.remove());
+    // Add badge on "setor" if there are rejections
+    if(tab.dataset.tab==="setor"&&recusas>0){
+      const b=document.createElement("span");
+      b.className="nav-badge";
+      b.style.cssText="background:#C62828;color:white;border-radius:10px;font-size:10px;font-weight:700;padding:2px 6px;margin-left:6px;display:inline-block;";
+      b.textContent=recusas+"✗";
+      tab.appendChild(b);
+    }
+    // Add badge on "historico" if there are rejection records
+    if(tab.dataset.tab==="historico"&&temRecusaHist>0){
+      const b=document.createElement("span");
+      b.className="nav-badge";
+      b.style.cssText="background:#C62828;color:white;border-radius:50%;font-size:10px;font-weight:700;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;margin-left:6px;";
+      b.textContent="!";
+      tab.appendChild(b);
+    }
+  });
+}
+
+// ── BLOQUEIOS ────────────────────────────────────────────────
 function renderBloqueios(){
   document.getElementById("bloqueiosBody").innerHTML=BLOCKED.map(b=>`<tr><td>${deptBadge(b.dept)}</td><td class="td-mono">${fmtDate(b.ini)}</td><td class="td-mono">${fmtDate(b.fim)}</td><td>${b.motivo}</td></tr>`).join("");
   document.getElementById("feriadosBody").innerHTML=FERIADOS.map(f=>{const dow=new Date(f.d+"T12:00:00").getDay();return`<tr><td class="td-mono">${fmtDate(f.d)}</td><td>${DIAS_SEMANA[dow]}</td><td>${f.nome}</td></tr>`;}).join("");
 }
+
+// ── CALENDÁRIO ───────────────────────────────────────────────
 function renderCalendario(){
   const cfg=getCurrentCfg();const dept=cfg?.dept;
   document.getElementById("calSub").textContent=dept?`Departamento: ${dept}`:"Todos os departamentos";
@@ -763,6 +1791,8 @@ function renderCalendario(){
 function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendario();}
 function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendario();}
 function calToday(){const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();renderCalendario();}
+
+// ── MODAL INDICAR DATAS ──────────────────────────────────────
 function openDatasModal(id){
   currentColab=colaboradores.find(c=>c.id===id);const c=currentColab;
   document.getElementById("modalDatasName").textContent=c.nome;
@@ -800,14 +1830,21 @@ function submitDatas(){
   const p2ini=document.getElementById("p2ini").value,p2fim=document.getElementById("p2fim").value;
   const obs=document.getElementById("inputObs").value,msg=document.getElementById("msgGeral");
   if(!p1ini||!p1fim){msg.className="validation-msg error";msg.textContent="❌ Preencha ao menos o 1º período.";return;}
-  const err1=getDayBlockReason(p1ini,currentColab?.dept);
-  if(err1){msg.className="validation-msg error";msg.textContent="❌ 1º Período: "+err1;return;}
+  const err1=getDayBlockReason(p1ini,currentColab?.dept);if(err1){msg.className="validation-msg error";msg.textContent="❌ 1º Período: "+err1;return;}
   if(p2ini){const err2=getDayBlockReason(p2ini,currentColab?.dept);if(err2){msg.className="validation-msg error";msg.textContent="❌ 2º Período: "+err2;return;}}
   const c=colaboradores.find(x=>x.id===currentColab.id);
   if(!c.p1ini||c.statusP1==="Recusado"){c.p1ini=p1ini;c.p1fim=p1fim;c.statusP1="Pendente";c.motivoP1="";}
   if(p2ini&&(!c.p2ini||c.statusP2==="Recusado")){c.p2ini=p2ini;c.p2fim=p2fim;c.statusP2="Pendente";c.motivoP2="";}
-  c.obs=obs;closeModal("modalDatas");showToast("✅ Indicação salva! O DP Interno será notificado.","success");renderSetor();
+  c.obs=obs;
+  // Log history
+  const nowD=new Date();const hdtD=`${String(nowD.getDate()).padStart(2,"0")}/${String(nowD.getMonth()+1).padStart(2,"0")}/${nowD.getFullYear()}`;
+  if(!c.hist)c.hist=[];
+  const det=`P1: ${fmtDate(p1ini)} → ${fmtDate(p1fim)}`+(p2ini?` | P2: ${fmtDate(p2ini)} → ${fmtDate(p2fim)}`:"");
+  c.hist.push({dt:hdtD,acao:"Datas indicadas",user:"Gestor",det});
+  closeModal("modalDatas");showToast("✅ Indicação salva! O DP Interno será notificado.","success");renderSetor();updateNavBadges();
 }
+
+// ── MODAL VALIDAR ────────────────────────────────────────────
 function onStatusP1Change(){document.getElementById("motivoP1Group").style.display=document.getElementById("inputStatusP1").value==="Recusado"?"block":"none";}
 function onStatusP2Change(){document.getElementById("motivoP2Group").style.display=document.getElementById("inputStatusP2").value==="Recusado"?"block":"none";}
 function openValidarModal(id){
@@ -831,137 +1868,28 @@ function submitValidar(){
   const c=colaboradores.find(x=>x.id===currentColab.id);
   c.statusP1=sP1;c.motivoP1=sP1==="Recusado"?mP1:"";c.situacao=document.getElementById("inputSituacao").value;
   if(hp){c.statusP2=sP2;c.motivoP2=sP2==="Recusado"?mP2:"";}
-  closeModal("modalValidar");showToast(sP1==="Validado"?"✅ Validado!":sP1==="Recusado"?"❌ Recusa registrada":"Atualizado!",sP1==="Validado"?"success":sP1==="Recusado"?"error":"");
-  renderPainel();renderValidar();
+  closeModal("modalValidar");
+  // Log history
+  const now=new Date();const hdt=`${String(now.getDate()).padStart(2,"0")}/${String(now.getMonth()+1).padStart(2,"0")}/${now.getFullYear()}`;
+  const hc=colaboradores.find(x=>x.id===currentColab.id);if(!hc.hist)hc.hist=[];
+  const detP1=`P1: ${fmtDate(hc.p1ini)} → ${fmtDate(hc.p1fim)}`;
+  hc.hist.push({dt:hdt,acao:sP1==="Validado"?"Validado pelo DP":sP1==="Recusado"?"Recusado pelo DP":sP1==="Comunicado"?"Comunicado":"Status atualizado",user:"DP Interno",det:sP1==="Recusado"?`P1 recusado — ${mP1}`:detP1});
+  if(hp&&sP2!=="Pendente"){const detP2=`P2: ${fmtDate(hc.p2ini)} → ${fmtDate(hc.p2fim)}`;hc.hist.push({dt:hdt,acao:sP2==="Validado"?"Validado pelo DP":sP2==="Recusado"?"Recusado pelo DP":"Comunicado",user:"DP Interno",det:sP2==="Recusado"?`P2 recusado — ${mP2}`:detP2});}
+  showToast(sP1==="Validado"?"✅ Validado!":sP1==="Recusado"?"❌ Recusa registrada":"Atualizado!",sP1==="Validado"?"success":sP1==="Recusado"?"error":"");
+  if(document.getElementById("painelCards"))renderPainel();if(document.getElementById("validarCount"))renderValidar();
+  if(sP1==="Validado"||sP1==="Comunicado"&&document.getElementById("aprovadasCount"))renderAprovadas();
+  updateNavBadges();
+}
+
+// ── UTILS ────────────────────────────────────────────────────
+function exportCSV(){
+  const rows=[["Nome","Departamento","Conceder Até","P1 Início","P1 Fim","P2 Início","P2 Fim","Status P1","Status P2","Situação"]];
+  colaboradores.forEach(c=>rows.push([c.nome,c.dept,fmtDate(c.conceder),fmtDate(c.p1ini),fmtDate(c.p1fim),fmtDate(c.p2ini),fmtDate(c.p2fim),c.statusP1,c.statusP2,c.situacao]));
+  const csv=rows.map(r=>r.join(";")).join("\n");const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);a.download="ferias_2027.csv";a.click();showToast("CSV exportado!","success");
 }
 function openModal(id){document.getElementById(id).classList.add("open");}
 function closeModal(id){document.getElementById(id).classList.remove("open");}
 function showToast(msg,type=""){const c=document.getElementById("toasts");const t=document.createElement("div");t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),3500);}
-function exportCSV(){
-  const rows=[["Nome","Departamento","Conceder Até","P1 Início","P1 Fim","P2 Início","P2 Fim","Status P1","Status P2","Situação"]];
-  colaboradores.forEach(c=>rows.push([c.nome,c.dept,fmtDate(c.conceder),fmtDate(c.p1ini),fmtDate(c.p1fim),fmtDate(c.p2ini),fmtDate(c.p2fim),c.statusP1,c.statusP2,c.situacao]));
-  const csv=rows.map(r=>r.join(";")).join("\n");const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);a.download="ferias_2027_jca.csv";a.click();showToast("CSV exportado!","success");
-}
-function exportFinCSV(){
-  const rows=[["Nome","Departamento","Salário","1/3","Total Férias","P1 Início","Data Pgto P1","Mês P1","P2 Início","Data Pgto P2","Mês P2","Provisão/Mês"]];
-  colaboradores.forEach(c=>{const f=calcFin(c);rows.push([c.nome,c.dept,c.salario.toFixed(2),f.t.toFixed(2),f.tot.toFixed(2),fmtDate(c.p1ini),f.p1?fmtDate(f.p1):"—",f.p1?MESES_CURTO[f.m1]:"—",fmtDate(c.p2ini),f.p2?fmtDate(f.p2):"—",f.p2?MESES_CURTO[f.m2]:"—",f.prov.toFixed(2)]);});
-  const csv=rows.map(r=>r.join(";")).join("\n");const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);a.download="financeiro_2027_jca.csv";a.click();showToast("CSV financeiro exportado!","success");
-}
-
-function renderDepto(){
-  const depts=[...new Set(colaboradores.map(c=>c.dept))].sort();
-  const maxSal=Math.max(...depts.map(d=>colaboradores.filter(c=>c.dept===d).reduce((a,c)=>a+c.salario,0)));
-
-  // Summary cards
-  const totalColab=colaboradores.length;
-  const totalFolha=colaboradores.reduce((a,c)=>a+c.salario,0);
-  const totalProv=colaboradores.reduce((a,c)=>a+calcFin(c).prov,0);
-  const comDatas=colaboradores.filter(c=>c.p1ini).length;
-  const emDobro=colaboradores.filter(c=>c.situacao==="Férias em Dobro").length;
-  document.getElementById("deptoSumCards").innerHTML=`
-    <div class="stat-card"><div class="stat-label">Total Colaboradores</div><div class="stat-value">${totalColab}</div><div class="stat-sub">${depts.length} departamentos</div></div>
-    <div class="stat-card gold"><div class="stat-label">Folha Total Mensal</div><div class="stat-value" style="font-size:18px">${fmtBRL(totalFolha)}</div><div class="stat-sub">salários base</div></div>
-    <div class="stat-card"><div class="stat-label">Provisão Férias/Mês</div><div class="stat-value" style="font-size:18px">${fmtBRL(totalProv)}</div><div class="stat-sub">(sal+1/3)÷12 total</div></div>
-    <div class="stat-card red"><div class="stat-label">Férias em Dobro</div><div class="stat-value">${emDobro}</div><div class="stat-sub">atenção imediata</div></div>`;
-
-  const grid=document.getElementById("deptoGrid");
-  grid.innerHTML="";
-
-  depts.forEach(dept=>{
-    const list=colaboradores.filter(c=>c.dept===dept);
-    const folha=list.reduce((a,c)=>a+c.salario,0);
-    const prov=list.reduce((a,c)=>a+calcFin(c).prov,0);
-    const pgto=list.filter(c=>c.p1ini).reduce((a,c)=>{const f=calcFin(c);return a+f.tot*(c.p2ini?2:1);},0);
-    const salMedio=folha/list.length;
-    const validados=list.filter(c=>c.statusP1==="Validado").length;
-    const pendentes=list.filter(c=>!c.p1ini).length;
-    const recusados=list.filter(c=>c.statusP1==="Recusado"||c.statusP2==="Recusado").length;
-    const dobro=list.filter(c=>c.situacao==="Férias em Dobro").length;
-    const comDatas=list.filter(c=>c.p1ini).length;
-    const barPct=Math.round(folha/maxSal*100);
-    const planPct=list.length>0?Math.round(comDatas/list.length*100):0;
-    const valPct=comDatas>0?Math.round(validados/comDatas*100):0;
-    const bg=DEPT_COLORS[dept]||"#ECEFF1";
-    const tc=DEPT_TEXT[dept]||"#546E7A";
-    const dname=dept.replace("PEQUENOS NEGOCIOS","Pequenos Negócios").replace("GENTE GESTAO","Gente e Gestão").replace("LEGALIZACAO","Legalização");
-
-    // Bar color per dept
-    const barColor=tc;
-
-    // Collaborator chips
-    const chips=list.map(c=>{
-      let cls="colab-chip";
-      if(c.situacao==="Férias em Dobro")cls+=" dobro";
-      else if(c.statusP1==="Recusado"||c.statusP2==="Recusado")cls+=" recusado";
-      else if(c.statusP1==="Validado")cls+=" validado";
-      return`<span class="${cls}" title="Conceder até: ${fmtDate(c.conceder)}">${c.nome.split(" ").slice(0,2).join(" ")}</span>`;
-    }).join("");
-
-    const card=document.createElement("div");
-    card.className="depto-card";
-    card.innerHTML=`
-      <div class="depto-card-header">
-        <div class="depto-card-title">
-          <span class="badge" style="background:${bg};color:${tc}">${dname}</span>
-          <span style="font-size:12px;color:var(--muted);font-weight:400">${list.length} colaborador${list.length>1?"es":""}</span>
-        </div>
-        <div style="display:flex;gap:8px">
-          ${dobro>0?`<span class="badge badge-red">⚠ ${dobro} férias em dobro</span>`:""}
-          ${recusados>0?`<span class="badge badge-red">${recusados} recusado${recusados>1?"s":""}</span>`:""}
-          ${pendentes>0?`<span class="badge badge-yellow">${pendentes} sem datas</span>`:""}
-          ${validados>0?`<span class="badge badge-green">${validados} validado${validados>1?"s":""}</span>`:""}
-        </div>
-      </div>
-      <div class="depto-card-body">
-        <div class="depto-kpis">
-          <div class="depto-kpi"><div class="depto-kpi-val">${fmtBRL(folha)}</div><div class="depto-kpi-label">Folha Mensal</div></div>
-          <div class="depto-kpi"><div class="depto-kpi-val gold">${fmtBRL(salMedio)}</div><div class="depto-kpi-label">Salário Médio</div></div>
-          <div class="depto-kpi"><div class="depto-kpi-val">${fmtBRL(prov)}</div><div class="depto-kpi-label">Provisão/Mês</div></div>
-          <div class="depto-kpi"><div class="depto-kpi-val green">${fmtBRL(pgto)}</div><div class="depto-kpi-label">Pgto Projetado</div></div>
-          <div class="depto-kpi"><div class="depto-kpi-val">${fmtBRL(prov*12)}</div><div class="depto-kpi-label">Provisão Anual</div></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-          <div>
-            <div class="bar-wrap">
-              <div class="bar-label-row"><span class="bar-label-name">Peso da Folha</span><span class="bar-label-val">${barPct}% do total</span></div>
-              <div class="bar-track"><div class="bar-fill" style="width:${barPct}%;background:${barColor}"></div></div>
-            </div>
-            <div class="bar-wrap">
-              <div class="bar-label-row"><span class="bar-label-name">Planejamento</span><span class="bar-label-val">${planPct}% indicados</span></div>
-              <div class="bar-track"><div class="bar-fill" style="width:${planPct}%;background:${planPct>=80?"#2E7D32":planPct>=50?"#F57F17":"#C62828"}"></div></div>
-            </div>
-            <div class="bar-wrap">
-              <div class="bar-label-row"><span class="bar-label-name">Validação DP</span><span class="bar-label-val">${valPct}% validados</span></div>
-              <div class="bar-track"><div class="bar-fill" style="width:${valPct}%;background:#4A90D9"></div></div>
-            </div>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Colaboradores</div>
-            <div class="colabs-mini">${chips}</div>
-          </div>
-        </div>
-      </div>`;
-    grid.appendChild(card);
-  });
-}
-function exportDeptoCSV(){
-  const depts=[...new Set(colaboradores.map(c=>c.dept))].sort();
-  const rows=[["Departamento","Colaboradores","Folha Mensal","Salário Médio","Provisão/Mês","Provisão Anual","Pgto Projetado","Validados","Pendentes","Recusados","Férias em Dobro"]];
-  depts.forEach(dept=>{
-    const list=colaboradores.filter(c=>c.dept===dept);
-    const folha=list.reduce((a,c)=>a+c.salario,0);
-    const prov=list.reduce((a,c)=>a+calcFin(c).prov,0);
-    const pgto=list.filter(c=>c.p1ini).reduce((a,c)=>{const f=calcFin(c);return a+f.tot*(c.p2ini?2:1);},0);
-    rows.push([dept,list.length,folha.toFixed(2),(folha/list.length).toFixed(2),prov.toFixed(2),(prov*12).toFixed(2),pgto.toFixed(2),
-      list.filter(c=>c.statusP1==="Validado").length,list.filter(c=>!c.p1ini).length,
-      list.filter(c=>c.statusP1==="Recusado"||c.statusP2==="Recusado").length,
-      list.filter(c=>c.situacao==="Férias em Dobro").length]);
-  });
-  const csv=rows.map(r=>r.join(";")).join("\n");
-  const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
-  a.download="dashboard_departamentos_2027.csv";a.click();showToast("CSV exportado!","success");
-}
-
 document.querySelectorAll(".modal-overlay").forEach(o=>{o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("open");});});
 calYear=2027;calMonth=0;
 </script>
