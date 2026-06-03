@@ -69,6 +69,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .login-divider-line{flex:1;height:1px;background:var(--border)}
 .login-divider-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
 .login-roles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.login-roles .role-card:last-child:nth-child(odd){grid-column:1/-1;max-width:calc(50% - 4px);margin:0 auto;width:100%}
 .role-card{padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center}
 .role-card:hover{border-color:var(--accent)}.role-card.selected{border-color:var(--navy);background:#EEF1FF}
 .role-card-icon{font-size:18px;margin-bottom:3px}.role-card-name{font-size:11px;font-weight:600;color:var(--navy);line-height:1.3}
@@ -314,6 +315,24 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
       </div>
     </div>
 
+
+    <!-- ALTERAÇÕES SOLICITADAS (DP) -->
+    <div class="section" id="sec-alteracoes">
+      <div class="page-header">
+        <div><div class="page-title">Alterações Solicitadas</div><div class="page-sub">Solicitações de alteração em férias já aprovadas — enviadas pelos gestores</div></div>
+      </div>
+      <div class="cards-row cols-3" id="alteracoesCards"></div>
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title" id="alteracoesCount">—</span></div>
+        <div style="overflow-x:auto"><table><thead><tr>
+          <th>Colaborador</th><th>Departamento</th>
+          <th>Datas Atuais P1</th><th>Datas Atuais P2</th>
+          <th>Novas Datas P1</th><th>Novas Datas P2</th>
+          <th>Justificativa Gestor</th><th>Status</th><th>Ações</th>
+        </tr></thead><tbody id="alteracoesBody"></tbody></table></div>
+      </div>
+    </div>
+
     <!-- VALIDAÇÕES PENDENTES -->
     <div class="section" id="sec-validar">
       <div class="page-header"><div><div class="page-title">Validações Pendentes</div><div class="page-sub">Indicações aguardando análise do DP Interno</div></div></div>
@@ -519,6 +538,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
           <th>P1 Início</th><th>P1 Fim</th><th>Status P1</th>
           <th>P2 Início</th><th>P2 Fim</th><th>Status P2</th>
           <th>Situação</th>
+          <th>Ação</th>
         </tr></thead><tbody id="aprovadasGestorBody"></tbody></table></div>
       </div>
     </div>
@@ -690,6 +710,112 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     </div>
   </div>
 </div>
+
+<!-- MODAL: SOLICITAR ALTERAÇÃO (GESTOR) -->
+<div class="modal-overlay" id="modalSolicitarAlt">
+  <div class="modal">
+    <div class="modal-title">Solicitar Alteração de Férias</div>
+    <div class="modal-sub" id="modalAltGestorName">—</div>
+    <div class="form-info" id="modalAltGestorInfo"></div>
+    <div style="background:#FFF8E1;border:1.5px solid #FFE0B2;border-left:4px solid #F57F17;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#E65100">
+      ⚠️ A solicitação será enviada ao Departamento Pessoal Interno para análise. As datas atuais permanecem vigentes até a aprovação.
+    </div>
+    <div class="period-block">
+      <div class="period-block-title"><span class="period-tag" style="background:var(--accent)">1º Período — Nova Data</span></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Novo Início</label>
+          <input type="date" class="form-input" id="altP1ini" oninput="onAltP1Change()"/>
+          <div class="validation-msg" id="msgAltP1"></div></div>
+        <div class="form-group"><label class="form-label">Novo Fim (automático)</label>
+          <input type="date" class="form-input" id="altP1fim" readonly style="background:#F0F4FF;cursor:not-allowed"/></div>
+      </div>
+    </div>
+    <div class="period-block">
+      <div class="period-block-title"><span class="period-tag" style="background:#2E7D32">2º Período — Nova Data</span></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Novo Início</label>
+          <input type="date" class="form-input" id="altP2ini" oninput="onAltP2Change()"/>
+          <div class="validation-msg" id="msgAltP2"></div></div>
+        <div class="form-group"><label class="form-label">Novo Fim (automático)</label>
+          <input type="date" class="form-input" id="altP2fim" readonly style="background:#F0F4FF;cursor:not-allowed"/></div>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label" style="color:#B71C1C">Justificativa (obrigatória)</label>
+        <textarea class="form-textarea" id="altJustif" placeholder="Descreva o motivo da solicitação de alteração..."></textarea>
+      </div>
+    </div>
+    <div class="validation-msg" id="msgAltGeral"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalSolicitarAlt')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitSolicitarAlt()">Enviar Solicitação</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDITAR APROVADAS (DP) -->
+<div class="modal-overlay" id="modalEditarDP">
+  <div class="modal">
+    <div class="modal-title">Editar Férias Aprovadas</div>
+    <div class="modal-sub" id="modalEditarDPName">—</div>
+    <div class="form-info" id="modalEditarDPInfo"></div>
+    <div style="background:#E3F2FD;border:1.5px solid #90CAF9;border-left:4px solid #1565C0;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#0D47A1">
+      ℹ️ Alteração direta pelo DP Interno. A mudança será registrada no histórico do colaborador.
+    </div>
+    <div class="period-block">
+      <div class="period-block-title"><span class="period-tag" style="background:var(--accent)">1º Período</span></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Novo Início</label>
+          <input type="date" class="form-input" id="editP1ini" oninput="onEditP1Change()"/>
+          <div class="validation-msg" id="msgEditP1"></div></div>
+        <div class="form-group"><label class="form-label">Novo Fim (automático)</label>
+          <input type="date" class="form-input" id="editP1fim" readonly style="background:#F0F4FF;cursor:not-allowed"/></div>
+      </div>
+    </div>
+    <div class="period-block" id="editP2Block">
+      <div class="period-block-title"><span class="period-tag" style="background:#2E7D32">2º Período</span></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Novo Início</label>
+          <input type="date" class="form-input" id="editP2ini" oninput="onEditP2Change()"/>
+          <div class="validation-msg" id="msgEditP2"></div></div>
+        <div class="form-group"><label class="form-label">Novo Fim (automático)</label>
+          <input type="date" class="form-input" id="editP2fim" readonly style="background:#F0F4FF;cursor:not-allowed"/></div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Status após edição</label>
+        <select class="form-select" id="editStatus">
+          <option value="Validado">✓ Validado</option>
+          <option value="Pendente">Pendente — aguardar revalidação</option>
+          <option value="Comunicado">Comunicado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Situação</label>
+        <select class="form-select" id="editSituacao">
+          <option value="">— selecione —</option>
+          <option>Dentro do Prazo</option><option>Férias em Dobro</option>
+          <option>Financeiro</option><option>Demissão</option>
+          <option>13º</option><option>Pago</option><option>Análise gestão</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label" style="color:#B71C1C">Justificativa da Alteração (obrigatória)</label>
+        <textarea class="form-textarea" id="editJustif" placeholder="Descreva o motivo da alteração para registro no histórico..."></textarea>
+      </div>
+    </div>
+    <div class="validation-msg" id="msgEditGeral"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalEditarDP')">Cancelar</button>
+      <button class="btn btn-green" onclick="submitEditarDP()">Salvar Alteração</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toasts"></div>
 
 
@@ -753,13 +879,14 @@ const ROLES_CSC=[
   {id:"csc_adm",label:"Administrativo",icon:"🗂️",dept:"CSC ADMINISTRATIVO",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
 ];
 const ROLE_DP={id:"dp",label:"Departamento Pessoal Interno",dept:null,
-  tabs:["painel","calendario","validar","aprovadas","financeiro","provisao","indicadores","bloqueios"]};
+  tabs:["painel","calendario","validar","aprovadas","alteracoes","financeiro","provisao","indicadores","bloqueios"]};
 const TAB_CONFIG={
   painel:{label:"📊 Painel Geral",sec:"sec-painel"},
   setor:{label:"👥 Meu Departamento",sec:"sec-setor"},
   calendario:{label:"📅 Calendário",sec:"sec-calendario"},
   validar:{label:"✅ Pendentes",sec:"sec-validar"},
   aprovadas:{label:"✔ Aprovadas",sec:"sec-aprovadas"},
+  alteracoes:{label:"🔄 Alterações",sec:"sec-alteracoes"},
   financeiro:{label:"💰 Financeiro",sec:"sec-financeiro"},
   indicadores:{label:"📈 Indicadores",sec:"sec-depto"},
   "aprovadas-gestor":{label:"✔ Aprovadas",sec:"sec-aprovadas-gestor"},
@@ -770,36 +897,36 @@ const TAB_CONFIG={
 const DEPT_COLORS={"FISCAL MATRIZ":"#EBF1FB","FISCAL CAXIAS":"#DCEEFB","CONTABIL MATRIZ":"#FFF3E0","CONTABIL CAXIAS":"#FFF8EC","PESSOAL MATRIZ":"#F3E5F5","PESSOAL CAXIAS":"#FAF0FF","PEQUENOS NEGOCIOS":"#E8F5E9","CSC MARKETING":"#FCE4EC","CSC FINANCEIRO":"#FFF9C4","CSC TECNOLOGIA":"#E8EAF6","CSC GENTE GESTAO":"#E0F2F1","CSC LEGALIZACAO":"#F9FBE7","CSC ADMINISTRATIVO":"#EFEBE9"};
 const DEPT_TEXT={"FISCAL MATRIZ":"#1E2761","FISCAL CAXIAS":"#0277BD","CONTABIL MATRIZ":"#E65100","CONTABIL CAXIAS":"#BF360C","PESSOAL MATRIZ":"#6A1B9A","PESSOAL CAXIAS":"#4A148C","PEQUENOS NEGOCIOS":"#1B5E20","CSC MARKETING":"#880E4F","CSC FINANCEIRO":"#F57F17","CSC TECNOLOGIA":"#283593","CSC GENTE GESTAO":"#004D40","CSC LEGALIZACAO":"#558B2F","CSC ADMINISTRATIVO":"#4E342E"};
 let colaboradores=[
-  {id:1,nome:"Ana Paula Ferreira",dept:"CONTABIL MATRIZ",salario:2085,admissao:"2019-03-15",pa_ini:"2026-03-15",pa_fim:"2027-03-14",conceder:"2027-09-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:2,nome:"Carlos Eduardo Lima",dept:"CONTABIL MATRIZ",salario:2228,admissao:"2021-07-01",pa_ini:"2026-07-01",pa_fim:"2027-06-30",conceder:"2027-12-31",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:3,nome:"Fernanda Costa Silva",dept:"CONTABIL MATRIZ",salario:2240,admissao:"2020-01-20",pa_ini:"2026-01-20",pa_fim:"2027-01-19",conceder:"2027-07-19",p1ini:"2027-02-02",p1fim:"2027-02-16",p2ini:"2027-03-15",p2fim:"2027-03-29",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"15/01/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 02/02 → 16/02 | P2: 15/03 → 29/03"},{dt:"20/01/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
-  {id:4,nome:"Gustavo Martins Souza",dept:"CONTABIL CAXIAS",salario:2458,admissao:"2022-05-10",pa_ini:"2026-05-10",pa_fim:"2027-05-09",conceder:"2027-11-09",p1ini:"2027-04-19",p1fim:"2027-05-03",p2ini:"",p2fim:"",obs:"",statusP1:"Recusado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"Período coincide com fechamento de impostos (01/04 a 15/04). Favor indicar datas após 16/04/2027.",motivoP2:"",hist:[{dt:"10/02/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 19/04 → 03/05"},{dt:"15/02/2027",acao:"Recusado pelo DP",user:"DP Interno",det:"P1 recusado — coincide com fechamento de impostos (01/04 a 15/04)"}]},
-  {id:5,nome:"Helena Ribeiro Nunes",dept:"CONTABIL CAXIAS",salario:2463,admissao:"2018-11-05",pa_ini:"2026-11-05",pa_fim:"2027-11-04",conceder:"2027-05-04",p1ini:"2027-03-08",p1fim:"2027-03-22",p2ini:"2027-04-19",p2fim:"2027-05-03",obs:"Preferência da colaboradora",statusP1:"Comunicado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"05/01/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 08/03 → 22/03 | P2: 19/04 → 03/05"},{dt:"10/01/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"},{dt:"15/01/2027",acao:"Comunicado",user:"DP Interno",det:"Colaboradora notificada com antecedência"}]},
-  {id:6,nome:"Igor Nascimento Santos",dept:"FISCAL MATRIZ",salario:2664,admissao:"2023-02-14",pa_ini:"2026-02-14",pa_fim:"2027-02-13",conceder:"2027-08-13",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:7,nome:"Juliana Alves Moreira",dept:"FISCAL MATRIZ",salario:2676,admissao:"2021-09-30",pa_ini:"2026-09-30",pa_fim:"2027-09-29",conceder:"2028-03-29",p1ini:"2027-07-06",p1fim:"2027-07-20",p2ini:"2027-08-03",p2fim:"2027-08-17",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"20/02/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 06/07 → 20/07 | P2: 03/08 → 17/08"},{dt:"25/02/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
-  {id:8,nome:"Lucas Pereira Gomes",dept:"FISCAL CAXIAS",salario:2883,admissao:"2020-06-22",pa_ini:"2026-06-22",pa_fim:"2027-06-21",conceder:"2027-12-21",p1ini:"2027-06-07",p1fim:"2027-06-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:9,nome:"Mariana Torres Campos",dept:"FISCAL CAXIAS",salario:2918,admissao:"2019-08-12",pa_ini:"2026-08-12",pa_fim:"2027-08-11",conceder:"2028-02-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:10,nome:"Nicolas Oliveira Dias",dept:"PESSOAL MATRIZ",salario:3158,admissao:"2022-11-01",pa_ini:"2026-11-01",pa_fim:"2027-10-31",conceder:"2028-04-30",p1ini:"2027-09-01",p1fim:"2027-09-15",p2ini:"2027-10-04",p2fim:"2027-10-18",obs:"",statusP1:"Validado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"01/03/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 01/09 → 15/09 | P2: 04/10 → 18/10"},{dt:"05/03/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 validado"}]},
-  {id:11,nome:"Patrícia Mendes Rocha",dept:"PESSOAL MATRIZ",salario:3227,admissao:"2020-04-08",pa_ini:"2026-04-08",pa_fim:"2027-04-07",conceder:"2027-10-07",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:12,nome:"Rafael Cardoso Teixeira",dept:"PESSOAL CAXIAS",salario:3560,admissao:"2021-12-15",pa_ini:"2026-12-15",pa_fim:"2027-12-14",conceder:"2028-06-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:13,nome:"Sabrina Vieira Lopes",dept:"PESSOAL CAXIAS",salario:3789,admissao:"2023-03-20",pa_ini:"2026-03-20",pa_fim:"2027-03-19",conceder:"2027-09-19",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:14,nome:"Thiago Barbosa Cunha",dept:"FISCAL MATRIZ",salario:4134,admissao:"2018-07-03",pa_ini:"2025-07-03",pa_fim:"2026-07-02",conceder:"2027-10-02",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Férias em Dobro",motivoP1:"",motivoP2:"",hist:[]},
-  {id:15,nome:"Vanessa Castro Pinto",dept:"PEQUENOS NEGOCIOS",salario:4306,admissao:"2022-02-28",pa_ini:"2026-02-28",pa_fim:"2027-02-27",conceder:"2027-08-27",p1ini:"2027-04-07",p1fim:"2027-04-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:16,nome:"Willian Fernandes Cruz",dept:"PEQUENOS NEGOCIOS",salario:4478,admissao:"2020-10-14",pa_ini:"2026-10-14",pa_fim:"2027-10-13",conceder:"2028-04-13",p1ini:"2027-08-04",p1fim:"2027-08-18",p2ini:"2027-09-08",p2fim:"2027-09-22",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"10/04/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 04/08 → 18/08 | P2: 08/09 → 22/09"},{dt:"15/04/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
-  {id:17,nome:"Ximena Ramos Bastos",dept:"PEQUENOS NEGOCIOS",salario:4823,admissao:"2021-05-17",pa_ini:"2026-05-17",pa_fim:"2027-05-16",conceder:"2027-11-16",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:18,nome:"Yasmin Correia Melo",dept:"CONTABIL MATRIZ",salario:4995,admissao:"2019-01-09",pa_ini:"2026-01-09",pa_fim:"2027-01-08",conceder:"2027-07-08",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:19,nome:"Zuleide Amaral Santos",dept:"FISCAL CAXIAS",salario:5167,admissao:"2022-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:20,nome:"André Luis Monteiro",dept:"PESSOAL MATRIZ",salario:5511,admissao:"2023-06-12",pa_ini:"2026-06-12",pa_fim:"2027-06-11",conceder:"2027-12-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:21,nome:"Beatriz Souza Lima",dept:"CSC MARKETING",salario:5856,admissao:"2021-03-10",pa_ini:"2026-03-10",pa_fim:"2027-03-09",conceder:"2027-09-09",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:22,nome:"Diego Henrique Prado",dept:"CSC MARKETING",salario:6085,admissao:"2022-06-15",pa_ini:"2026-06-15",pa_fim:"2027-06-14",conceder:"2027-12-14",p1ini:"2027-05-03",p1fim:"2027-05-17",p2ini:"2027-06-16",p2fim:"2027-06-30",obs:"",statusP1:"Validado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"05/03/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 03/05 → 17/05 | P2: 16/06 → 30/06"},{dt:"10/03/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 validado"}]},
-  {id:23,nome:"Eduarda Nunes Farias",dept:"CSC FINANCEIRO",salario:6269,admissao:"2019-09-01",pa_ini:"2026-09-01",pa_fim:"2027-08-31",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:24,nome:"Fábio Augusto Torres",dept:"CSC FINANCEIRO",salario:6602,admissao:"2020-11-20",pa_ini:"2026-11-20",pa_fim:"2027-11-19",conceder:"2028-05-19",p1ini:"2027-08-03",p1fim:"2027-08-17",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:25,nome:"Giovana Melo Carvalho",dept:"CSC TECNOLOGIA",salario:6728,admissao:"2021-04-05",pa_ini:"2026-04-05",pa_fim:"2027-04-04",conceder:"2027-10-04",p1ini:"2027-07-07",p1fim:"2027-07-21",p2ini:"2027-08-10",p2fim:"2027-08-24",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"15/02/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 07/07 → 21/07 | P2: 10/08 → 24/08"},{dt:"20/02/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
-  {id:26,nome:"Henrique Braga Costa",dept:"CSC TECNOLOGIA",salario:7084,admissao:"2020-02-18",pa_ini:"2026-02-18",pa_fim:"2027-02-17",conceder:"2027-08-17",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:27,nome:"Isabela Rocha Martins",dept:"CSC GENTE GESTAO",salario:7485,admissao:"2019-07-22",pa_ini:"2026-07-22",pa_fim:"2027-07-21",conceder:"2028-01-21",p1ini:"2027-03-01",p1fim:"2027-03-15",p2ini:"2027-04-07",p2fim:"2027-04-21",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"10/01/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 01/03 → 15/03 | P2: 07/04 → 21/04"},{dt:"15/01/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}]},
-  {id:28,nome:"Jonas Ferreira Alves",dept:"CSC GENTE GESTAO",salario:7899,admissao:"2022-01-10",pa_ini:"2026-01-10",pa_fim:"2027-01-09",conceder:"2027-07-09",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:29,nome:"Karla Vieira Santos",dept:"CSC LEGALIZACAO",salario:8244,admissao:"2021-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
-  {id:30,nome:"Leonardo Paz Cardoso",dept:"CSC ADMINISTRATIVO",salario:3000,admissao:"2022-10-03",pa_ini:"2026-10-03",pa_fim:"2027-10-02",conceder:"2028-04-02",p1ini:"2027-09-08",p1fim:"2027-09-22",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[]},
+  {id:1,nome:"Ana Paula Ferreira",dept:"CONTABIL MATRIZ",salario:2085,admissao:"2019-03-15",pa_ini:"2026-03-15",pa_fim:"2027-03-14",conceder:"2027-09-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:2,nome:"Carlos Eduardo Lima",dept:"CONTABIL MATRIZ",salario:2228,admissao:"2021-07-01",pa_ini:"2026-07-01",pa_fim:"2027-06-30",conceder:"2027-12-31",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:3,nome:"Fernanda Costa Silva",dept:"CONTABIL MATRIZ",salario:2240,admissao:"2020-01-20",pa_ini:"2026-01-20",pa_fim:"2027-01-19",conceder:"2027-07-19",p1ini:"2027-02-02",p1fim:"2027-02-16",p2ini:"2027-03-15",p2fim:"2027-03-29",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"15/01/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 02/02 → 16/02 | P2: 15/03 → 29/03"},{dt:"20/01/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:4,nome:"Gustavo Martins Souza",dept:"CONTABIL CAXIAS",salario:2458,admissao:"2022-05-10",pa_ini:"2026-05-10",pa_fim:"2027-05-09",conceder:"2027-11-09",p1ini:"2027-04-19",p1fim:"2027-05-03",p2ini:"",p2fim:"",obs:"",statusP1:"Recusado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"Período coincide com fechamento de impostos (01/04 a 15/04). Favor indicar datas após 16/04/2027.",motivoP2:"",hist:[{dt:"10/02/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 19/04 → 03/05"},{dt:"15/02/2027",acao:"Recusado pelo DP",user:"DP Interno",det:"P1 recusado — coincide com fechamento de impostos (01/04 a 15/04)"}],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:5,nome:"Helena Ribeiro Nunes",dept:"CONTABIL CAXIAS",salario:2463,admissao:"2018-11-05",pa_ini:"2026-11-05",pa_fim:"2027-11-04",conceder:"2027-05-04",p1ini:"2027-03-08",p1fim:"2027-03-22",p2ini:"2027-04-19",p2fim:"2027-05-03",obs:"Preferência da colaboradora",statusP1:"Comunicado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"05/01/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 08/03 → 22/03 | P2: 19/04 → 03/05"},{dt:"10/01/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"},{dt:"15/01/2027",acao:"Comunicado",user:"DP Interno",det:"Colaboradora notificada com antecedência"}],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:6,nome:"Igor Nascimento Santos",dept:"FISCAL MATRIZ",salario:2664,admissao:"2023-02-14",pa_ini:"2026-02-14",pa_fim:"2027-02-13",conceder:"2027-08-13",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:7,nome:"Juliana Alves Moreira",dept:"FISCAL MATRIZ",salario:2676,admissao:"2021-09-30",pa_ini:"2026-09-30",pa_fim:"2027-09-29",conceder:"2028-03-29",p1ini:"2027-07-06",p1fim:"2027-07-20",p2ini:"2027-08-03",p2fim:"2027-08-17",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"20/02/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 06/07 → 20/07 | P2: 03/08 → 17/08"},{dt:"25/02/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:8,nome:"Lucas Pereira Gomes",dept:"FISCAL CAXIAS",salario:2883,admissao:"2020-06-22",pa_ini:"2026-06-22",pa_fim:"2027-06-21",conceder:"2027-12-21",p1ini:"2027-06-07",p1fim:"2027-06-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:9,nome:"Mariana Torres Campos",dept:"FISCAL CAXIAS",salario:2918,admissao:"2019-08-12",pa_ini:"2026-08-12",pa_fim:"2027-08-11",conceder:"2028-02-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:10,nome:"Nicolas Oliveira Dias",dept:"PESSOAL MATRIZ",salario:3158,admissao:"2022-11-01",pa_ini:"2026-11-01",pa_fim:"2027-10-31",conceder:"2028-04-30",p1ini:"2027-09-01",p1fim:"2027-09-15",p2ini:"2027-10-04",p2fim:"2027-10-18",obs:"",statusP1:"Validado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"01/03/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 01/09 → 15/09 | P2: 04/10 → 18/10"},{dt:"05/03/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 validado"}],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:11,nome:"Patrícia Mendes Rocha",dept:"PESSOAL MATRIZ",salario:3227,admissao:"2020-04-08",pa_ini:"2026-04-08",pa_fim:"2027-04-07",conceder:"2027-10-07",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:12,nome:"Rafael Cardoso Teixeira",dept:"PESSOAL CAXIAS",salario:3560,admissao:"2021-12-15",pa_ini:"2026-12-15",pa_fim:"2027-12-14",conceder:"2028-06-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:13,nome:"Sabrina Vieira Lopes",dept:"PESSOAL CAXIAS",salario:3789,admissao:"2023-03-20",pa_ini:"2026-03-20",pa_fim:"2027-03-19",conceder:"2027-09-19",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:14,nome:"Thiago Barbosa Cunha",dept:"FISCAL MATRIZ",salario:4134,admissao:"2018-07-03",pa_ini:"2025-07-03",pa_fim:"2026-07-02",conceder:"2027-10-02",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Férias em Dobro",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:15,nome:"Vanessa Castro Pinto",dept:"PEQUENOS NEGOCIOS",salario:4306,admissao:"2022-02-28",pa_ini:"2026-02-28",pa_fim:"2027-02-27",conceder:"2027-08-27",p1ini:"2027-04-07",p1fim:"2027-04-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:16,nome:"Willian Fernandes Cruz",dept:"PEQUENOS NEGOCIOS",salario:4478,admissao:"2020-10-14",pa_ini:"2026-10-14",pa_fim:"2027-10-13",conceder:"2028-04-13",p1ini:"2027-08-04",p1fim:"2027-08-18",p2ini:"2027-09-08",p2fim:"2027-09-22",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"10/04/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 04/08 → 18/08 | P2: 08/09 → 22/09"},{dt:"15/04/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:17,nome:"Ximena Ramos Bastos",dept:"PEQUENOS NEGOCIOS",salario:4823,admissao:"2021-05-17",pa_ini:"2026-05-17",pa_fim:"2027-05-16",conceder:"2027-11-16",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:18,nome:"Yasmin Correia Melo",dept:"CONTABIL MATRIZ",salario:4995,admissao:"2019-01-09",pa_ini:"2026-01-09",pa_fim:"2027-01-08",conceder:"2027-07-08",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:19,nome:"Zuleide Amaral Santos",dept:"FISCAL CAXIAS",salario:5167,admissao:"2022-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:20,nome:"André Luis Monteiro",dept:"PESSOAL MATRIZ",salario:5511,admissao:"2023-06-12",pa_ini:"2026-06-12",pa_fim:"2027-06-11",conceder:"2027-12-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:21,nome:"Beatriz Souza Lima",dept:"CSC MARKETING",salario:5856,admissao:"2021-03-10",pa_ini:"2026-03-10",pa_fim:"2027-03-09",conceder:"2027-09-09",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:22,nome:"Diego Henrique Prado",dept:"CSC MARKETING",salario:6085,admissao:"2022-06-15",pa_ini:"2026-06-15",pa_fim:"2027-06-14",conceder:"2027-12-14",p1ini:"2027-05-03",p1fim:"2027-05-17",p2ini:"2027-06-16",p2fim:"2027-06-30",obs:"",statusP1:"Validado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"05/03/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 03/05 → 17/05 | P2: 16/06 → 30/06"},{dt:"10/03/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 validado"}],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:23,nome:"Eduarda Nunes Farias",dept:"CSC FINANCEIRO",salario:6269,admissao:"2019-09-01",pa_ini:"2026-09-01",pa_fim:"2027-08-31",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:24,nome:"Fábio Augusto Torres",dept:"CSC FINANCEIRO",salario:6602,admissao:"2020-11-20",pa_ini:"2026-11-20",pa_fim:"2027-11-19",conceder:"2028-05-19",p1ini:"2027-08-03",p1fim:"2027-08-17",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:25,nome:"Giovana Melo Carvalho",dept:"CSC TECNOLOGIA",salario:6728,admissao:"2021-04-05",pa_ini:"2026-04-05",pa_fim:"2027-04-04",conceder:"2027-10-04",p1ini:"2027-07-07",p1fim:"2027-07-21",p2ini:"2027-08-10",p2fim:"2027-08-24",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"15/02/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 07/07 → 21/07 | P2: 10/08 → 24/08"},{dt:"20/02/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:26,nome:"Henrique Braga Costa",dept:"CSC TECNOLOGIA",salario:7084,admissao:"2020-02-18",pa_ini:"2026-02-18",pa_fim:"2027-02-17",conceder:"2027-08-17",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:27,nome:"Isabela Rocha Martins",dept:"CSC GENTE GESTAO",salario:7485,admissao:"2019-07-22",pa_ini:"2026-07-22",pa_fim:"2027-07-21",conceder:"2028-01-21",p1ini:"2027-03-01",p1fim:"2027-03-15",p2ini:"2027-04-07",p2fim:"2027-04-21",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[{dt:"10/01/2027",acao:"Datas indicadas",user:"Gestor",det:"P1: 01/03 → 15/03 | P2: 07/04 → 21/04"},{dt:"15/01/2027",acao:"Validado pelo DP",user:"DP Interno",det:"P1 e P2 validados"}],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:28,nome:"Jonas Ferreira Alves",dept:"CSC GENTE GESTAO",salario:7899,admissao:"2022-01-10",pa_ini:"2026-01-10",pa_fim:"2027-01-09",conceder:"2027-07-09",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:29,nome:"Karla Vieira Santos",dept:"CSC LEGALIZACAO",salario:8244,admissao:"2021-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
+  {id:30,nome:"Leonardo Paz Cardoso",dept:"CSC ADMINISTRATIVO",salario:3000,admissao:"2022-10-03",pa_ini:"2026-10-03",pa_fim:"2027-10-02",conceder:"2028-04-02",p1ini:"2027-09-08",p1fim:"2027-09-22",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
 ];
 let currentRole=null,currentColab=null,filterAtivo="Todos",filterFinAtivo="Todos",filterAprAtivo="Todos",selectedCscRole=null,finMesSel=-1;
 let calYear=2027,calMonth=0;
@@ -859,6 +986,7 @@ function switchTab(k){
   if(k==="calendario")renderCalendario();
   if(k==="validar")renderValidar();
   if(k==="aprovadas")renderAprovadas();
+  if(k==="alteracoes")renderAlteracoes();
   if(k==="aprovadas-gestor")renderAprovadasGestor();
   if(k==="historico")renderHistorico();
   if(k==="financeiro")renderFinanceiro();
@@ -916,7 +1044,10 @@ function renderPainelBody(q=""){
     <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
     <td>${statusBadge(c.statusP1)}</td><td>${c.p2ini?statusBadge(c.statusP2):"<span style='color:var(--muted);font-size:11px'>—</span>"}</td>
     <td><span class="badge badge-gray" style="font-size:10px">${c.situacao}</span></td>
-    <td><button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Editar</button></td>
+    <td style="display:flex;gap:4px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Validar</button>
+      ${["Validado","Comunicado"].includes(c.statusP1)?`<button class="btn btn-outline btn-sm" onclick="openEditarDP(${c.id})">✎ Editar</button>`:""}
+    </td>
   </tr>`).join("");
 }
 
@@ -1627,7 +1758,10 @@ function renderAprovadasGestor(){
     <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
     <td>${c.p2ini?statusBadge(c.statusP2):"<span style='color:var(--muted);font-size:11px'>—</span>"}</td>
     <td><span class="badge badge-gray" style="font-size:10px">${c.situacao}</span></td>
-  </tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">Nenhuma aprovação ainda no seu departamento</td></tr>`;
+    <td>${c.altReq&&c.altReq.status==="Solicitado"
+      ?`<span class="badge badge-yellow">⏳ Aguard. DP</span>`
+      :`<button class="btn btn-outline btn-sm" onclick="openSolicitarAlteracao(${c.id})">✎ Solicitar Alteração</button>`}</td>
+  </tr>`).join(""):`<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--muted)">Nenhuma aprovação ainda no seu departamento</td></tr>`;
 }
 function filterAprovadasGestor(q){
   const cfg=getCurrentCfg();const dept=cfg.dept;
@@ -1728,7 +1862,21 @@ function renderHistoricoBody(list,dept){
 function updateNavBadges(){
   const cfg=getCurrentCfg();
   const dept=cfg?cfg.dept:null;
-  if(!dept) return; // DP não precisa de badge — tem painel completo
+  // DP badge for pending alterations
+  if(!dept){
+    const pendAlt=colaboradores.filter(c=>c.altReq&&c.altReq.status==="Solicitado").length;
+    document.querySelectorAll(".nav-tab").forEach(tab=>{
+      tab.querySelectorAll(".nav-badge").forEach(b=>b.remove());
+      if(tab.dataset.tab==="alteracoes"&&pendAlt>0){
+        const b=document.createElement("span");
+        b.className="nav-badge";
+        b.style.cssText="background:#C62828;color:white;border-radius:10px;font-size:10px;font-weight:700;padding:2px 6px;margin-left:6px;display:inline-block;";
+        b.textContent=pendAlt;
+        tab.appendChild(b);
+      }
+    });
+    return;
+  }
   const recusas=colaboradores.filter(c=>c.dept===dept&&(c.statusP1==="Recusado"||c.statusP2==="Recusado")).length;
   const temRecusaHist=colaboradores.filter(c=>c.dept===dept&&(c.hist||[]).some(h=>h.acao.includes("Recusado"))).length;
   document.querySelectorAll(".nav-tab").forEach(tab=>{
@@ -1751,6 +1899,194 @@ function updateNavBadges(){
       tab.appendChild(b);
     }
   });
+}
+
+
+// ── SOLICITAR ALTERAÇÃO (GESTOR) ─────────────────────────────
+function openSolicitarAlteracao(id){
+  currentColab=colaboradores.find(c=>c.id===id);
+  const c=currentColab;
+  document.getElementById("modalAltGestorName").textContent=c.nome;
+  document.getElementById("modalAltGestorInfo").innerHTML=`
+    <strong>Datas atuais P1:</strong> ${fmtDate(c.p1ini)} a ${fmtDate(c.p1fim)}<br>
+    ${c.p2ini?`<strong>Datas atuais P2:</strong> ${fmtDate(c.p2ini)} a ${fmtDate(c.p2fim)}<br>`:""}
+    <strong>Conceder até:</strong> ${fmtDate(c.conceder)} &nbsp; <strong>Status atual:</strong> ${c.statusP1}`;
+  // Pre-fill with current dates
+  document.getElementById("altP1ini").value=c.p1ini||"";
+  document.getElementById("altP1fim").value=c.p1fim||"";
+  document.getElementById("altP2ini").value=c.p2ini||"";
+  document.getElementById("altP2fim").value=c.p2fim||"";
+  document.getElementById("altJustif").value="";
+  ["msgAltP1","msgAltP2","msgAltGeral"].forEach(i=>{const e=document.getElementById(i);e.className="validation-msg";e.textContent="";});
+  openModal("modalSolicitarAlt");
+}
+function onAltP1Change(){
+  const ini=document.getElementById("altP1ini").value;
+  const msg=document.getElementById("msgAltP1");
+  if(!ini){msg.className="validation-msg";return;}
+  const err=getDayBlockReason(ini,currentColab?.dept);
+  if(err){msg.className="validation-msg error";msg.textContent="❌ "+err;document.getElementById("altP1fim").value="";return;}
+  document.getElementById("altP1fim").value=addDays(ini,14);
+  msg.className="validation-msg ok";msg.textContent=`✅ ${fmtDate(ini)} a ${fmtDate(addDays(ini,14))} — 15 dias`;
+}
+function onAltP2Change(){
+  const ini=document.getElementById("altP2ini").value;
+  const msg=document.getElementById("msgAltP2");
+  if(!ini){msg.className="validation-msg";return;}
+  const err=getDayBlockReason(ini,currentColab?.dept);
+  if(err){msg.className="validation-msg error";msg.textContent="❌ "+err;document.getElementById("altP2fim").value="";return;}
+  const p1fim=document.getElementById("altP1fim").value;
+  if(p1fim&&ini<=p1fim){msg.className="validation-msg error";msg.textContent=`❌ 2º período deve começar após ${fmtDate(p1fim)}.`;document.getElementById("altP2fim").value="";return;}
+  document.getElementById("altP2fim").value=addDays(ini,14);
+  msg.className="validation-msg ok";msg.textContent=`✅ ${fmtDate(ini)} a ${fmtDate(addDays(ini,14))} — 15 dias`;
+}
+function submitSolicitarAlt(){
+  const p1ini=document.getElementById("altP1ini").value;
+  const p1fim=document.getElementById("altP1fim").value;
+  const p2ini=document.getElementById("altP2ini").value;
+  const p2fim=document.getElementById("altP2fim").value;
+  const justif=document.getElementById("altJustif").value.trim();
+  const msg=document.getElementById("msgAltGeral");
+  if(!p1ini||!p1fim){msg.className="validation-msg error";msg.textContent="❌ Informe ao menos as novas datas do 1º período.";return;}
+  if(!justif){msg.className="validation-msg error";msg.textContent="❌ A justificativa é obrigatória.";return;}
+  const err=getDayBlockReason(p1ini,currentColab?.dept);
+  if(err){msg.className="validation-msg error";msg.textContent="❌ 1º Período: "+err;return;}
+  if(p2ini){const err2=getDayBlockReason(p2ini,currentColab?.dept);if(err2){msg.className="validation-msg error";msg.textContent="❌ 2º Período: "+err2;return;}}
+  const c=colaboradores.find(x=>x.id===currentColab.id);
+  if(!c.altReq)c.altReq={p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""};
+  c.altReq={p1ini,p1fim,p2ini:p2ini||"",p2fim:p2fim||"",justif,status:"Solicitado"};
+  // Log in history
+  const now=new Date();
+  const hdt=`${String(now.getDate()).padStart(2,"0")}/${String(now.getMonth()+1).padStart(2,"0")}/${now.getFullYear()}`;
+  if(!c.hist)c.hist=[];
+  c.hist.push({dt:hdt,acao:"Alteração solicitada",user:"Gestor",det:`Nova P1: ${fmtDate(p1ini)} → ${fmtDate(p1fim)}${p2ini?" | Nova P2: "+fmtDate(p2ini)+" → "+fmtDate(p2fim):""} | Justif: ${justif}`});
+  closeModal("modalSolicitarAlt");
+  showToast("✅ Solicitação enviada ao DP Interno!","success");
+  renderAprovadasGestor();
+  updateNavBadges();
+}
+
+// ── EDITAR APROVADAS (DP) ────────────────────────────────────
+function openEditarDP(id){
+  currentColab=colaboradores.find(c=>c.id===id);
+  const c=currentColab;
+  document.getElementById("modalEditarDPName").textContent=c.nome;
+  document.getElementById("modalEditarDPInfo").innerHTML=`
+    <strong>Departamento:</strong> ${c.dept} &nbsp;
+    <strong>Conceder até:</strong> ${fmtDate(c.conceder)}<br>
+    <strong>P1 atual:</strong> ${fmtDate(c.p1ini)} a ${fmtDate(c.p1fim)} &nbsp;
+    <strong>P2 atual:</strong> ${c.p2ini?fmtDate(c.p2ini)+" a "+fmtDate(c.p2fim):"Não indicado"}`;
+  document.getElementById("editP1ini").value=c.p1ini||"";
+  document.getElementById("editP1fim").value=c.p1fim||"";
+  document.getElementById("editP2ini").value=c.p2ini||"";
+  document.getElementById("editP2fim").value=c.p2fim||"";
+  document.getElementById("editStatus").value=c.statusP1||"Validado";
+  document.getElementById("editSituacao").value=c.situacao||"";
+  document.getElementById("editJustif").value="";
+  document.getElementById("editP2Block").style.display=c.p2ini?"block":"none";
+  ["msgEditP1","msgEditP2","msgEditGeral"].forEach(i=>{const e=document.getElementById(i);e.className="validation-msg";e.textContent="";});
+  openModal("modalEditarDP");
+}
+function onEditP1Change(){
+  const ini=document.getElementById("editP1ini").value;
+  const msg=document.getElementById("msgEditP1");
+  if(!ini){msg.className="validation-msg";return;}
+  const err=getDayBlockReason(ini,currentColab?.dept);
+  if(err){msg.className="validation-msg error";msg.textContent="❌ "+err;document.getElementById("editP1fim").value="";return;}
+  document.getElementById("editP1fim").value=addDays(ini,14);
+  msg.className="validation-msg ok";msg.textContent=`✅ ${fmtDate(ini)} a ${fmtDate(addDays(ini,14))} — 15 dias`;
+}
+function onEditP2Change(){
+  const ini=document.getElementById("editP2ini").value;
+  const msg=document.getElementById("msgEditP2");
+  if(!ini){msg.className="validation-msg";return;}
+  const err=getDayBlockReason(ini,currentColab?.dept);
+  if(err){msg.className="validation-msg error";msg.textContent="❌ "+err;document.getElementById("editP2fim").value="";return;}
+  const p1fim=document.getElementById("editP1fim").value;
+  if(p1fim&&ini<=p1fim){msg.className="validation-msg error";msg.textContent=`❌ 2º período deve começar após ${fmtDate(p1fim)}.`;document.getElementById("editP2fim").value="";return;}
+  document.getElementById("editP2fim").value=addDays(ini,14);
+  msg.className="validation-msg ok";msg.textContent=`✅ ${fmtDate(ini)} a ${fmtDate(addDays(ini,14))} — 15 dias`;
+}
+function submitEditarDP(){
+  const p1ini=document.getElementById("editP1ini").value;
+  const p1fim=document.getElementById("editP1fim").value;
+  const p2ini=document.getElementById("editP2ini").value;
+  const p2fim=document.getElementById("editP2fim").value;
+  const justif=document.getElementById("editJustif").value.trim();
+  const status=document.getElementById("editStatus").value;
+  const situacao=document.getElementById("editSituacao").value;
+  const msg=document.getElementById("msgEditGeral");
+  if(!p1ini||!p1fim){msg.className="validation-msg error";msg.textContent="❌ Informe as novas datas do 1º período.";return;}
+  if(!justif){msg.className="validation-msg error";msg.textContent="❌ A justificativa é obrigatória para registrar a alteração.";return;}
+  const err=getDayBlockReason(p1ini,currentColab?.dept);
+  if(err){msg.className="validation-msg error";msg.textContent="❌ 1º Período: "+err;return;}
+  if(p2ini){const err2=getDayBlockReason(p2ini,currentColab?.dept);if(err2){msg.className="validation-msg error";msg.textContent="❌ 2º Período: "+err2;return;}}
+  const c=colaboradores.find(x=>x.id===currentColab.id);
+  const oldP1=`${fmtDate(c.p1ini)} a ${fmtDate(c.p1fim)}`;
+  const oldP2=c.p2ini?`${fmtDate(c.p2ini)} a ${fmtDate(c.p2fim)}`:"—";
+  c.p1ini=p1ini;c.p1fim=p1fim;
+  if(p2ini){c.p2ini=p2ini;c.p2fim=p2fim;}
+  c.statusP1=status;if(p2ini)c.statusP2=status;
+  if(situacao)c.situacao=situacao;
+  // Log in history
+  const now=new Date();
+  const hdt=`${String(now.getDate()).padStart(2,"0")}/${String(now.getMonth()+1).padStart(2,"0")}/${now.getFullYear()}`;
+  if(!c.hist)c.hist=[];
+  c.hist.push({dt:hdt,acao:"Alteração pelo DP",user:"DP Interno",
+    det:`P1: ${oldP1} → ${fmtDate(p1ini)} a ${fmtDate(p1fim)}${p2ini?" | P2: "+oldP2+" → "+fmtDate(p2ini)+" a "+fmtDate(p2fim):""} | Justif: ${justif}`});
+  closeModal("modalEditarDP");
+  showToast("✅ Férias alteradas e registradas no histórico!","success");
+  if(document.getElementById("painelCards"))renderPainel();
+  if(document.getElementById("aprovadasCount"))renderAprovadas();
+  updateNavBadges();
+}
+
+// ── ALTERAÇÕES SOLICITADAS (DP) ──────────────────────────────
+function renderAlteracoes(){
+  const list=colaboradores.filter(c=>c.altReq&&c.altReq.status==="Solicitado");
+  const aprovadas=colaboradores.filter(c=>c.altReq&&c.altReq.status==="Aprovado").length;
+  const recusadas=colaboradores.filter(c=>c.altReq&&c.altReq.status==="Recusado").length;
+  document.getElementById("alteracoesCards").innerHTML=`
+    <div class="stat-card"><div class="stat-label">Pendentes</div><div class="stat-value">${list.length}</div><div class="stat-sub">aguardando análise</div></div>
+    <div class="stat-card green"><div class="stat-label">Aprovadas</div><div class="stat-value">${aprovadas}</div><div class="stat-sub">alterações aceitas</div></div>
+    <div class="stat-card red"><div class="stat-label">Recusadas</div><div class="stat-value">${recusadas}</div><div class="stat-sub">mantidas as datas originais</div></div>`;
+  document.getElementById("alteracoesCount").textContent=`${list.length} solicitação(ões) pendente(s)`;
+  document.getElementById("alteracoesBody").innerHTML=list.length?list.map(c=>`<tr>
+    <td><div class="td-name">${c.nome}</div></td>
+    <td>${deptBadge(c.dept)}</td>
+    <td class="td-mono">${fmtDate(c.p1ini)} a ${fmtDate(c.p1fim)}</td>
+    <td class="td-mono">${c.p2ini?fmtDate(c.p2ini)+" a "+fmtDate(c.p2fim):"—"}</td>
+    <td class="td-mono" style="color:#1565C0;font-weight:600">${fmtDate(c.altReq.p1ini)} a ${fmtDate(c.altReq.p1fim)}</td>
+    <td class="td-mono" style="color:#1565C0;font-weight:600">${c.altReq.p2ini?fmtDate(c.altReq.p2ini)+" a "+fmtDate(c.altReq.p2fim):"—"}</td>
+    <td style="font-size:12px;max-width:200px;color:var(--muted)">${c.altReq.justif}</td>
+    <td><span class="badge badge-yellow">⏳ Pendente</span></td>
+    <td style="display:flex;gap:6px">
+      <button class="btn btn-green btn-sm" onclick="responderAlteracao(${c.id},true)">✓ Aprovar</button>
+      <button class="btn btn-red btn-sm" onclick="responderAlteracao(${c.id},false)">✗ Recusar</button>
+    </td>
+  </tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhuma solicitação pendente</td></tr>`;
+}
+function responderAlteracao(id,aprovar){
+  const c=colaboradores.find(x=>x.id===id);
+  const now=new Date();
+  const hdt=`${String(now.getDate()).padStart(2,"0")}/${String(now.getMonth()+1).padStart(2,"0")}/${now.getFullYear()}`;
+  if(!c.hist)c.hist=[];
+  if(aprovar){
+    const oldP1=`${fmtDate(c.p1ini)} a ${fmtDate(c.p1fim)}`;
+    c.p1ini=c.altReq.p1ini;c.p1fim=c.altReq.p1fim;
+    if(c.altReq.p2ini){c.p2ini=c.altReq.p2ini;c.p2fim=c.altReq.p2fim;}
+    c.statusP1="Validado";if(c.p2ini)c.statusP2="Validado";
+    c.altReq.status="Aprovado";
+    c.hist.push({dt:hdt,acao:"Alteração aprovada",user:"DP Interno",det:`Novas datas aplicadas. P1: ${fmtDate(c.p1ini)} a ${fmtDate(c.p1fim)}`});
+    showToast("✅ Alteração aprovada e datas atualizadas!","success");
+  } else {
+    c.altReq.status="Recusado";
+    c.hist.push({dt:hdt,acao:"Alteração recusada",user:"DP Interno",det:`Solicitação recusada. Datas originais mantidas.`});
+    showToast("❌ Solicitação recusada. Datas originais mantidas.","error");
+  }
+  renderAlteracoes();
+  if(document.getElementById("painelCards"))renderPainel();
+  updateNavBadges();
 }
 
 // ── BLOQUEIOS ────────────────────────────────────────────────
