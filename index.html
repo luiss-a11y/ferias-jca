@@ -6,13 +6,7 @@
 <title>Férias 2027 — JCA Contadores</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --navy:#1E2761; --navy-dark:#151D4A; --accent:#4A90D9; --accent-light:#CADCFC;
-  --white:#FFFFFF; --bg:#F0F4FF; --card:#FFFFFF; --text:#1E2761; --muted:#6B7A9F;
-  --border:#D8E2F5; --green:#1B5E20; --green-bg:#E8F5E9; --red:#B71C1C; --red-bg:#FFEBEE;
-  --yellow:#E65100; --yellow-bg:#FFF8E1; --blue:#0D47A1; --blue-bg:#E3F2FD;
-  --shadow:0 2px 12px rgba(30,39,97,.10); --shadow-lg:0 8px 32px rgba(30,39,97,.15); --radius:12px;
-}
+:root{--navy:#1E2761;--navy-dark:#151D4A;--accent:#4A90D9;--accent-light:#CADCFC;--white:#FFFFFF;--bg:#F0F4FF;--card:#FFFFFF;--text:#1E2761;--muted:#6B7A9F;--border:#D8E2F5;--green:#1B5E20;--green-bg:#E8F5E9;--red:#B71C1C;--red-bg:#FFEBEE;--yellow:#E65100;--yellow-bg:#FFF8E1;--blue:#0D47A1;--blue-bg:#E3F2FD;--shadow:0 2px 12px rgba(30,39,97,.10);--shadow-lg:0 8px 32px rgba(30,39,97,.15);--radius:12px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .topbar{background:var(--navy);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.2)}
@@ -22,8 +16,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .topbar-sub{color:var(--accent-light);font-size:12px}
 .topbar-right{display:flex;align-items:center;gap:16px}
 .role-badge{background:rgba(74,144,217,.2);color:var(--accent-light);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid rgba(74,144,217,.3)}
-.nav-tabs{background:var(--white);border-bottom:1px solid var(--border);padding:0 32px;display:flex;gap:0;overflow-x:auto}
-.nav-tab{padding:14px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
+.nav-tabs{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto}
+.nav-tab{padding:14px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
 .nav-tab:hover{color:var(--accent)}
 .nav-tab.active{color:var(--navy);border-bottom-color:var(--accent);font-weight:600}
 .main{padding:28px 32px;max-width:1400px;margin:0 auto}
@@ -39,7 +33,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
 .stat-card.green::before{background:#2E7D32}
 .stat-card.red::before{background:#C62828}
-.stat-card.navy::before{background:var(--navy)}
 .stat-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .stat-value{font-size:28px;font-weight:700;color:var(--navy);line-height:1}
 .stat-sub{font-size:12px;color:var(--muted);margin-top:6px}
@@ -68,14 +61,10 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .badge-yellow{background:var(--yellow-bg);color:var(--yellow)}
 .badge-blue{background:var(--blue-bg);color:var(--blue)}
 .badge-gray{background:#ECEFF1;color:#546E7A}
-.setor-contabil{background:#EBF1FB;color:var(--navy)}
-.setor-fiscal{background:#FFF3E0;color:#E65100}
-.setor-pessoal{background:#F3E5F5;color:#6A1B9A}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
 .btn-primary{background:var(--accent);color:white}
 .btn-primary:hover{background:#3A7BC8}
 .btn-navy{background:var(--navy);color:white}
-.btn-navy:hover{background:var(--navy-dark)}
 .btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--border)}
 .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
 .btn-sm{padding:5px 12px;font-size:12px}
@@ -83,52 +72,45 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .btn-green:hover{background:#1B5E20}
 .btn-red{background:#C62828;color:white}
 .btn-red:hover{background:#B71C1C}
-/* LOGIN */
 .login-wrap{min-height:100vh;background:var(--navy);display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
 .login-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 20%,rgba(74,144,217,.15) 0%,transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(74,144,217,.1) 0%,transparent 50%)}
-.login-card{background:white;border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,.3);position:relative;z-index:1}
+.login-card{background:white;border-radius:20px;padding:40px;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(0,0,0,.3);position:relative;z-index:1}
 .login-logo{width:56px;height:56px;background:var(--navy);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;margin-bottom:20px}
 .login-title{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px}
 .login-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
 .login-roles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-.role-card{padding:14px 12px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center}
+.role-card{padding:12px 10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center}
 .role-card:hover{border-color:var(--accent)}
 .role-card.selected{border-color:var(--navy);background:#EEF1FF}
-.role-card-icon{font-size:22px;margin-bottom:6px}
-.role-card-name{font-size:12px;font-weight:600;color:var(--navy)}
-.role-card-sub{font-size:11px;color:var(--muted);margin-top:2px}
-/* MODAL */
+.role-card-icon{font-size:20px;margin-bottom:4px}
+.role-card-name{font-size:11px;font-weight:600;color:var(--navy)}
+.role-card-sub{font-size:10px;color:var(--muted);margin-top:1px}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
-.modal{background:white;border-radius:16px;padding:32px;width:100%;max-width:580px;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;max-height:90vh;overflow-y:auto}
-.modal-wide{max-width:780px}
+.modal{background:white;border-radius:16px;padding:32px;width:100%;max-width:620px;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;max-height:90vh;overflow-y:auto}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px}
-.modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .form-row.full{grid-template-columns:1fr}
-.form-row.cols3{grid-template-columns:1fr 1fr 1fr}
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-label{font-size:12px;font-weight:600;color:var(--navy);text-transform:uppercase;letter-spacing:.4px}
 .form-input,.form-select,.form-textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);background:white}
-.form-textarea{resize:vertical;min-height:80px}
-.form-info{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.form-textarea{resize:vertical;min-height:72px}
+.form-info{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.7}
 .form-info strong{color:var(--navy)}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 .validation-msg{padding:10px 14px;border-radius:8px;font-size:12px;font-weight:500;margin-top:6px;display:none}
 .validation-msg.error{background:var(--red-bg);color:var(--red);display:block}
 .validation-msg.warn{background:var(--yellow-bg);color:var(--yellow);display:block}
 .validation-msg.ok{background:var(--green-bg);color:var(--green);display:block}
-/* PERIOD DIVIDER */
-.period-block{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.period-block{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
 .period-block-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.period-tag{background:var(--accent);color:white;padding:2px 8px;border-radius:10px;font-size:10px}
-/* REJECTION BOX */
+.period-tag{color:white;padding:2px 8px;border-radius:10px;font-size:10px}
 .rejection-box{background:var(--red-bg);border:1.5px solid #FFCDD2;border-left:4px solid var(--red);border-radius:8px;padding:14px 16px;margin-bottom:16px}
 .rejection-title{font-size:12px;font-weight:700;color:var(--red);margin-bottom:4px}
 .rejection-text{font-size:13px;color:#5D0000}
-/* CALENDAR */
 .cal-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:24px}
 .cal-header{background:var(--navy);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
 .cal-title{color:white;font-weight:700;font-size:15px}
@@ -143,7 +125,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .cal-dow-label{text-align:center;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:4px 0}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal-day{min-height:52px;border-radius:8px;padding:6px;cursor:pointer;transition:all .15s;position:relative;border:1.5px solid transparent;display:flex;flex-direction:column}
-.cal-day:hover:not(.cal-empty):not(.cal-blocked):not(.cal-holiday){border-color:var(--accent);background:#EBF1FB}
+.cal-day:hover:not(.cal-empty):not(.cal-blocked):not(.cal-holiday):not(.cal-weekend){border-color:var(--accent);background:#EBF1FB}
 .cal-day-num{font-size:12px;font-weight:600;color:var(--text)}
 .cal-empty{cursor:default}
 .cal-blocked{background:#FFF3E0;border-color:#FFE0B2}
@@ -160,15 +142,8 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .cal-vacation-pending .cal-day-num{color:#1565C0}
 .cal-today{border-color:var(--accent)!important}
 .cal-today .cal-day-num{color:var(--accent)!important;font-weight:800}
-.cal-dot{width:5px;height:5px;border-radius:50%;margin-top:2px}
-.cal-dot-name{font-size:9px;line-height:1.2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:inherit;margin-top:1px}
-.cal-tooltip{font-size:10px;color:var(--muted);line-height:1.3}
 .alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start}
 .alert-warn{background:var(--yellow-bg);color:var(--yellow);border-left:3px solid #FF9800}
-.alert-info{background:var(--blue-bg);color:var(--blue);border-left:3px solid #2196F3}
-.section-header{display:flex;align-items:center;gap:10px;margin:28px 0 14px}
-.section-header-line{flex:1;height:1px;background:var(--border)}
-.section-header-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
 .detail-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .detail-item label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:3px}
 .detail-item span{font-size:13px;color:var(--navy);font-weight:500}
@@ -188,14 +163,9 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   <div class="login-bg"></div>
   <div class="login-card">
     <div class="login-logo">JCA</div>
-    <div class="login-title">Planejamento de Férias</div>
-    <div class="login-sub">Selecione seu perfil de acesso para continuar</div>
-    <div class="login-roles">
-      <div class="role-card" onclick="selectRole('dp')" id="role-dp"><div class="role-card-icon">🏢</div><div class="role-card-name">Departamento Pessoal</div><div class="role-card-sub">Visão completa</div></div>
-      <div class="role-card" onclick="selectRole('contabil')" id="role-contabil"><div class="role-card-icon">📊</div><div class="role-card-name">Gestor Contábil</div><div class="role-card-sub">Setor Contábil</div></div>
-      <div class="role-card" onclick="selectRole('fiscal')" id="role-fiscal"><div class="role-card-icon">📋</div><div class="role-card-name">Gestor Fiscal</div><div class="role-card-sub">Setor Fiscal</div></div>
-      <div class="role-card" onclick="selectRole('pessoal')" id="role-pessoal"><div class="role-card-icon">👥</div><div class="role-card-name">Gestor DP</div><div class="role-card-sub">Depto Pessoal</div></div>
-    </div>
+    <div class="login-title">Planejamento de Férias 2027</div>
+    <div class="login-sub">Selecione seu departamento para continuar</div>
+    <div class="login-roles" id="loginRoles"></div>
     <button class="btn btn-navy" style="width:100%;justify-content:center" onclick="doLogin()">Entrar</button>
     <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:16px">⚠️ Demonstração — dados fictícios · JCA Contadores 2027</p>
   </div>
@@ -216,10 +186,10 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   <div class="nav-tabs" id="navTabs"></div>
   <div class="main">
 
-    <!-- PAINEL DP -->
+    <!-- PAINEL DP INTERNO -->
     <div class="section" id="sec-painel">
       <div class="page-header">
-        <div><div class="page-title">Painel Geral</div><div class="page-sub">Visão consolidada de todos os setores</div></div>
+        <div><div class="page-title">Painel Geral</div><div class="page-sub">Visão consolidada de todos os departamentos</div></div>
         <button class="btn btn-primary" onclick="exportCSV()">↓ Exportar CSV</button>
       </div>
       <div class="cards-row cols-4" id="painelCards"></div>
@@ -233,16 +203,16 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
           <table><thead><tr>
             <th>Nome</th><th>Departamento</th><th>Conceder Até</th>
             <th>P1 Início</th><th>P1 Fim</th><th>P2 Início</th><th>P2 Fim</th>
-            <th>Status</th><th>Situação</th><th>Ações</th>
+            <th>Status P1</th><th>Status P2</th><th>Situação</th><th>Ações</th>
           </tr></thead><tbody id="painelBody"></tbody></table>
         </div>
       </div>
     </div>
 
-    <!-- SETOR GESTOR -->
+    <!-- DEPARTAMENTO (GESTOR) -->
     <div class="section" id="sec-setor">
       <div class="page-header">
-        <div><div class="page-title" id="setorTitle">Meu Setor</div><div class="page-sub" id="setorSub">—</div></div>
+        <div><div class="page-title" id="setorTitle">Meu Departamento</div><div class="page-sub" id="setorSub">—</div></div>
       </div>
       <div class="cards-row cols-3" id="setorCards"></div>
       <div class="alert alert-warn" id="setorAlert" style="display:none"></div>
@@ -253,9 +223,9 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         </div>
         <div style="overflow-x:auto">
           <table><thead><tr>
-            <th>Nome</th><th>Departamento</th><th>P.A. Fim</th><th>Conceder Até</th>
+            <th>Nome</th><th>Departamento</th><th>Conceder Até</th>
             <th>P1 Início</th><th>P1 Fim</th><th>P2 Início</th><th>P2 Fim</th>
-            <th>Status</th><th>Ações</th>
+            <th>Status P1</th><th>Status P2</th><th>Ações</th>
           </tr></thead><tbody id="setorBody"></tbody></table>
         </div>
       </div>
@@ -264,7 +234,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     <!-- CALENDÁRIO -->
     <div class="section" id="sec-calendario">
       <div class="page-header">
-        <div><div class="page-title">Calendário de Férias</div><div class="page-sub" id="calSub">Visualize as férias e datas disponíveis</div></div>
+        <div><div class="page-title">Calendário de Férias</div><div class="page-sub" id="calSub">—</div></div>
       </div>
       <div class="cal-wrap">
         <div class="cal-header">
@@ -278,7 +248,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         <div class="cal-legend">
           <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#E8F5E9;border:1px solid #A5D6A7"></div>Férias validadas</div>
           <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#E3F2FD;border:1px solid #90CAF9"></div>Férias pendentes</div>
-          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#FFEBEE;border:1px solid #FFCDD2"></div>Feriado</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#FFEBEE;border:1px solid #FFCDD2"></div>Feriado nacional</div>
           <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#FFF3E0;border:1px solid #FFE0B2"></div>Período bloqueado</div>
           <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#FFF8E1;border:1px solid #FFF176"></div>Sexta-feira</div>
           <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#F5F5F5;border:1px solid #E0E0E0"></div>Fim de semana</div>
@@ -293,7 +263,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     <!-- VALIDAÇÕES DP -->
     <div class="section" id="sec-validar">
       <div class="page-header">
-        <div><div class="page-title">Validações Pendentes</div><div class="page-sub">Datas indicadas pelos gestores aguardando análise</div></div>
+        <div><div class="page-title">Validações Pendentes</div><div class="page-sub">Indicações aguardando análise do Departamento Pessoal Interno</div></div>
       </div>
       <div class="table-wrap">
         <div class="table-header"><span class="table-title" id="validarCount">—</span></div>
@@ -312,15 +282,15 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
       <div class="page-header">
         <div><div class="page-title">Períodos Bloqueados & Feriados</div><div class="page-sub">Referência de impedimentos para indicação de férias</div></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div class="table-wrap">
-          <div class="table-header"><span class="table-title">Períodos Bloqueados por Setor</span></div>
+          <div class="table-header"><span class="table-title">Períodos Bloqueados por Departamento</span></div>
           <table><thead><tr><th>Departamento</th><th>Início</th><th>Fim</th><th>Motivo</th></tr></thead>
           <tbody id="bloqueiosBody"></tbody></table>
         </div>
         <div class="table-wrap">
-          <div class="table-header"><span class="table-title">Feriados 2027 — Nacional + RJ</span></div>
-          <table><thead><tr><th>Data</th><th>Dia</th><th>Feriado</th><th>Âmbito</th></tr></thead>
+          <div class="table-header"><span class="table-title">Feriados Nacionais 2027</span></div>
+          <table><thead><tr><th>Data</th><th>Dia</th><th>Feriado</th></tr></thead>
           <tbody id="feriadosBody"></tbody></table>
         </div>
       </div>
@@ -331,15 +301,13 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 
 <!-- MODAL: INDICAR DATAS (GESTOR) -->
 <div class="modal-overlay" id="modalDatas">
-  <div class="modal modal-wide">
+  <div class="modal">
     <div class="modal-title">Indicar Datas de Férias</div>
     <div class="modal-sub" id="modalDatasName">—</div>
     <div class="form-info" id="modalDatasInfo"></div>
-    <div id="modalRejectionBox" style="display:none"></div>
-
-    <!-- Período 1 -->
+    <div id="modalRejectionBox"></div>
     <div class="period-block">
-      <div class="period-block-title"><span class="period-tag">1º Período</span> 15 dias corridos</div>
+      <div class="period-block-title"><span class="period-tag" style="background:var(--accent)">1º Período</span> 15 dias corridos</div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Início</label>
@@ -352,8 +320,6 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         </div>
       </div>
     </div>
-
-    <!-- Período 2 -->
     <div class="period-block">
       <div class="period-block-title"><span class="period-tag" style="background:#2E7D32">2º Período</span> 15 dias corridos</div>
       <div class="form-row">
@@ -368,11 +334,10 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         </div>
       </div>
     </div>
-
     <div class="form-row full">
       <div class="form-group">
         <label class="form-label">Observações do Gestor</label>
-        <textarea class="form-textarea" id="inputObs" placeholder="Ex: preferência do colaborador, férias fracionadas, observações gerais..."></textarea>
+        <textarea class="form-textarea" id="inputObs" placeholder="Observações gerais, preferências..."></textarea>
       </div>
     </div>
     <div class="validation-msg" id="msgGeral"></div>
@@ -383,42 +348,73 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   </div>
 </div>
 
-<!-- MODAL: VALIDAR (DP) -->
+<!-- MODAL: VALIDAR (DP INTERNO) -->
 <div class="modal-overlay" id="modalValidar">
-  <div class="modal modal-wide">
-    <div class="modal-title">Validar / Recusar Férias</div>
+  <div class="modal">
+    <div class="modal-title">Validar Períodos de Férias</div>
     <div class="modal-sub" id="modalValidarName">—</div>
     <div class="detail-card" id="modalValidarDetail"></div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Status DP</label>
-        <select class="form-select" id="inputStatus" onchange="onStatusChange()">
-          <option value="Pendente">Pendente</option>
-          <option value="Validado">Validado</option>
-          <option value="Recusado">Recusado</option>
-          <option value="Comunicado">Comunicado</option>
-        </select>
+
+    <!-- P1 -->
+    <div class="period-block">
+      <div class="period-block-title"><span class="period-tag" style="background:var(--accent)">1º Período</span> <span id="validarP1Datas" style="font-weight:400;color:var(--muted);font-size:12px">—</span></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Status do 1º Período</label>
+          <select class="form-select" id="inputStatusP1" onchange="onStatusP1Change()">
+            <option value="Pendente">Pendente</option>
+            <option value="Validado">✓ Validado</option>
+            <option value="Recusado">✗ Recusado</option>
+            <option value="Comunicado">Comunicado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Situação</label>
+          <select class="form-select" id="inputSituacao">
+            <option value="">— selecione —</option>
+            <option>Dentro do Prazo</option><option>Férias em Dobro</option>
+            <option>Financeiro</option><option>Demissão</option>
+            <option>13º</option><option>Pago</option><option>Análise gestão</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Situação</label>
-        <select class="form-select" id="inputSituacao">
-          <option value="">— selecione —</option>
-          <option>Dentro do Prazo</option><option>Férias em Dobro</option>
-          <option>Financeiro</option><option>Demissão</option>
-          <option>13º</option><option>Pago</option><option>Análise gestão</option>
-        </select>
+      <div id="motivoP1Group" style="display:none">
+        <div class="form-group">
+          <label class="form-label" style="color:#B71C1C">Motivo da Recusa — 1º Período (visível ao gestor)</label>
+          <textarea class="form-textarea" id="motivoP1" placeholder="Descreva o motivo para que o gestor possa corrigir a indicação..."></textarea>
+        </div>
       </div>
     </div>
-    <div class="form-row full" id="motivoRecusaGroup" style="display:none">
-      <div class="form-group">
-        <label class="form-label" style="color:#B71C1C">Motivo da Recusa (obrigatório — visível ao gestor)</label>
-        <textarea class="form-textarea" id="inputMotivoRecusa" placeholder="Descreva o motivo da recusa para que o gestor possa corrigir a indicação..."></textarea>
+
+    <!-- P2 -->
+    <div class="period-block" id="validarP2Block">
+      <div class="period-block-title"><span class="period-tag" style="background:#2E7D32">2º Período</span> <span id="validarP2Datas" style="font-weight:400;color:var(--muted);font-size:12px">—</span></div>
+      <div id="validarP2Vazio" style="font-size:13px;color:var(--muted);padding:0 0 4px">Nenhuma data indicada para o 2º período.</div>
+      <div id="validarP2Form" style="display:none">
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label">Status do 2º Período</label>
+            <select class="form-select" id="inputStatusP2" onchange="onStatusP2Change()">
+              <option value="Pendente">Pendente</option>
+              <option value="Validado">✓ Validado</option>
+              <option value="Recusado">✗ Recusado</option>
+              <option value="Comunicado">Comunicado</option>
+            </select>
+          </div>
+        </div>
+        <div id="motivoP2Group" style="display:none">
+          <div class="form-group">
+            <label class="form-label" style="color:#B71C1C">Motivo da Recusa — 2º Período (visível ao gestor)</label>
+            <textarea class="form-textarea" id="motivoP2" placeholder="Descreva o motivo para que o gestor possa corrigir a indicação..."></textarea>
+          </div>
+        </div>
       </div>
     </div>
+
     <div class="form-row full">
       <div class="form-group">
-        <label class="form-label">Observação interna do DP</label>
-        <textarea class="form-textarea" id="inputObsDP" placeholder="Nota interna — não visível ao gestor..."></textarea>
+        <label class="form-label">Observação interna do DP (não visível ao gestor)</label>
+        <textarea class="form-textarea" id="inputObsDP" placeholder="Nota interna..."></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -432,89 +428,127 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 
 <script>
 // ══════════════════════════════════════════════════════
-// FERIADOS 2027 — Nacional + Estado do Rio de Janeiro
+// FERIADOS NACIONAIS 2027
 // ══════════════════════════════════════════════════════
-const FERIADOS = [
-  {d:"2027-01-01", nome:"Confraternização Universal",        tipo:"Nacional"},
-  {d:"2027-01-20", nome:"São Sebastião (Padroeiro RJ)",      tipo:"RJ"},
-  {d:"2027-02-08", nome:"Carnaval (segunda)",                tipo:"Nacional"},
-  {d:"2027-02-09", nome:"Carnaval (terça)",                  tipo:"Nacional"},
-  {d:"2027-02-10", nome:"Quarta de Cinzas (até meio-dia)",   tipo:"Nacional"},
-  {d:"2027-03-26", nome:"Sexta-feira Santa",                 tipo:"Nacional"},
-  {d:"2027-03-28", nome:"Páscoa",                            tipo:"Nacional"},
-  {d:"2027-04-21", nome:"Tiradentes",                        tipo:"Nacional"},
-  {d:"2027-04-23", nome:"São Jorge (RJ)",                    tipo:"RJ"},
-  {d:"2027-05-01", nome:"Dia do Trabalho",                   tipo:"Nacional"},
-  {d:"2027-06-10", nome:"Corpus Christi",                    tipo:"Nacional"},
-  {d:"2027-09-07", nome:"Independência do Brasil",           tipo:"Nacional"},
-  {d:"2027-10-12", nome:"Nossa Sra. Aparecida",              tipo:"Nacional"},
-  {d:"2027-11-02", nome:"Finados",                           tipo:"Nacional"},
-  {d:"2027-11-15", nome:"Proclamação da República",          tipo:"Nacional"},
-  {d:"2027-11-20", nome:"Consciência Negra",                 tipo:"Nacional"},
-  {d:"2027-12-25", nome:"Natal",                             tipo:"Nacional"},
+const FERIADOS=[
+  {d:"2027-01-01",nome:"Confraternização Universal"},
+  {d:"2027-02-08",nome:"Carnaval (segunda-feira)"},
+  {d:"2027-02-09",nome:"Carnaval (terça-feira)"},
+  {d:"2027-02-10",nome:"Quarta-feira de Cinzas (até meio-dia)"},
+  {d:"2027-03-26",nome:"Sexta-feira Santa"},
+  {d:"2027-03-28",nome:"Páscoa"},
+  {d:"2027-04-21",nome:"Tiradentes"},
+  {d:"2027-05-01",nome:"Dia do Trabalho"},
+  {d:"2027-06-10",nome:"Corpus Christi"},
+  {d:"2027-09-07",nome:"Independência do Brasil"},
+  {d:"2027-10-12",nome:"Nossa Sra. Aparecida"},
+  {d:"2027-11-02",nome:"Finados"},
+  {d:"2027-11-15",nome:"Proclamação da República"},
+  {d:"2027-11-20",nome:"Consciência Negra"},
+  {d:"2027-12-25",nome:"Natal"},
 ];
-const FERIADO_SET = new Set(FERIADOS.map(f=>f.d));
+const FERIADO_SET=new Set(FERIADOS.map(f=>f.d));
 
-const BLOCKED = [
-  {dept:"CONTABIL", ini:"2027-01-01",fim:"2027-01-10",motivo:"Fechamento de balanço anual"},
-  {dept:"CONTABIL", ini:"2027-04-01",fim:"2027-04-15",motivo:"Fechamento de impostos anuais"},
-  {dept:"CONTABIL", ini:"2027-06-25",fim:"2027-07-05",motivo:"Fechamento semestral"},
-  {dept:"CONTABIL", ini:"2027-12-20",fim:"2027-12-31",motivo:"Fechamento de exercício"},
-  {dept:"FISCAL",   ini:"2027-01-10",fim:"2027-01-20",motivo:"Obrigações competência dez/2026"},
-  {dept:"FISCAL",   ini:"2027-02-10",fim:"2027-02-20",motivo:"SPED/EFD competência jan"},
-  {dept:"FISCAL",   ini:"2027-05-01",fim:"2027-05-15",motivo:"Entrega de declarações"},
-  {dept:"FISCAL",   ini:"2027-11-15",fim:"2027-11-30",motivo:"Planejamento tributário"},
-  {dept:"PESSOAL",  ini:"2027-01-01",fim:"2027-01-07",motivo:"13º salário — fechamento"},
-  {dept:"PESSOAL",  ini:"2027-02-01",fim:"2027-02-10",motivo:"DIRF — entrega"},
-  {dept:"PESSOAL",  ini:"2027-11-20",fim:"2027-12-05",motivo:"Adiantamento 13º salário"},
-  {dept:"PESSOAL",  ini:"2027-12-20",fim:"2027-12-31",motivo:"Fechamento folha dezembro"},
-];
-
-const DIAS_SEMANA = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-const MESES_NOME  = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-
-let colaboradores = [
-  {id:1, nome:"Ana Paula Ferreira",     dept:"DEPARTAMENTO CONTABIL NITEROI",    celula:"Niterói",  admissao:"2019-03-15",pa_ini:"2026-03-15",pa_fim:"2027-03-14",conceder:"2027-09-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Contábil"},
-  {id:2, nome:"Carlos Eduardo Lima",    dept:"DEPARTAMENTO CONTABIL NITEROI",    celula:"Niterói",  admissao:"2021-07-01",pa_ini:"2026-07-01",pa_fim:"2027-06-30",conceder:"2027-12-31",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Contábil"},
-  {id:3, nome:"Fernanda Costa Silva",   dept:"DEPARTAMENTO CONTABIL CAXIAS",     celula:"Caxias",   admissao:"2020-01-20",pa_ini:"2026-01-20",pa_fim:"2027-01-19",conceder:"2027-07-19",p1ini:"2027-02-02",p1fim:"2027-02-16",p2ini:"2027-03-15",p2fim:"2027-03-29",obs:"",status:"Validado",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Contábil"},
-  {id:4, nome:"Gustavo Martins Souza",  dept:"DEPARTAMENTO CONTABIL CAXIAS",     celula:"Caxias",   admissao:"2022-05-10",pa_ini:"2026-05-10",pa_fim:"2027-05-09",conceder:"2027-11-09",p1ini:"2027-04-19",p1fim:"2027-05-03",p2ini:"",p2fim:"",obs:"",status:"Recusado",situacao:"Dentro do Prazo",motivo_recusa:"Período 1 coincide com fechamento de balanço. Por favor, escolha datas após 15/04/2027.",grupo:"Contábil"},
-  {id:5, nome:"Helena Ribeiro Nunes",   dept:"DEPARTAMENTO CONTABIL AURELINO",   celula:"Aurelino", admissao:"2018-11-05",pa_ini:"2026-11-05",pa_fim:"2027-11-04",conceder:"2027-05-04",p1ini:"2027-03-08",p1fim:"2027-03-22",p2ini:"2027-04-19",p2fim:"2027-05-03",obs:"Preferência da colaboradora",status:"Comunicado",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Contábil"},
-  {id:6, nome:"Igor Nascimento Santos", dept:"DEPARTAMENTO CONTABIL NITEROI",    celula:"Niterói",  admissao:"2023-02-14",pa_ini:"2026-02-14",pa_fim:"2027-02-13",conceder:"2027-08-13",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Contábil"},
-  {id:7, nome:"Juliana Alves Moreira",  dept:"DEPARTAMENTO CONTABIL CAXIAS",     celula:"Caxias",   admissao:"2021-09-30",pa_ini:"2026-09-30",pa_fim:"2027-09-29",conceder:"2028-03-29",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Contábil"},
-  {id:8, nome:"Lucas Pereira Gomes",    dept:"DEPARTAMENTO CONTABIL AURELINO",   celula:"Aurelino", admissao:"2020-06-22",pa_ini:"2026-06-22",pa_fim:"2027-06-21",conceder:"2027-12-21",p1ini:"2027-05-03",p1fim:"2027-05-17",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Contábil"},
-  {id:9, nome:"Mariana Torres Campos",  dept:"DEPARTAMENTO FISCAL NITEROI",      celula:"Niterói",  admissao:"2019-08-12",pa_ini:"2026-08-12",pa_fim:"2027-08-11",conceder:"2028-02-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Fiscal"},
-  {id:10,nome:"Nicolas Oliveira Dias",  dept:"DEPARTAMENTO FISCAL NITEROI",      celula:"Niterói",  admissao:"2022-11-01",pa_ini:"2026-11-01",pa_fim:"2027-10-31",conceder:"2028-04-30",p1ini:"2027-07-07",p1fim:"2027-07-21",p2ini:"2027-08-04",p2fim:"2027-08-18",obs:"",status:"Validado",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Fiscal"},
-  {id:11,nome:"Patrícia Mendes Rocha",  dept:"DEPARTAMENTO FISCAL CAXIAS",       celula:"Caxias",   admissao:"2020-04-08",pa_ini:"2026-04-08",pa_fim:"2027-04-07",conceder:"2027-10-07",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Fiscal"},
-  {id:12,nome:"Rafael Cardoso Teixeira",dept:"DEPARTAMENTO FISCAL CAXIAS",       celula:"Caxias",   admissao:"2021-12-15",pa_ini:"2026-12-15",pa_fim:"2027-12-14",conceder:"2028-06-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Fiscal"},
-  {id:13,nome:"Sabrina Vieira Lopes",   dept:"DEPARTAMENTO FISCAL AURELINO",     celula:"Aurelino", admissao:"2023-03-20",pa_ini:"2026-03-20",pa_fim:"2027-03-19",conceder:"2027-09-19",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Fiscal"},
-  {id:14,nome:"Thiago Barbosa Cunha",   dept:"DEPARTAMENTO FISCAL NITEROI",      celula:"Niterói",  admissao:"2018-07-03",pa_ini:"2025-07-03",pa_fim:"2026-07-02",conceder:"2027-01-02",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Férias em Dobro",motivo_recusa:"",grupo:"Fiscal"},
-  {id:15,nome:"Vanessa Castro Pinto",   dept:"DEPARTAMENTO FISCAL AURELINO",     celula:"Aurelino", admissao:"2022-02-28",pa_ini:"2026-02-28",pa_fim:"2027-02-27",conceder:"2027-08-27",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Fiscal"},
-  {id:16,nome:"Willian Fernandes Cruz", dept:"DEPARTAMENTO PESSOAL NITEROI",     celula:"Niterói",  admissao:"2020-10-14",pa_ini:"2026-10-14",pa_fim:"2027-10-13",conceder:"2028-04-13",p1ini:"2027-09-01",p1fim:"2027-09-15",p2ini:"2027-10-04",p2fim:"2027-10-18",obs:"",status:"Validado",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Depto Pessoal"},
-  {id:17,nome:"Ximena Ramos Bastos",    dept:"DEPARTAMENTO PESSOAL CAXIAS",      celula:"Caxias",   admissao:"2021-05-17",pa_ini:"2026-05-17",pa_fim:"2027-05-16",conceder:"2027-11-16",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Depto Pessoal"},
-  {id:18,nome:"Yasmin Correia Melo",    dept:"DEPARTAMENTO PESSOAL NITEROI",     celula:"Niterói",  admissao:"2019-01-09",pa_ini:"2026-01-09",pa_fim:"2027-01-08",conceder:"2027-07-08",p1ini:"2027-04-07",p1fim:"2027-04-21",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Depto Pessoal"},
-  {id:19,nome:"Zuleide Amaral Santos",  dept:"DEPARTAMENTO PESSOAL AURELINO",    celula:"Aurelino", admissao:"2022-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Depto Pessoal"},
-  {id:20,nome:"André Luis Monteiro",    dept:"DEPARTAMENTO PESSOAL CAXIAS",      celula:"Caxias",   admissao:"2023-06-12",pa_ini:"2026-06-12",pa_fim:"2027-06-11",conceder:"2027-12-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",status:"Pendente",situacao:"Dentro do Prazo",motivo_recusa:"",grupo:"Depto Pessoal"},
+const BLOCKED=[
+  {dept:"FISCAL MATRIZ",    ini:"2027-01-10",fim:"2027-01-20",motivo:"Obrigações competência dez/2026"},
+  {dept:"FISCAL MATRIZ",    ini:"2027-02-10",fim:"2027-02-20",motivo:"SPED/EFD competência jan"},
+  {dept:"FISCAL MATRIZ",    ini:"2027-05-01",fim:"2027-05-15",motivo:"Entrega de declarações"},
+  {dept:"FISCAL MATRIZ",    ini:"2027-11-15",fim:"2027-11-30",motivo:"Planejamento tributário"},
+  {dept:"FISCAL CAXIAS",    ini:"2027-01-10",fim:"2027-01-20",motivo:"Obrigações competência dez/2026"},
+  {dept:"FISCAL CAXIAS",    ini:"2027-05-01",fim:"2027-05-15",motivo:"Entrega de declarações"},
+  {dept:"CONTABIL MATRIZ",  ini:"2027-01-01",fim:"2027-01-10",motivo:"Fechamento de balanço anual"},
+  {dept:"CONTABIL MATRIZ",  ini:"2027-04-01",fim:"2027-04-15",motivo:"Fechamento de impostos anuais"},
+  {dept:"CONTABIL MATRIZ",  ini:"2027-06-25",fim:"2027-07-05",motivo:"Fechamento semestral"},
+  {dept:"CONTABIL MATRIZ",  ini:"2027-12-20",fim:"2027-12-31",motivo:"Fechamento de exercício"},
+  {dept:"CONTABIL CAXIAS",  ini:"2027-04-01",fim:"2027-04-15",motivo:"Fechamento de impostos anuais"},
+  {dept:"CONTABIL CAXIAS",  ini:"2027-12-20",fim:"2027-12-31",motivo:"Fechamento de exercício"},
+  {dept:"PESSOAL MATRIZ",   ini:"2027-01-01",fim:"2027-01-07",motivo:"13º salário — fechamento"},
+  {dept:"PESSOAL MATRIZ",   ini:"2027-02-01",fim:"2027-02-10",motivo:"DIRF — entrega"},
+  {dept:"PESSOAL MATRIZ",   ini:"2027-11-20",fim:"2027-12-05",motivo:"Adiantamento 13º salário"},
+  {dept:"PESSOAL MATRIZ",   ini:"2027-12-20",fim:"2027-12-31",motivo:"Fechamento folha dezembro"},
+  {dept:"PESSOAL CAXIAS",   ini:"2027-01-01",fim:"2027-01-07",motivo:"13º salário — fechamento"},
+  {dept:"PESSOAL CAXIAS",   ini:"2027-11-20",fim:"2027-12-05",motivo:"Adiantamento 13º salário"},
+  {dept:"PESSOAL CAXIAS",   ini:"2027-12-20",fim:"2027-12-31",motivo:"Fechamento folha dezembro"},
+  {dept:"PEQUENOS NEGOCIOS",ini:"2027-03-01",fim:"2027-03-15",motivo:"Fechamento trimestral"},
+  {dept:"PEQUENOS NEGOCIOS",ini:"2027-12-01",fim:"2027-12-20",motivo:"Planejamento anual"},
 ];
 
-// ══════════════════════════════════════════════════════
-// AUTH
-// ══════════════════════════════════════════════════════
-let currentRole=null, currentColab=null, filterAtivo="Todos";
-let calYear=2027, calMonth=0;
+const DIAS_SEMANA=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+const MESES_NOME=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
-const ROLE_CONFIG={
-  dp:      {label:"Departamento Pessoal",  grupo:null,            tabs:["painel","calendario","validar","bloqueios"]},
-  contabil:{label:"Gestor Contábil",       grupo:"Contábil",      tabs:["setor","calendario","bloqueios"]},
-  fiscal:  {label:"Gestor Fiscal",         grupo:"Fiscal",        tabs:["setor","calendario","bloqueios"]},
-  pessoal: {label:"Gestor Depto Pessoal",  grupo:"Depto Pessoal", tabs:["setor","calendario","bloqueios"]},
-};
+// ══════════════════════════════════════════════════════
+// PERFIS DE ACESSO
+// ══════════════════════════════════════════════════════
+const ROLES=[
+  {id:"dp",         label:"Depto Pessoal Interno", icon:"🏢", sub:"Visão completa",          dept:null,                tabs:["painel","calendario","validar","bloqueios"]},
+  {id:"fiscal_mtz", label:"Fiscal Matriz",          icon:"📋", sub:"Gestor Departamento",     dept:"FISCAL MATRIZ",     tabs:["setor","calendario","bloqueios"]},
+  {id:"fiscal_cx",  label:"Fiscal Caxias",          icon:"📋", sub:"Gestor Departamento",     dept:"FISCAL CAXIAS",     tabs:["setor","calendario","bloqueios"]},
+  {id:"contabil_mtz",label:"Contábil Matriz",       icon:"📊", sub:"Gestor Departamento",     dept:"CONTABIL MATRIZ",   tabs:["setor","calendario","bloqueios"]},
+  {id:"contabil_cx", label:"Contábil Caxias",       icon:"📊", sub:"Gestor Departamento",     dept:"CONTABIL CAXIAS",   tabs:["setor","calendario","bloqueios"]},
+  {id:"pessoal_mtz", label:"Pessoal Matriz",        icon:"👥", sub:"Gestor Departamento",     dept:"PESSOAL MATRIZ",    tabs:["setor","calendario","bloqueios"]},
+  {id:"pessoal_cx",  label:"Pessoal Caxias",        icon:"👥", sub:"Gestor Departamento",     dept:"PESSOAL CAXIAS",    tabs:["setor","calendario","bloqueios"]},
+  {id:"pequenos",    label:"Pequenos Negócios",     icon:"🏪", sub:"Gestor Departamento",     dept:"PEQUENOS NEGOCIOS", tabs:["setor","calendario","bloqueios"]},
+];
+
 const TAB_CONFIG={
   painel:    {label:"📊 Painel Geral",        sec:"sec-painel"},
-  setor:     {label:"👥 Meu Setor",           sec:"sec-setor"},
+  setor:     {label:"👥 Meu Departamento",    sec:"sec-setor"},
   calendario:{label:"📅 Calendário",          sec:"sec-calendario"},
   validar:   {label:"✅ Validações Pendentes",sec:"sec-validar"},
   bloqueios: {label:"🚫 Bloqueios & Feriados",sec:"sec-bloqueios"},
 };
+
+const DEPT_COLORS={
+  "FISCAL MATRIZ":    "#EBF1FB","FISCAL CAXIAS":     "#E8F5FE",
+  "CONTABIL MATRIZ":  "#FFF3E0","CONTABIL CAXIAS":   "#FFF8EC",
+  "PESSOAL MATRIZ":   "#F3E5F5","PESSOAL CAXIAS":    "#FAF0FF",
+  "PEQUENOS NEGOCIOS":"#E8F5E9",
+};
+const DEPT_TEXT={
+  "FISCAL MATRIZ":"#1E2761","FISCAL CAXIAS":"#0277BD",
+  "CONTABIL MATRIZ":"#E65100","CONTABIL CAXIAS":"#BF360C",
+  "PESSOAL MATRIZ":"#6A1B9A","PESSOAL CAXIAS":"#4A148C",
+  "PEQUENOS NEGOCIOS":"#1B5E20",
+};
+
+let colaboradores=[
+  {id:1, nome:"Ana Paula Ferreira",     dept:"CONTABIL MATRIZ",    admissao:"2019-03-15",pa_ini:"2026-03-15",pa_fim:"2027-03-14",conceder:"2027-09-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:2, nome:"Carlos Eduardo Lima",    dept:"CONTABIL MATRIZ",    admissao:"2021-07-01",pa_ini:"2026-07-01",pa_fim:"2027-06-30",conceder:"2027-12-31",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:3, nome:"Fernanda Costa Silva",   dept:"CONTABIL MATRIZ",    admissao:"2020-01-20",pa_ini:"2026-01-20",pa_fim:"2027-01-19",conceder:"2027-07-19",p1ini:"2027-02-02",p1fim:"2027-02-16",p2ini:"2027-03-15",p2fim:"2027-03-29",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:4, nome:"Gustavo Martins Souza",  dept:"CONTABIL CAXIAS",    admissao:"2022-05-10",pa_ini:"2026-05-10",pa_fim:"2027-05-09",conceder:"2027-11-09",p1ini:"2027-04-19",p1fim:"2027-05-03",p2ini:"",p2fim:"",obs:"",statusP1:"Recusado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"Período coincide com fechamento de impostos (01/04 a 15/04). Favor indicar datas após 16/04/2027.",motivoP2:""},
+  {id:5, nome:"Helena Ribeiro Nunes",   dept:"CONTABIL CAXIAS",    admissao:"2018-11-05",pa_ini:"2026-11-05",pa_fim:"2027-11-04",conceder:"2027-05-04",p1ini:"2027-03-08",p1fim:"2027-03-22",p2ini:"2027-04-19",p2fim:"2027-05-03",obs:"Preferência da colaboradora",statusP1:"Comunicado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:6, nome:"Igor Nascimento Santos", dept:"FISCAL MATRIZ",      admissao:"2023-02-14",pa_ini:"2026-02-14",pa_fim:"2027-02-13",conceder:"2027-08-13",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:7, nome:"Juliana Alves Moreira",  dept:"FISCAL MATRIZ",      admissao:"2021-09-30",pa_ini:"2026-09-30",pa_fim:"2027-09-29",conceder:"2028-03-29",p1ini:"2027-07-06",p1fim:"2027-07-20",p2ini:"2027-08-03",p2fim:"2027-08-17",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:8, nome:"Lucas Pereira Gomes",    dept:"FISCAL CAXIAS",      admissao:"2020-06-22",pa_ini:"2026-06-22",pa_fim:"2027-06-21",conceder:"2027-12-21",p1ini:"2027-06-07",p1fim:"2027-06-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:9, nome:"Mariana Torres Campos",  dept:"FISCAL CAXIAS",      admissao:"2019-08-12",pa_ini:"2026-08-12",pa_fim:"2027-08-11",conceder:"2028-02-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:10,nome:"Nicolas Oliveira Dias",  dept:"PESSOAL MATRIZ",     admissao:"2022-11-01",pa_ini:"2026-11-01",pa_fim:"2027-10-31",conceder:"2028-04-30",p1ini:"2027-09-01",p1fim:"2027-09-15",p2ini:"2027-10-04",p2fim:"2027-10-18",obs:"",statusP1:"Validado",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:11,nome:"Patrícia Mendes Rocha",  dept:"PESSOAL MATRIZ",     admissao:"2020-04-08",pa_ini:"2026-04-08",pa_fim:"2027-04-07",conceder:"2027-10-07",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:12,nome:"Rafael Cardoso Teixeira",dept:"PESSOAL CAXIAS",     admissao:"2021-12-15",pa_ini:"2026-12-15",pa_fim:"2027-12-14",conceder:"2028-06-14",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:13,nome:"Sabrina Vieira Lopes",   dept:"PESSOAL CAXIAS",     admissao:"2023-03-20",pa_ini:"2026-03-20",pa_fim:"2027-03-19",conceder:"2027-09-19",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:14,nome:"Thiago Barbosa Cunha",   dept:"FISCAL MATRIZ",      admissao:"2018-07-03",pa_ini:"2025-07-03",pa_fim:"2026-07-02",conceder:"2027-01-02",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Férias em Dobro",motivoP1:"",motivoP2:""},
+  {id:15,nome:"Vanessa Castro Pinto",   dept:"PEQUENOS NEGOCIOS",  admissao:"2022-02-28",pa_ini:"2026-02-28",pa_fim:"2027-02-27",conceder:"2027-08-27",p1ini:"2027-04-07",p1fim:"2027-04-21",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:16,nome:"Willian Fernandes Cruz", dept:"PEQUENOS NEGOCIOS",  admissao:"2020-10-14",pa_ini:"2026-10-14",pa_fim:"2027-10-13",conceder:"2028-04-13",p1ini:"2027-08-04",p1fim:"2027-08-18",p2ini:"2027-09-08",p2fim:"2027-09-22",obs:"",statusP1:"Validado",statusP2:"Validado",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:17,nome:"Ximena Ramos Bastos",    dept:"PEQUENOS NEGOCIOS",  admissao:"2021-05-17",pa_ini:"2026-05-17",pa_fim:"2027-05-16",conceder:"2027-11-16",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:18,nome:"Yasmin Correia Melo",    dept:"CONTABIL MATRIZ",    admissao:"2019-01-09",pa_ini:"2026-01-09",pa_fim:"2027-01-08",conceder:"2027-07-08",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:19,nome:"Zuleide Amaral Santos",  dept:"FISCAL CAXIAS",      admissao:"2022-08-30",pa_ini:"2026-08-30",pa_fim:"2027-08-29",conceder:"2028-02-28",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+  {id:20,nome:"André Luis Monteiro",    dept:"PESSOAL MATRIZ",     admissao:"2023-06-12",pa_ini:"2026-06-12",pa_fim:"2027-06-11",conceder:"2027-12-11",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:""},
+];
+
+let currentRole=null, currentColab=null, filterAtivo="Todos";
+let calYear=2027, calMonth=0;
+
+// ══════════════════════════════════════════════════════
+// BUILD LOGIN
+// ══════════════════════════════════════════════════════
+function buildLogin(){
+  document.getElementById('loginRoles').innerHTML=ROLES.map(r=>`
+    <div class="role-card" onclick="selectRole('${r.id}')" id="role-${r.id}">
+      <div class="role-card-icon">${r.icon}</div>
+      <div class="role-card-name">${r.label}</div>
+      <div class="role-card-sub">${r.sub}</div>
+    </div>`).join('');
+}
+buildLogin();
 
 function selectRole(r){
   document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
@@ -522,10 +556,10 @@ function selectRole(r){
   currentRole=r;
 }
 function doLogin(){
-  if(!currentRole){showToast("Selecione um perfil","warn");return;}
+  if(!currentRole){showToast("Selecione um departamento","warn");return;}
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appScreen').style.display='block';
-  const cfg=ROLE_CONFIG[currentRole];
+  const cfg=ROLES.find(r=>r.id===currentRole);
   document.getElementById('roleBadge').textContent=cfg.label;
   buildNav(cfg.tabs);
   switchTab(cfg.tabs[0]);
@@ -564,43 +598,54 @@ function switchTab(k){
 // HELPERS
 // ══════════════════════════════════════════════════════
 function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
-function addDays(dateStr,n){
-  const d=new Date(dateStr+'T12:00:00');
-  d.setDate(d.getDate()+n);
-  return d.toISOString().split('T')[0];
-}
+function addDays(s,n){const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
 function getWeekday(s){if(!s)return-1;return new Date(s+'T12:00:00').getDay();}
 function isHoliday(s){return FERIADO_SET.has(s);}
 function getHolidayName(s){return FERIADOS.find(f=>f.d===s)?.nome||'';}
+function isVencendo(d){if(!d)return false;return(new Date(d)-new Date())/86400000<60;}
 
-// Check if date is within 2 days before a holiday or weekend
-// Rule: cannot start vacation on Friday, Saturday, Sunday, holiday,
-// or 2 days before a holiday (if holiday is Mon -> Thu/Fri blocked, if holiday is Tue -> Sun/Mon blocked)
-function getDayBlockReason(dateStr, grupo){
+function getDeptKey(dept){
+  if(dept==='FISCAL MATRIZ')     return 'FISCAL MATRIZ';
+  if(dept==='FISCAL CAXIAS')     return 'FISCAL CAXIAS';
+  if(dept==='CONTABIL MATRIZ')   return 'CONTABIL MATRIZ';
+  if(dept==='CONTABIL CAXIAS')   return 'CONTABIL CAXIAS';
+  if(dept==='PESSOAL MATRIZ')    return 'PESSOAL MATRIZ';
+  if(dept==='PESSOAL CAXIAS')    return 'PESSOAL CAXIAS';
+  if(dept==='PEQUENOS NEGOCIOS') return 'PEQUENOS NEGOCIOS';
+  return dept;
+}
+
+function getDayBlockReason(dateStr,dept){
   if(!dateStr) return null;
   const dow=getWeekday(dateStr);
-  if(dow===0) return "Domingo — não permitido iniciar férias.";
-  if(dow===6) return "Sábado — não permitido iniciar férias.";
-  if(isHoliday(dateStr)) return `Feriado: ${getHolidayName(dateStr)} — não permitido iniciar férias.`;
-  if(dow===5) return "Sexta-feira — a legislação trabalhista não permite iniciar férias até 2 dias antes do repouso semanal (sábado/domingo).";
-  // Check 2 days before holiday
-  const d1=addDays(dateStr,1), d2=addDays(dateStr,2);
-  if(isHoliday(d1)) return `Início em ${fmtDate(dateStr)} ficaria a 1 dia de ${getHolidayName(d1)} — não permitido pela legislação trabalhista.`;
-  if(isHoliday(d2)) return `Início em ${fmtDate(dateStr)} ficaria a 2 dias de ${getHolidayName(d2)} — não permitido pela legislação trabalhista.`;
-  // Check sector blocks
-  if(grupo){
-    const key=grupo.toUpperCase().replace('DEPTO PESSOAL','PESSOAL').replace('CONTÁBIL','CONTABIL');
+  if(dow===0) return "Domingo — não é permitido iniciar férias.";
+  if(dow===6) return "Sábado — não é permitido iniciar férias.";
+  if(isHoliday(dateStr)) return`Feriado nacional: ${getHolidayName(dateStr)}.`;
+  if(dow===5) return "Sexta-feira — a CLT não permite iniciar férias até 2 dias antes do repouso semanal.";
+  const d1=addDays(dateStr,1),d2=addDays(dateStr,2);
+  if(isHoliday(d1)) return`A data está a 1 dia do feriado "${getHolidayName(d1)}" — não permitido pela CLT.`;
+  if(isHoliday(d2)) return`A data está a 2 dias do feriado "${getHolidayName(d2)}" — não permitido pela CLT.`;
+  if(dept){
+    const key=getDeptKey(dept);
     const blk=BLOCKED.find(b=>b.dept===key&&dateStr>=b.ini&&dateStr<=b.fim);
-    if(blk) return `Período bloqueado: ${blk.motivo} (${fmtDate(blk.ini)} a ${fmtDate(blk.fim)}).`;
+    if(blk) return`Período bloqueado: ${blk.motivo} (${fmtDate(blk.ini)} a ${fmtDate(blk.fim)}).`;
   }
   return null;
 }
 
-function statusBadge(s){
-  const map={Validado:'badge-green',Recusado:'badge-red',Pendente:'badge-yellow',Comunicado:'badge-blue'};
-  return`<span class="badge ${map[s]||'badge-gray'}">${s||'—'}</span>`;
+function deptBadge(dept){
+  const bg=DEPT_COLORS[dept]||'#ECEFF1';
+  const tc=DEPT_TEXT[dept]||'#546E7A';
+  const label=dept.replace('PEQUENOS NEGOCIOS','PEQU. NEGÓCIOS');
+  return`<span class="badge" style="background:${bg};color:${tc}">${label}</span>`;
 }
-function isVencendo(d){if(!d)return false;return(new Date(d)-new Date())/86400000<60;}
+function statusBadge(s){
+  if(!s||s==='Pendente') return`<span class="badge badge-yellow">${s||'Pendente'}</span>`;
+  if(s==='Validado')   return`<span class="badge badge-green">✓ Validado</span>`;
+  if(s==='Recusado')   return`<span class="badge badge-red">✗ Recusado</span>`;
+  if(s==='Comunicado') return`<span class="badge badge-blue">Comunicado</span>`;
+  return`<span class="badge badge-gray">${s}</span>`;
+}
 
 // ══════════════════════════════════════════════════════
 // RENDER PAINEL
@@ -608,28 +653,29 @@ function isVencendo(d){if(!d)return false;return(new Date(d)-new Date())/8640000
 function renderPainel(){
   const stats=[
     {label:'Total',val:colaboradores.length,sub:'colaboradores',cls:''},
-    {label:'Com datas indicadas',val:colaboradores.filter(c=>c.p1ini).length,sub:'1º período indicado',cls:''},
-    {label:'Validados ✓',val:colaboradores.filter(c=>c.status==='Validado').length,sub:'pelo DP',cls:'green'},
-    {label:'Férias em Dobro ⚠',val:colaboradores.filter(c=>c.situacao==='Férias em Dobro').length,sub:'atenção necessária',cls:'red'},
+    {label:'Com datas indicadas',val:colaboradores.filter(c=>c.p1ini).length,sub:'1º período preenchido',cls:''},
+    {label:'Validados ✓',val:colaboradores.filter(c=>c.statusP1==='Validado').length,sub:'P1 validado',cls:'green'},
+    {label:'Férias em Dobro ⚠',val:colaboradores.filter(c=>c.situacao==='Férias em Dobro').length,sub:'atenção imediata',cls:'red'},
   ];
   document.getElementById('painelCards').innerHTML=stats.map(s=>`<div class="stat-card ${s.cls}"><div class="stat-label">${s.label}</div><div class="stat-value">${s.val}</div><div class="stat-sub">${s.sub}</div></div>`).join('');
-  const all=['Todos','Contábil','Fiscal','Depto Pessoal','Pendente','Validado','Recusado','Comunicado'];
-  document.getElementById('painelFilters').innerHTML=all.map(f=>`<button class="filter-btn${filterAtivo===f?' active':''}" onclick="setFilter('${f}')">${f}</button>`).join('');
+  const depts=['Todos',...new Set(colaboradores.map(c=>c.dept)),'Pendente','Validado','Recusado'];
+  document.getElementById('painelFilters').innerHTML=depts.map(f=>`<button class="filter-btn${filterAtivo===f?' active':''}" onclick="setFilter('${f}')">${f==='PEQUENOS NEGOCIOS'?'PEQU. NEGÓCIOS':f}</button>`).join('');
   renderPainelBody();
 }
 function setFilter(f){filterAtivo=f;renderPainel();}
 function filterPainel(q){renderPainelBody(q);}
 function renderPainelBody(q=''){
-  const src=filterAtivo==='Todos'?colaboradores:colaboradores.filter(c=>c.grupo===filterAtivo||c.status===filterAtivo);
-  const list=q?src.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase())):src;
-  document.getElementById('painelCount').textContent=`${list.length} colaboradores`;
-  document.getElementById('painelBody').innerHTML=list.map(c=>`<tr>
-    <td><div class="td-name">${c.nome}</div><span class="badge ${c.grupo==='Contábil'?'setor-contabil':c.grupo==='Fiscal'?'setor-fiscal':'setor-pessoal'}" style="font-size:10px">${c.grupo}</span></td>
-    <td><div class="td-dept">${c.dept.replace('DEPARTAMENTO ','')}</div></td>
+  let src=filterAtivo==='Todos'?colaboradores:colaboradores.filter(c=>c.dept===filterAtivo||c.statusP1===filterAtivo);
+  if(q) src=src.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('painelCount').textContent=`${src.length} colaboradores`;
+  document.getElementById('painelBody').innerHTML=src.map(c=>`<tr>
+    <td><div class="td-name">${c.nome}</div></td>
+    <td>${deptBadge(c.dept)}</td>
     <td class="td-mono" style="color:${isVencendo(c.conceder)?'#B71C1C':'inherit'};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
     <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
     <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
-    <td>${statusBadge(c.status)}${c.status==='Recusado'&&c.motivo_recusa?`<div style="font-size:10px;color:#B71C1C;margin-top:3px">⚠ Com motivo</div>`:''}</td>
+    <td>${statusBadge(c.statusP1)}</td>
+    <td>${c.p2ini?statusBadge(c.statusP2):'<span style="color:var(--muted);font-size:11px">—</span>'}</td>
     <td><span class="badge badge-gray" style="font-size:10px">${c.situacao}</span></td>
     <td><button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Editar</button></td>
   </tr>`).join('');
@@ -639,18 +685,18 @@ function renderPainelBody(q=''){
 // RENDER SETOR
 // ══════════════════════════════════════════════════════
 function renderSetor(){
-  const cfg=ROLE_CONFIG[currentRole];
-  const grupo=cfg.grupo;
-  const list=colaboradores.filter(c=>c.grupo===grupo);
-  document.getElementById('setorTitle').textContent=`Setor — ${grupo}`;
+  const cfg=ROLES.find(r=>r.id===currentRole);
+  const dept=cfg.dept;
+  const list=colaboradores.filter(c=>c.dept===dept);
+  document.getElementById('setorTitle').textContent=`Departamento ${dept.replace('PEQUENOS NEGOCIOS','Pequenos Negócios').replace(/\b\w/g,l=>l.toUpperCase()).toLowerCase().replace(/\b\w/g,l=>l.toUpperCase())}`;
   document.getElementById('setorSub').textContent=`${list.length} colaboradores`;
   const pendentes=list.filter(c=>!c.p1ini).length;
-  const validados=list.filter(c=>c.status==='Validado').length;
-  const recusados=list.filter(c=>c.status==='Recusado').length;
+  const validados=list.filter(c=>c.statusP1==='Validado').length;
+  const recusados=list.filter(c=>c.statusP1==='Recusado'||c.statusP2==='Recusado').length;
   document.getElementById('setorCards').innerHTML=`
-    <div class="stat-card"><div class="stat-label">Aguardando Indicação</div><div class="stat-value">${pendentes}</div><div class="stat-sub">sem datas definidas</div></div>
-    <div class="stat-card green"><div class="stat-label">Validados ✓</div><div class="stat-value">${validados}</div><div class="stat-sub">pelo DP</div></div>
-    <div class="stat-card red"><div class="stat-label">Recusados ✗</div><div class="stat-value">${recusados}</div><div class="stat-sub">necessitam nova indicação</div></div>`;
+    <div class="stat-card"><div class="stat-label">Aguardando Indicação</div><div class="stat-value">${pendentes}</div><div class="stat-sub">sem datas</div></div>
+    <div class="stat-card green"><div class="stat-label">P1 Validado ✓</div><div class="stat-value">${validados}</div><div class="stat-sub">pelo DP Interno</div></div>
+    <div class="stat-card red"><div class="stat-label">Com Recusa ✗</div><div class="stat-value">${recusados}</div><div class="stat-sub">nova indicação necessária</div></div>`;
   const dobro=list.filter(c=>c.situacao==='Férias em Dobro');
   const alertEl=document.getElementById('setorAlert');
   if(dobro.length){alertEl.style.display='flex';alertEl.innerHTML=`⚠️ <strong>${dobro.length} colaborador(es) com férias em dobro:</strong> ${dobro.map(c=>c.nome).join(', ')}`;}
@@ -661,20 +707,20 @@ function renderSetorBody(list){
   document.getElementById('setorCount').textContent=`${list.length} colaboradores`;
   document.getElementById('setorBody').innerHTML=list.map(c=>`<tr>
     <td><div class="td-name">${c.nome}</div></td>
-    <td><div class="td-dept">${c.dept.replace('DEPARTAMENTO ','')}</div></td>
-    <td class="td-mono">${fmtDate(c.pa_fim)}</td>
+    <td>${deptBadge(c.dept)}</td>
     <td class="td-mono" style="color:${isVencendo(c.conceder)?'#B71C1C':'inherit'};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
     <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
     <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
-    <td>${statusBadge(c.status)}</td>
-    <td>${c.status==='Validado'||c.status==='Comunicado'
+    <td>${statusBadge(c.statusP1)}</td>
+    <td>${c.p2ini?statusBadge(c.statusP2):'<span style="color:var(--muted);font-size:11px">—</span>'}</td>
+    <td>${c.statusP1==='Validado'&&c.statusP2!=='Recusado'
       ?`<span style="font-size:11px;color:var(--muted)">Bloqueado</span>`
-      :`<button class="btn btn-primary btn-sm" onclick="openDatasModal(${c.id})">${c.p1ini?'Editar':'Indicar Datas'}</button>`}</td>
+      :`<button class="btn btn-primary btn-sm" onclick="openDatasModal(${c.id})">${c.p1ini?'Editar':'Indicar'}</button>`}</td>
   </tr>`).join('');
 }
 function filterSetor(q){
-  const cfg=ROLE_CONFIG[currentRole];
-  const list=colaboradores.filter(c=>c.grupo===cfg.grupo&&(!q||c.nome.toLowerCase().includes(q.toLowerCase())));
+  const cfg=ROLES.find(r=>r.id===currentRole);
+  const list=colaboradores.filter(c=>c.dept===cfg.dept&&(!q||c.nome.toLowerCase().includes(q.toLowerCase())));
   renderSetorBody(list);
 }
 
@@ -682,46 +728,33 @@ function filterSetor(q){
 // RENDER VALIDAR
 // ══════════════════════════════════════════════════════
 function renderValidar(){
-  const list=colaboradores.filter(c=>c.p1ini&&c.status==='Pendente');
-  document.getElementById('validarCount').textContent=`${list.length} validação(ões) pendente(s)`;
+  const list=colaboradores.filter(c=>c.p1ini&&(c.statusP1==='Pendente'||(c.p2ini&&c.statusP2==='Pendente')));
+  document.getElementById('validarCount').textContent=`${list.length} indicação(ões) pendente(s)`;
   document.getElementById('validarBody').innerHTML=list.length?list.map(c=>`<tr>
-    <td><div class="td-name">${c.nome}</div><span class="badge ${c.grupo==='Contábil'?'setor-contabil':c.grupo==='Fiscal'?'setor-fiscal':'setor-pessoal'}" style="font-size:10px">${c.grupo}</span></td>
-    <td><div class="td-dept">${c.dept.replace('DEPARTAMENTO ','')}</div></td>
+    <td><div class="td-name">${c.nome}</div></td>
+    <td>${deptBadge(c.dept)}</td>
     <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
     <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
     <td class="td-mono" style="color:${isVencendo(c.conceder)?'#B71C1C':'inherit'};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
     <td style="display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn btn-green btn-sm" onclick="quickValidar(${c.id},'Validado')">✓ Validar</button>
-      <button class="btn btn-red btn-sm" onclick="openValidarModal(${c.id},'recusar')">✗ Recusar</button>
-      <button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Detalhar</button>
+      <button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Analisar</button>
     </td>
   </tr>`).join(''):`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhuma validação pendente</td></tr>`;
-}
-function quickValidar(id,status){
-  const c=colaboradores.find(x=>x.id===id);
-  if(c){c.status=status;}
-  showToast(status==='Validado'?'✅ Férias validadas!':'❌ Use "Recusar" para informar o motivo','success');
-  renderValidar();
 }
 
 // ══════════════════════════════════════════════════════
 // RENDER BLOQUEIOS
 // ══════════════════════════════════════════════════════
 function renderBloqueios(){
-  const dc={CONTABIL:'setor-contabil',FISCAL:'setor-fiscal',PESSOAL:'setor-pessoal'};
   document.getElementById('bloqueiosBody').innerHTML=BLOCKED.map(b=>`<tr>
-    <td><span class="badge ${dc[b.dept]||'badge-gray'}">${b.dept}</span></td>
-    <td class="td-mono">${fmtDate(b.ini)}</td><td class="td-mono">${fmtDate(b.fim)}</td>
+    <td>${deptBadge(b.dept)}</td>
+    <td class="td-mono">${fmtDate(b.ini)}</td>
+    <td class="td-mono">${fmtDate(b.fim)}</td>
     <td>${b.motivo}</td>
   </tr>`).join('');
   document.getElementById('feriadosBody').innerHTML=FERIADOS.map(f=>{
     const dow=new Date(f.d+'T12:00:00').getDay();
-    return`<tr>
-      <td class="td-mono">${fmtDate(f.d)}</td>
-      <td>${DIAS_SEMANA[dow]}</td>
-      <td>${f.nome}</td>
-      <td><span class="badge ${f.tipo==='Nacional'?'badge-red':'badge-blue'}">${f.tipo}</span></td>
-    </tr>`;
+    return`<tr><td class="td-mono">${fmtDate(f.d)}</td><td>${DIAS_SEMANA[dow]}</td><td>${f.nome}</td></tr>`;
   }).join('');
 }
 
@@ -729,59 +762,43 @@ function renderBloqueios(){
 // CALENDÁRIO
 // ══════════════════════════════════════════════════════
 function renderCalendario(){
-  const grupo=ROLE_CONFIG[currentRole]?.grupo;
-  document.getElementById('calSub').textContent=grupo?`Setor: ${grupo}`:'Todos os setores';
+  const cfg=ROLES.find(r=>r.id===currentRole);
+  const dept=cfg?.dept;
+  document.getElementById('calSub').textContent=dept?`Departamento: ${dept}`:'Todos os departamentos';
   document.getElementById('calTitle').textContent=`${MESES_NOME[calMonth]} de ${calYear}`;
-  const dow=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  document.getElementById('calDow').innerHTML=dow.map(d=>`<div class="cal-dow-label">${d}</div>`).join('');
-
+  document.getElementById('calDow').innerHTML=DIAS_SEMANA.map(d=>`<div class="cal-dow-label">${d}</div>`).join('');
   const firstDay=new Date(calYear,calMonth,1).getDay();
   const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
   const today=new Date().toISOString().split('T')[0];
-
-  const list=grupo?colaboradores.filter(c=>c.grupo===grupo):colaboradores;
-
+  const list=dept?colaboradores.filter(c=>c.dept===dept):colaboradores;
   let html='';
   for(let i=0;i<firstDay;i++) html+=`<div class="cal-day cal-empty"></div>`;
-
   for(let day=1;day<=daysInMonth;day++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    const dow2=getWeekday(ds);
-    const isSat=dow2===6, isSun=dow2===0, isFri=dow2===5;
+    const dow=getWeekday(ds);
+    const isSat=dow===6,isSun=dow===0,isFri=dow===5;
     const isFer=isHoliday(ds);
     const blk=BLOCKED.find(b=>{
-      if(grupo){
-        const key=grupo.toUpperCase().replace('DEPTO PESSOAL','PESSOAL').replace('CONTÁBIL','CONTABIL');
-        return b.dept===key&&ds>=b.ini&&ds<=b.fim;
-      }
+      if(dept) return b.dept===getDeptKey(dept)&&ds>=b.ini&&ds<=b.fim;
       return ds>=b.ini&&ds<=b.fim;
     });
-
-    // Férias
-    const vacValidado=list.find(c=>(c.p1ini&&ds>=c.p1ini&&ds<=c.p1fim&&c.status==='Validado')||(c.p2ini&&ds>=c.p2ini&&ds<=c.p2fim&&c.status==='Validado'));
-    const vacPendente=list.find(c=>(c.p1ini&&ds>=c.p1ini&&ds<=c.p1fim&&c.status==='Pendente')||(c.p2ini&&ds>=c.p2ini&&ds<=c.p2fim&&c.status==='Pendente'));
-
+    const vacV=list.find(c=>(c.p1ini&&ds>=c.p1ini&&ds<=c.p1fim&&c.statusP1==='Validado')||(c.p2ini&&ds>=c.p2ini&&ds<=c.p2fim&&c.statusP2==='Validado'));
+    const vacP=list.find(c=>(c.p1ini&&ds>=c.p1ini&&ds<=c.p1fim&&c.statusP1==='Pendente')||(c.p2ini&&ds>=c.p2ini&&ds<=c.p2fim&&c.statusP2==='Pendente'));
     let cls='cal-day';
     let tooltip='';
     if(isSat||isSun) cls+=' cal-weekend';
-    else if(isFer){ cls+=' cal-holiday'; tooltip=getHolidayName(ds); }
-    else if(blk){ cls+=' cal-blocked'; tooltip=blk.motivo; }
+    else if(isFer){cls+=' cal-holiday';tooltip=getHolidayName(ds);}
+    else if(blk){cls+=' cal-blocked';tooltip=blk.motivo;}
     else if(isFri) cls+=' cal-friday';
-    if(vacValidado) cls+=' cal-vacation';
-    else if(vacPendente) cls+=' cal-vacation-pending';
+    if(vacV) cls+=' cal-vacation';
+    else if(vacP) cls+=' cal-vacation-pending';
     if(ds===today) cls+=' cal-today';
-
-    const dots=[];
-    list.filter(c=>(c.p1ini&&ds>=c.p1ini&&ds<=c.p1fim)||(c.p2ini&&ds>=c.p2ini&&ds<=c.p2fim))
-      .slice(0,2).forEach(c=>{
-        const color=c.status==='Validado'?'#2E7D32':c.status==='Recusado'?'#C62828':'#1565C0';
-        dots.push(`<div style="font-size:9px;color:${color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.nome.split(' ')[0]}</div>`);
-      });
-
+    const nomes=list.filter(c=>(c.p1ini&&ds>=c.p1ini&&ds<=c.p1fim)||(c.p2ini&&ds>=c.p2ini&&ds<=c.p2fim)).slice(0,2)
+      .map(c=>`<div style="font-size:9px;color:${c.statusP1==='Validado'?'#1B5E20':'#1565C0'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.nome.split(' ')[0]}</div>`).join('');
     html+=`<div class="${cls}" title="${tooltip}">
       <div class="cal-day-num">${day}</div>
-      ${tooltip?`<div style="font-size:9px;color:inherit;line-height:1.2;margin-top:1px;overflow:hidden">${tooltip.substring(0,20)}</div>`:''}
-      ${dots.join('')}
+      ${tooltip?`<div style="font-size:9px;color:inherit;overflow:hidden;line-height:1.2">${tooltip.substring(0,22)}</div>`:''}
+      ${nomes}
     </div>`;
   }
   document.getElementById('calDays').innerHTML=html;
@@ -798,66 +815,46 @@ function openDatasModal(id){
   const c=currentColab;
   document.getElementById('modalDatasName').textContent=c.nome;
   document.getElementById('modalDatasInfo').innerHTML=`
-    <strong>P.A.:</strong> ${fmtDate(c.pa_ini)} a ${fmtDate(c.pa_fim)}&nbsp;&nbsp;
-    <strong>Conceder até:</strong> <span style="color:${isVencendo(c.conceder)?'#B71C1C':'inherit'};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</span>&nbsp;&nbsp;
-    <strong>Departamento:</strong> ${c.dept.replace('DEPARTAMENTO ','')}
-    <br><span style="color:#1565C0;font-size:11px">ℹ️ As férias são divididas em 2 períodos de 15 dias. Informe o início de cada período — o fim será calculado automaticamente.</span>`;
-  // Rejection box
+    <strong>P.A.:</strong> ${fmtDate(c.pa_ini)} a ${fmtDate(c.pa_fim)} &nbsp;
+    <strong>Conceder até:</strong> <span style="color:${isVencendo(c.conceder)?'#B71C1C':'inherit'};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</span><br>
+    <span style="color:#1565C0;font-size:11px">ℹ️ Férias em 2 períodos de 15 dias. Informe o início — o fim é calculado automaticamente.</span>`;
   const rb=document.getElementById('modalRejectionBox');
-  if(c.status==='Recusado'&&c.motivo_recusa){
-    rb.style.display='block';
-    rb.innerHTML=`<div class="rejection-box"><div class="rejection-title">❌ Motivo da recusa pelo Departamento Pessoal</div><div class="rejection-text">${c.motivo_recusa}</div></div>`;
-  } else rb.style.display='none';
-  document.getElementById('p1ini').value=c.p1ini||'';
-  document.getElementById('p1fim').value=c.p1fim||'';
-  document.getElementById('p2ini').value=c.p2ini||'';
-  document.getElementById('p2fim').value=c.p2fim||'';
+  let rbHtml='';
+  if(c.statusP1==='Recusado'&&c.motivoP1) rbHtml+=`<div class="rejection-box"><div class="rejection-title">❌ Recusa do 1º Período pelo DP Interno</div><div class="rejection-text">${c.motivoP1}</div></div>`;
+  if(c.statusP2==='Recusado'&&c.motivoP2) rbHtml+=`<div class="rejection-box"><div class="rejection-title">❌ Recusa do 2º Período pelo DP Interno</div><div class="rejection-text">${c.motivoP2}</div></div>`;
+  rb.innerHTML=rbHtml;
+  document.getElementById('p1ini').value=c.statusP1==='Recusado'?'':c.p1ini||'';
+  document.getElementById('p1fim').value=c.statusP1==='Recusado'?'':c.p1fim||'';
+  document.getElementById('p2ini').value=c.statusP2==='Recusado'?'':c.p2ini||'';
+  document.getElementById('p2fim').value=c.statusP2==='Recusado'?'':c.p2fim||'';
   document.getElementById('inputObs').value=c.obs||'';
-  ['msgP1','msgP2','msgGeral'].forEach(id=>{ const el=document.getElementById(id); el.className='validation-msg'; el.textContent=''; });
+  ['msgP1','msgP2','msgGeral'].forEach(i=>{const e=document.getElementById(i);e.className='validation-msg';e.textContent='';});
   openModal('modalDatas');
 }
-
 function onP1IniChange(){
   const ini=document.getElementById('p1ini').value;
   const msg=document.getElementById('msgP1');
   if(!ini){msg.className='validation-msg';return;}
-  const err=getDayBlockReason(ini, currentColab?.grupo||'');
-  if(err){
-    msg.className='validation-msg error';
-    msg.textContent='❌ '+err;
-    document.getElementById('p1fim').value='';
-    return;
-  }
+  const err=getDayBlockReason(ini,currentColab?.dept);
+  if(err){msg.className='validation-msg error';msg.textContent='❌ '+err;document.getElementById('p1fim').value='';return;}
   const fim=addDays(ini,14);
   document.getElementById('p1fim').value=fim;
   msg.className='validation-msg ok';
-  msg.textContent=`✅ Período 1: ${fmtDate(ini)} a ${fmtDate(fim)} (15 dias corridos)`;
+  msg.textContent=`✅ 1º Período: ${fmtDate(ini)} a ${fmtDate(fim)} — 15 dias corridos`;
 }
-
 function onP2IniChange(){
   const ini=document.getElementById('p2ini').value;
   const msg=document.getElementById('msgP2');
   if(!ini){msg.className='validation-msg';return;}
-  const err=getDayBlockReason(ini, currentColab?.grupo||'');
-  if(err){
-    msg.className='validation-msg error';
-    msg.textContent='❌ '+err;
-    document.getElementById('p2fim').value='';
-    return;
-  }
+  const err=getDayBlockReason(ini,currentColab?.dept);
+  if(err){msg.className='validation-msg error';msg.textContent='❌ '+err;document.getElementById('p2fim').value='';return;}
   const p1fim=document.getElementById('p1fim').value;
-  if(p1fim&&ini<=p1fim){
-    msg.className='validation-msg error';
-    msg.textContent='❌ O 2º período deve começar após o fim do 1º período ('+fmtDate(p1fim)+').';
-    document.getElementById('p2fim').value='';
-    return;
-  }
+  if(p1fim&&ini<=p1fim){msg.className='validation-msg error';msg.textContent=`❌ O 2º período deve começar após o fim do 1º (${fmtDate(p1fim)}).`;document.getElementById('p2fim').value='';return;}
   const fim=addDays(ini,14);
   document.getElementById('p2fim').value=fim;
   msg.className='validation-msg ok';
-  msg.textContent=`✅ Período 2: ${fmtDate(ini)} a ${fmtDate(fim)} (15 dias corridos)`;
+  msg.textContent=`✅ 2º Período: ${fmtDate(ini)} a ${fmtDate(fim)} — 15 dias corridos`;
 }
-
 function submitDatas(){
   const p1ini=document.getElementById('p1ini').value;
   const p1fim=document.getElementById('p1fim').value;
@@ -866,59 +863,69 @@ function submitDatas(){
   const obs=document.getElementById('inputObs').value;
   const msg=document.getElementById('msgGeral');
   if(!p1ini||!p1fim){msg.className='validation-msg error';msg.textContent='❌ Preencha ao menos o 1º período.';return;}
-  const err1=getDayBlockReason(p1ini,currentColab?.grupo||'');
-  if(err1){msg.className='validation-msg error';msg.textContent='❌ 1º período: '+err1;return;}
-  if(p2ini){
-    const err2=getDayBlockReason(p2ini,currentColab?.grupo||'');
-    if(err2){msg.className='validation-msg error';msg.textContent='❌ 2º período: '+err2;return;}
-  }
+  const err1=getDayBlockReason(p1ini,currentColab?.dept);
+  if(err1){msg.className='validation-msg error';msg.textContent='❌ 1º Período: '+err1;return;}
+  if(p2ini){const err2=getDayBlockReason(p2ini,currentColab?.dept);if(err2){msg.className='validation-msg error';msg.textContent='❌ 2º Período: '+err2;return;}}
   const c=colaboradores.find(x=>x.id===currentColab.id);
-  c.p1ini=p1ini;c.p1fim=p1fim;c.p2ini=p2ini||'';c.p2fim=p2fim||'';
-  c.obs=obs;c.status='Pendente';c.motivo_recusa='';
+  if(!c.p1ini||c.statusP1==='Recusado'){c.p1ini=p1ini;c.p1fim=p1fim;c.statusP1='Pendente';c.motivoP1='';}
+  if(p2ini&&(!c.p2ini||c.statusP2==='Recusado')){c.p2ini=p2ini;c.p2fim=p2fim;c.statusP2='Pendente';c.motivoP2='';}
+  c.obs=obs;
   closeModal('modalDatas');
-  showToast('✅ Indicação salva! O DP será notificado.','success');
+  showToast('✅ Indicação salva! O DP Interno será notificado.','success');
   renderSetor();
 }
 
 // ══════════════════════════════════════════════════════
-// MODAL: VALIDAR (DP)
+// MODAL: VALIDAR
 // ══════════════════════════════════════════════════════
-function onStatusChange(){
-  const s=document.getElementById('inputStatus').value;
-  document.getElementById('motivoRecusaGroup').style.display=s==='Recusado'?'':'none';
+function onStatusP1Change(){
+  document.getElementById('motivoP1Group').style.display=document.getElementById('inputStatusP1').value==='Recusado'?'block':'none';
 }
-function openValidarModal(id, mode=''){
+function onStatusP2Change(){
+  document.getElementById('motivoP2Group').style.display=document.getElementById('inputStatusP2').value==='Recusado'?'block':'none';
+}
+function openValidarModal(id){
   currentColab=colaboradores.find(c=>c.id===id);
   const c=currentColab;
   document.getElementById('modalValidarName').textContent=c.nome;
   document.getElementById('modalValidarDetail').innerHTML=`
-    <div class="detail-item"><label>Departamento</label><span>${c.dept.replace('DEPARTAMENTO ','')}</span></div>
-    <div class="detail-item"><label>Célula</label><span>${c.celula}</span></div>
+    <div class="detail-item"><label>Departamento</label><span>${c.dept.replace('PEQUENOS NEGOCIOS','Pequenos Negócios')}</span></div>
     <div class="detail-item"><label>Conceder Até</label><span style="color:${isVencendo(c.conceder)?'#B71C1C':'inherit'}">${fmtDate(c.conceder)}</span></div>
-    <div class="detail-item"><label>1º Período</label><span>${fmtDate(c.p1ini)} a ${fmtDate(c.p1fim)}</span></div>
-    <div class="detail-item"><label>2º Período</label><span>${c.p2ini?fmtDate(c.p2ini)+' a '+fmtDate(c.p2fim):'Não indicado'}</span></div>
     <div class="detail-item"><label>Obs. Gestor</label><span>${c.obs||'—'}</span></div>`;
-  const status=mode==='recusar'?'Recusado':(c.status||'Pendente');
-  document.getElementById('inputStatus').value=status;
+  // P1
+  document.getElementById('validarP1Datas').textContent=c.p1ini?`${fmtDate(c.p1ini)} a ${fmtDate(c.p1fim)}`:'Não indicado';
+  document.getElementById('inputStatusP1').value=c.statusP1||'Pendente';
   document.getElementById('inputSituacao').value=c.situacao||'';
-  document.getElementById('inputMotivoRecusa').value=c.motivo_recusa||'';
+  document.getElementById('motivoP1').value=c.motivoP1||'';
+  document.getElementById('motivoP1Group').style.display=c.statusP1==='Recusado'?'block':'none';
+  // P2
+  const hasP2=!!c.p2ini;
+  document.getElementById('validarP2Datas').textContent=hasP2?`${fmtDate(c.p2ini)} a ${fmtDate(c.p2fim)}`:'Não indicado';
+  document.getElementById('validarP2Vazio').style.display=hasP2?'none':'block';
+  document.getElementById('validarP2Form').style.display=hasP2?'block':'none';
+  if(hasP2){
+    document.getElementById('inputStatusP2').value=c.statusP2||'Pendente';
+    document.getElementById('motivoP2').value=c.motivoP2||'';
+    document.getElementById('motivoP2Group').style.display=c.statusP2==='Recusado'?'block':'none';
+  }
   document.getElementById('inputObsDP').value='';
-  document.getElementById('motivoRecusaGroup').style.display=status==='Recusado'?'':'none';
   openModal('modalValidar');
 }
 function submitValidar(){
-  const status=document.getElementById('inputStatus').value;
-  const motivo=document.getElementById('inputMotivoRecusa').value.trim();
-  if(status==='Recusado'&&!motivo){
-    showToast('Informe o motivo da recusa — o gestor precisa ser orientado.','error');
-    return;
-  }
+  const sP1=document.getElementById('inputStatusP1').value;
+  const mP1=document.getElementById('motivoP1').value.trim();
+  const sP2=document.getElementById('inputStatusP2').value;
+  const mP2=document.getElementById('motivoP2').value.trim();
+  const hasP2=!!currentColab.p2ini;
+  if(sP1==='Recusado'&&!mP1){showToast('Informe o motivo da recusa do 1º período.','error');return;}
+  if(hasP2&&sP2==='Recusado'&&!mP2){showToast('Informe o motivo da recusa do 2º período.','error');return;}
   const c=colaboradores.find(x=>x.id===currentColab.id);
-  c.status=status;
+  c.statusP1=sP1;c.motivoP1=sP1==='Recusado'?mP1:'';
   c.situacao=document.getElementById('inputSituacao').value;
-  c.motivo_recusa=status==='Recusado'?motivo:'';
+  if(hasP2){c.statusP2=sP2;c.motivoP2=sP2==='Recusado'?mP2:'';}
   closeModal('modalValidar');
-  showToast(status==='Validado'?'✅ Férias validadas!':status==='Recusado'?'❌ Recusa registrada com motivo':'Registro atualizado!',status==='Validado'?'success':status==='Recusado'?'error':'');
+  const msg=sP1==='Validado'?'✅ Validado com sucesso!':sP1==='Recusado'?'❌ Recusa registrada com motivo':'Registro atualizado!';
+  showToast(msg,sP1==='Validado'?'success':sP1==='Recusado'?'error':'');
   renderPainel();renderValidar();
 }
 
@@ -934,8 +941,8 @@ function showToast(msg,type=''){
   setTimeout(()=>t.remove(),3500);
 }
 function exportCSV(){
-  const rows=[["Nome","Departamento","Célula","Conceder Até","P1 Início","P1 Fim","P2 Início","P2 Fim","Status","Situação","Obs Gestor"]];
-  colaboradores.forEach(c=>rows.push([c.nome,c.dept,c.celula,fmtDate(c.conceder),fmtDate(c.p1ini),fmtDate(c.p1fim),fmtDate(c.p2ini),fmtDate(c.p2fim),c.status,c.situacao,c.obs]));
+  const rows=[["Nome","Departamento","Conceder Até","P1 Início","P1 Fim","P2 Início","P2 Fim","Status P1","Status P2","Situação"]];
+  colaboradores.forEach(c=>rows.push([c.nome,c.dept,fmtDate(c.conceder),fmtDate(c.p1ini),fmtDate(c.p1fim),fmtDate(c.p2ini),fmtDate(c.p2fim),c.statusP1,c.statusP2,c.situacao]));
   const csv=rows.map(r=>r.join(';')).join('\n');
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
@@ -945,7 +952,6 @@ function exportCSV(){
 document.querySelectorAll('.modal-overlay').forEach(o=>{
   o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
 });
-// Init calendar to Jan 2027
 calYear=2027;calMonth=0;
 </script>
 </body>
