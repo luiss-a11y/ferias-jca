@@ -286,6 +286,27 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .table-scroll-hint::before{content:"← "}
 .table-scroll-hint::after{content:" →"}
 
+
+/* Criticality levels */
+.nivel-4{background:#FFEBEE!important;border-left:4px solid #B71C1C!important}
+.nivel-3{background:#FFF3E0!important;border-left:4px solid #E65100!important}
+.nivel-2{background:#FFF8E1!important;border-left:4px solid #F57F17!important}
+.nivel-1{background:#E3F2FD!important;border-left:4px solid #0277BD!important}
+.alerta-badge-4{background:#FFEBEE;color:#B71C1C;border:1px solid #FFCDD2;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.alerta-badge-3{background:#FFF3E0;color:#E65100;border:1px solid #FFE0B2;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.alerta-badge-2{background:#FFF8E1;color:#F57F17;border:1px solid #FFE082;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.alerta-badge-1{background:#E3F2FD;color:#0277BD;border:1px solid #90CAF9;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.alerta-card{border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px;border:1px solid transparent}
+.alerta-card-4{background:#FFEBEE;border-color:#FFCDD2}
+.alerta-card-3{background:#FFF3E0;border-color:#FFE0B2}
+.alerta-card-2{background:#FFF8E1;border-color:#FFE082}
+.alerta-card-1{background:#E3F2FD;border-color:#BBDEFB}
+.alerta-icon{font-size:20px;flex-shrink:0}
+.alerta-info{flex:1}
+.alerta-nome{font-weight:600;font-size:13px;color:var(--navy)}
+.alerta-detalhe{font-size:12px;color:var(--muted);margin-top:2px}
+.alerta-dias{font-size:13px;font-weight:700;flex-shrink:0}
+
 </style>
 </head>
 
@@ -362,12 +383,55 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   <div class="nav-tabs" id="navTabs"></div>
   <div class="main">
 
+
+    <!-- ALERTAS -->
+    <div class="section" id="sec-alertas">
+      <div class="page-header">
+        <div><div class="page-title">Alertas de Criticidade</div><div class="page-sub">Colaboradores que exigem atenção imediata para concessão de férias</div></div>
+        <button class="btn btn-primary btn-sm" onclick="exportAlertasCSV()">↓ Exportar CSV</button>
+      </div>
+
+      <!-- Legend -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+        <span class="alerta-badge-4">🔴 Nível 4 — Férias em Dobro</span>
+        <span class="alerta-badge-3">🟠 Nível 3 — Vence em até 30 dias</span>
+        <span class="alerta-badge-2">🟡 Nível 2 — Vence em até 60 dias</span>
+        <span class="alerta-badge-1">🔵 Nível 1 — Sem datas, prazo OK</span>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="cards-row cols-4" id="alertasCards"></div>
+
+      <!-- Filters -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="alertasFilters"></div>
+
+      <!-- Alert list -->
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title" id="alertasCount">—</span>
+          <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterAlertas(this.value)"/></div>
+        </div>
+        <div style="overflow-x:auto"><table><thead><tr>
+          <th>Nível</th><th>Colaborador</th><th>Departamento</th>
+          <th>Conceder Até</th><th>Dias Restantes</th><th>Status Atual</th>
+          <th>Situação</th><th>Ação</th>
+        </tr></thead><tbody id="alertasBody"></tbody></table></div>
+      </div>
+
+      <!-- Grouped by dept -->
+      <div style="margin-top:24px">
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px">Por Departamento</div>
+        <div id="alertasDeptGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px"></div>
+      </div>
+    </div>
+
     <!-- PAINEL -->
     <div class="section" id="sec-painel">
       <div class="page-header">
         <div><div class="page-title">Painel Geral</div><div class="page-sub">Visão consolidada de todos os departamentos</div></div>
         <button class="btn btn-primary btn-sm" onclick="exportCSV()">↓ Exportar CSV</button>
       </div>
+      <div id="painelAlertaBanner"></div>
       <div class="cards-row cols-4" id="painelCards"></div>
       <div class="table-wrap">
         <div class="table-header">
@@ -1016,8 +1080,9 @@ const ROLES_CSC=[
   {id:"csc_adm",label:"Administrativo",icon:"🗂️",dept:"CSC ADMINISTRATIVO",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
 ];
 const ROLE_DP={id:"dp",label:"Departamento Pessoal Interno",dept:null,
-  tabs:["painel","calendario","validar","aprovadas","alteracoes","financeiro","provisao","grafico","indicadores","bloqueios"]};
+  tabs:["alertas","painel","calendario","validar","aprovadas","alteracoes","financeiro","provisao","grafico","indicadores","bloqueios"]};
 const TAB_CONFIG={
+  alertas:{label:"🚨 Alertas",sec:"sec-alertas"},
   painel:{label:"📊 Painel Geral",sec:"sec-painel"},
   setor:{label:"👥 Meu Departamento",sec:"sec-setor"},
   calendario:{label:"📅 Calendário",sec:"sec-calendario"},
@@ -1120,6 +1185,7 @@ function switchTab(k){
   document.querySelectorAll(".nav-tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===k));
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   const sec=TAB_CONFIG[k]?.sec;if(sec)document.getElementById(sec)?.classList.add("active");
+  if(k==="alertas")renderAlertas();
   if(k==="painel")renderPainel();
   if(k==="setor")renderSetor();
   if(k==="calendario")renderCalendario();
@@ -1182,7 +1248,7 @@ function renderPainelBody(q=""){
   let src=filterAtivo==="Todos"?colaboradores:colaboradores.filter(c=>c.dept===filterAtivo||c.statusP1===filterAtivo);
   if(q)src=src.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase()));
   document.getElementById("painelCount").textContent=`${src.length} colaboradores`;
-  document.getElementById("painelBody").innerHTML=src.map(c=>`<tr>
+  document.getElementById("painelBody").innerHTML=src.map(c=>{const _nl=getNivelLabel(getNivel(c));return`<tr class="${_nl.rowCls}">
     <td><div class="td-name">${c.nome}</div></td><td>${deptBadge(c.dept)}</td>
     <td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
     <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
@@ -1193,7 +1259,7 @@ function renderPainelBody(q=""){
       <button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Validar</button>
       ${["Validado","Comunicado"].includes(c.statusP1)?`<button class="btn btn-outline btn-sm" onclick="openEditarDP(${c.id})">✎ Editar</button>`:""}
     </td>
-  </tr>`).join("");
+  </tr>`; }).join("");
 }
 
 // ── SETOR ────────────────────────────────────────────────────
@@ -1328,6 +1394,7 @@ function renderFinanceiro(){
   document.getElementById("finFilters").innerHTML=depts.map(f=>`<button class="filter-btn${filterFinAtivo===f?" active":""}" onclick="setFilterFin('${f}')">${f}</button>`).join("");
   document.getElementById("finDetCount").textContent=`${colaboradores.length} colaboradores`;
   renderFinBody();
+  renderPainelAlertaBanner();
   // Show/hide breakdown
   document.getElementById("finDeptBreakdown").style.display=finMesSel>=0?"block":"none";
   document.getElementById("finAnoWrap").style.display=finMesSel>=0?"none":"block";
@@ -2547,6 +2614,169 @@ function drawComparativoChart(mm, tProv){
     tableRows,
   });
 }
+
+
+// ── ALERTAS ───────────────────────────────────────────────────
+let alertaFiltroNivel = 'Todos';
+
+function getNivel(c){
+  const hoje = new Date();
+  const dias = c.conceder ? Math.ceil((new Date(c.conceder)-hoje)/86400000) : 999;
+  if(c.situacao==="Férias em Dobro" || dias < 0) return 4;
+  if(dias <= 30) return 3;
+  if(dias <= 60) return 2;
+  if(!c.p1ini) return 1;
+  return 0; // OK
+}
+function getNivelLabel(n){
+  if(n===4) return {label:"🔴 Férias em Dobro", cls:"alerta-badge-4", rowCls:"nivel-4", icon:"🔴"};
+  if(n===3) return {label:"🟠 Vence em 30 dias", cls:"alerta-badge-3", rowCls:"nivel-3", icon:"🟠"};
+  if(n===2) return {label:"🟡 Vence em 60 dias", cls:"alerta-badge-2", rowCls:"nivel-2", icon:"🟡"};
+  if(n===1) return {label:"🔵 Sem datas", cls:"alerta-badge-1", rowCls:"nivel-1", icon:"🔵"};
+  return {label:"✅ OK", cls:"badge-green", rowCls:"", icon:"✅"};
+}
+function getDiasRestantes(c){
+  if(!c.conceder) return null;
+  return Math.ceil((new Date(c.conceder)-new Date())/86400000);
+}
+
+function getCriticos(){
+  return colaboradores
+    .map(c=>({...c, nivel:getNivel(c), dias:getDiasRestantes(c)}))
+    .filter(c=>c.nivel>=1)
+    .sort((a,b)=>b.nivel-a.nivel||(a.dias||999)-(b.dias||999));
+}
+
+function renderAlertas(){
+  const criticos = getCriticos();
+  const n4=criticos.filter(c=>c.nivel===4).length;
+  const n3=criticos.filter(c=>c.nivel===3).length;
+  const n2=criticos.filter(c=>c.nivel===2).length;
+  const n1=criticos.filter(c=>c.nivel===1).length;
+
+  document.getElementById('alertasCards').innerHTML=`
+    <div class="stat-card red"><div class="stat-label">🔴 Férias em Dobro</div><div class="stat-value">${n4}</div><div class="stat-sub">ação imediata</div></div>
+    <div class="stat-card" style="border-top:3px solid #E65100"><div class="stat-label">🟠 Vence em 30 dias</div><div class="stat-value" style="color:#E65100">${n3}</div><div class="stat-sub">urgente</div></div>
+    <div class="stat-card gold"><div class="stat-label">🟡 Vence em 60 dias</div><div class="stat-value">${n2}</div><div class="stat-sub">atenção</div></div>
+    <div class="stat-card" style="border-top:3px solid #0277BD"><div class="stat-label">🔵 Sem datas indicadas</div><div class="stat-value" style="color:#0277BD">${n1}</div><div class="stat-sub">planejar</div></div>`;
+
+  const niveis=['Todos','🔴 Nível 4','🟠 Nível 3','🟡 Nível 2','🔵 Nível 1'];
+  document.getElementById('alertasFilters').innerHTML=niveis.map((n,i)=>`
+    <button class="filter-btn${alertaFiltroNivel===n?' active':''}" onclick="setAlertaFiltro('${n}')">${n}</button>`).join('');
+
+  document.getElementById('alertasCount').textContent=`${criticos.length} colaboradores em estado crítico`;
+  renderAlertasBody(criticos);
+  renderAlertasDept(criticos);
+}
+
+function setAlertaFiltro(n){
+  alertaFiltroNivel=n;
+  document.querySelectorAll('#alertasFilters .filter-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim()===n));
+  renderAlertasBody(getCriticos());
+}
+function filterAlertas(q){
+  let list=getCriticos();
+  if(alertaFiltroNivel!=='Todos'){const map={'🔴 Nível 4':4,'🟠 Nível 3':3,'🟡 Nível 2':2,'🔵 Nível 1':1};list=list.filter(c=>c.nivel===map[alertaFiltroNivel]);}
+  if(q)list=list.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase()));
+  renderAlertasBody(list);
+}
+
+function renderAlertasBody(list){
+  if(alertaFiltroNivel!=='Todos'){const map={'🔴 Nível 4':4,'🟠 Nível 3':3,'🟡 Nível 2':2,'🔵 Nível 1':1};list=list.filter(c=>c.nivel===map[alertaFiltroNivel]);}
+  document.getElementById('alertasCount').textContent=`${list.length} colaboradores em estado crítico`;
+  document.getElementById('alertasBody').innerHTML=list.length?list.map(c=>{
+    const nl=getNivelLabel(c.nivel);
+    const dias=c.dias;
+    const diasStr=c.nivel===4&&dias<0?`<span style="color:#B71C1C;font-weight:700">${Math.abs(dias)}d vencido</span>`:
+                  dias!==null?`<span style="font-weight:700;color:${c.nivel===3?'#E65100':c.nivel===2?'#F57F17':'#0277BD'}">${dias}d</span>`:'—';
+    return`<tr class="${nl.rowCls}">
+      <td><span class="${nl.cls}">${nl.label}</span></td>
+      <td><div class="td-name">${c.nome}</div></td>
+      <td>${deptBadge(c.dept)}</td>
+      <td class="td-mono" style="font-weight:600">${fmtDate(c.conceder)}</td>
+      <td style="text-align:center">${diasStr}</td>
+      <td>${statusBadge(c.statusP1)}</td>
+      <td><span class="badge badge-gray" style="font-size:10px">${c.situacao}</span></td>
+      <td>${c.statusP1==='Validado'||c.statusP1==='Comunicado'
+        ?`<span style="font-size:11px;color:var(--muted)">Aprovado</span>`
+        :`<button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Analisar</button>`}</td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhum alerta crítico</td></tr>`;
+}
+
+function renderAlertasDept(criticos){
+  const depts=[...new Set(criticos.map(c=>c.dept))].sort();
+  const grid=document.getElementById('alertasDeptGrid');
+  grid.innerHTML='';
+  depts.forEach(dept=>{
+    const list=criticos.filter(c=>c.dept===dept);
+    const bg=DEPT_COLORS[dept]||'#ECEFF1', tc=DEPT_TEXT[dept]||'#546E7A';
+    const dname=dept.replace('PEQUENOS NEGOCIOS','Peq. Negócios').replace('GENTE GESTAO','G&G').replace('LEGALIZACAO','Legal').replace('ADMINISTRATIVO','Adm');
+    const div=document.createElement('div');
+    div.style.cssText='background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow)';
+    div.innerHTML=`
+      <div style="background:${bg};padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-weight:700;font-size:13px;color:${tc}">${dname}</span>
+        <span style="font-size:12px;font-weight:600;color:${tc}">${list.length} alerta${list.length!==1?'s':''}</span>
+      </div>
+      ${list.map(c=>{
+        const nl=getNivelLabel(c.nivel);
+        const dias=c.dias;
+        const diasStr=c.nivel===4&&dias<0?`${Math.abs(dias)}d vencido`:dias!==null?`${dias}d`:'-';
+        return`<div class="alerta-card alerta-card-${c.nivel}">
+          <div class="alerta-icon">${nl.icon}</div>
+          <div class="alerta-info">
+            <div class="alerta-nome">${c.nome}</div>
+            <div class="alerta-detalhe">${c.situacao} · ${fmtDate(c.conceder)}</div>
+          </div>
+          <div class="alerta-dias" style="color:${c.nivel===4?'#B71C1C':c.nivel===3?'#E65100':c.nivel===2?'#F57F17':'#0277BD'}">${diasStr}</div>
+        </div>`;
+      }).join('')}`;
+    grid.appendChild(div);
+  });
+}
+
+function exportAlertasCSV(){
+  const rows=[['Nível','Colaborador','Departamento','Conceder Até','Dias Restantes','Status','Situação']];
+  getCriticos().forEach(c=>{
+    const nl=getNivelLabel(c.nivel);
+    rows.push([nl.label.replace(/[🔴🟠🟡🔵]/g,'').trim(),c.nome,c.dept,fmtDate(c.conceder),
+      c.dias!==null?(c.dias<0?`${Math.abs(c.dias)} dias vencido`:`${c.dias} dias`):'-',
+      c.statusP1,c.situacao]);
+  });
+  const csv=rows.map(r=>r.join(';')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='alertas_ferias_2027.csv';a.click();showToast('CSV exportado!','success');
+}
+
+// ── PAINEL ALERT BANNER ───────────────────────────────────────
+function renderPainelAlertaBanner(){
+  const el=document.getElementById('painelAlertaBanner');
+  if(!el)return;
+  const criticos=getCriticos();
+  const n4=criticos.filter(c=>c.nivel===4).length;
+  const n3=criticos.filter(c=>c.nivel===3).length;
+  if(n4===0&&n3===0){el.innerHTML='';return;}
+  el.innerHTML=`
+    <div style="background:#FFEBEE;border:1.5px solid #FFCDD2;border-left:5px solid #B71C1C;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font-size:20px">🚨</span>
+        <div>
+          <div style="font-weight:700;font-size:14px;color:#B71C1C">Atenção — Colaboradores em estado crítico</div>
+          <div style="font-size:12px;color:#C62828;margin-top:2px">
+            ${n4>0?`<strong>${n4} com férias em dobro</strong>`:''}
+            ${n4>0&&n3>0?' · ':''}
+            ${n3>0?`<strong>${n3} vencem em até 30 dias</strong>`:''}
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-red btn-sm" onclick="switchTab('alertas')">Ver Alertas →</button>
+    </div>`;
+}
+
+// ── ROW HIGHLIGHTING IN PAINEL ────────────────────────────────
+// Patch renderPainelBody to add criticality row classes
+const _origRenderPainelBody = renderPainelBody;
 
 // ── BLOQUEIOS ────────────────────────────────────────────────
 function renderBloqueios(){
