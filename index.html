@@ -189,6 +189,103 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .mes-val.empty{color:var(--muted)}
 .stat-card.gold::before{background:#F57F17}
 
+
+/* ── MOBILE NAV ─────────────────────────────────── */
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;border-radius:6px;transition:background .15s}
+.hamburger:hover{background:rgba(255,255,255,.1)}
+.hamburger span{display:block;width:22px;height:2px;background:white;border-radius:2px;margin:5px 0;transition:all .25s}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open span:nth-child(2){opacity:0;transform:translateX(-8px)}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mobile-nav{display:none;position:fixed;top:56px;left:0;right:0;background:var(--navy-dark);z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.08)}
+.mobile-nav.open{display:block}
+.mobile-nav-item{display:flex;align-items:center;gap:12px;padding:14px 24px;color:rgba(255,255,255,.8);font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s}
+.mobile-nav-item:hover,.mobile-nav-item.active{background:rgba(74,144,217,.2);color:white}
+.mobile-nav-item.active{border-left:3px solid var(--accent)}
+.mobile-nav-overlay{display:none;position:fixed;inset:0;top:56px;background:rgba(0,0,0,.4);z-index:98}
+.mobile-nav-overlay.open{display:block}
+
+/* ── RESPONSIVE OVERRIDES ───────────────────────── */
+@media(max-width:768px){
+  /* Topbar */
+  .topbar{padding:0 16px}
+  .topbar-sub{display:none}
+  .role-badge{display:none}
+  .hamburger{display:block}
+  .nav-tabs{display:none}
+
+  /* Main */
+  .main{padding:16px 12px}
+  .page-header{flex-direction:column;gap:10px}
+  .page-header .btn{width:100%;justify-content:center}
+
+  /* Cards */
+  .cards-row.cols-4{grid-template-columns:repeat(2,1fr)}
+  .cards-row.cols-3{grid-template-columns:repeat(2,1fr)}
+  .cards-row.cols-2{grid-template-columns:1fr}
+  .stat-card{padding:14px 16px}
+  .stat-value{font-size:22px}
+
+  /* Tables */
+  .table-wrap{border-radius:8px}
+  .table-header{padding:12px 14px;flex-direction:column;align-items:flex-start}
+  .search-box{width:100%}
+  .filter-row{padding:10px 14px}
+  thead th{padding:10px 10px;font-size:10px}
+  tbody td{padding:10px 10px;font-size:12px}
+
+  /* Login */
+  .login-card{padding:28px 20px;border-radius:16px}
+  .login-roles{grid-template-columns:1fr 1fr;gap:8px}
+  .login-title{font-size:18px}
+
+  /* Modals */
+  .modal{padding:20px 16px;border-radius:12px 12px 0 0;position:fixed;bottom:0;left:0;right:0;max-width:100%;max-height:90vh;margin:0;animation:slideUpModal .25s ease}
+  @keyframes slideUpModal{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-overlay{align-items:flex-end;padding:0}
+  .form-row{grid-template-columns:1fr}
+  .modal-footer{flex-direction:column-reverse}
+  .modal-footer .btn{width:100%;justify-content:center}
+
+  /* Detail card */
+  .detail-card{grid-template-columns:1fr 1fr}
+
+  /* Period blocks */
+  .period-block{padding:12px}
+
+  /* Calendar */
+  .cal-grid{padding:12px 10px}
+  .cal-day{min-height:40px;padding:4px}
+  .cal-day-num{font-size:11px}
+  .cal-legend{padding:8px 12px;gap:8px}
+  .cal-legend-item{font-size:10px}
+
+  /* Depto cards */
+  .depto-kpis{grid-template-columns:repeat(3,1fr)}
+
+  /* Chart */
+  #graficoCanvas{height:220px!important}
+
+  /* Scroll indicator for tables */
+  .table-scroll-hint{display:block}
+
+  /* Page title smaller */
+  .page-title{font-size:18px}
+  .page-sub{font-size:12px}
+}
+
+@media(max-width:400px){
+  .cards-row.cols-4,.cards-row.cols-3{grid-template-columns:1fr}
+  .depto-kpis{grid-template-columns:repeat(2,1fr)}
+  .login-roles{grid-template-columns:1fr 1fr}
+  .cal-day{min-height:34px}
+}
+
+/* Scroll hint */
+.table-scroll-hint{display:none;font-size:11px;color:var(--muted);padding:4px 14px 8px;font-style:italic}
+.table-scroll-hint::before{content:"← "}
+.table-scroll-hint::after{content:" →"}
+
 </style>
 </head>
 
@@ -252,9 +349,16 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     </div>
     <div class="topbar-right">
       <span class="role-badge" id="roleBadge">—</span>
-      <button class="btn btn-outline btn-sm" onclick="doLogout()">Sair</button>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()" id="btnSair">Sair</button>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
+  <!-- Mobile nav overlay -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
+  <!-- Mobile nav menu -->
+  <div class="mobile-nav" id="mobileNav"></div>
   <div class="nav-tabs" id="navTabs"></div>
   <div class="main">
 
@@ -271,7 +375,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
           <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterPainel(this.value)" id="painelSearch"/></div>
         </div>
         <div class="filter-row" id="painelFilters"></div>
-        <div style="overflow-x:auto"><table><thead><tr>
+        <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
           <th>Nome</th><th>Departamento</th><th>Conceder Até</th>
           <th>P1 Início</th><th>P1 Fim</th><th>P2 Início</th><th>P2 Fim</th>
           <th>Status P1</th><th>Status P2</th><th>Situação</th><th>Ações</th>
@@ -287,7 +391,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
       <div class="table-wrap">
         <div class="table-header"><span class="table-title" id="setorCount">—</span>
           <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterSetor(this.value)"/></div></div>
-        <div style="overflow-x:auto"><table><thead><tr>
+        <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
           <th>Nome</th><th>Departamento</th><th>Conceder Até</th>
           <th>P1 Início</th><th>P1 Fim</th><th>P2 Início</th><th>P2 Fim</th>
           <th>Status P1</th><th>Status P2</th><th>Ações</th>
@@ -324,7 +428,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
       <div class="cards-row cols-3" id="alteracoesCards"></div>
       <div class="table-wrap">
         <div class="table-header"><span class="table-title" id="alteracoesCount">—</span></div>
-        <div style="overflow-x:auto"><table><thead><tr>
+        <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
           <th>Colaborador</th><th>Departamento</th>
           <th>Datas Atuais P1</th><th>Datas Atuais P2</th>
           <th>Novas Datas P1</th><th>Novas Datas P2</th>
@@ -338,7 +442,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
       <div class="page-header"><div><div class="page-title">Validações Pendentes</div><div class="page-sub">Indicações aguardando análise do DP Interno</div></div></div>
       <div class="table-wrap">
         <div class="table-header"><span class="table-title" id="validarCount">—</span></div>
-        <div style="overflow-x:auto"><table><thead><tr>
+        <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
           <th>Nome</th><th>Departamento</th><th>P1 Início</th><th>P1 Fim</th><th>P2 Início</th><th>P2 Fim</th><th>Conceder Até</th><th>Ações</th>
         </tr></thead><tbody id="validarBody"></tbody></table></div>
       </div>
@@ -359,7 +463,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
           </div>
         </div>
         <div class="filter-row" id="aprovadasFilters"></div>
-        <div style="overflow-x:auto"><table><thead><tr>
+        <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
           <th>Nome</th><th>Departamento</th><th>Conceder Até</th>
           <th>P1 Início</th><th>P1 Fim</th><th>Status P1</th>
           <th>P2 Início</th><th>P2 Fim</th><th>Status P2</th>
@@ -393,13 +497,13 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         <div class="cards-row cols-4" id="finDeptCards"></div>
         <div class="table-wrap" style="margin-bottom:16px">
           <div class="table-header"><span class="table-title">Custo por Departamento</span></div>
-          <div style="overflow-x:auto"><table><thead><tr>
+          <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Departamento</th><th>Colaboradores</th><th>Total Salários</th><th>Total 1/3</th><th>Total a Pagar</th><th>% do Mês</th>
           </tr></thead><tbody id="finDeptBody"></tbody></table></div>
         </div>
         <div class="table-wrap">
           <div class="table-header"><span class="table-title" id="finDeptDetTitle">Detalhamento Individual</span></div>
-          <div style="overflow-x:auto"><table><thead><tr>
+          <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th><th>Total Férias</th><th>Período</th><th>Data Pagamento</th>
           </tr></thead><tbody id="finDeptDetBody"></tbody></table></div>
         </div>
@@ -412,7 +516,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
             <span class="table-title">Projeção Anual de Pagamentos</span>
             <span style="font-size:12px;color:var(--muted)">Pagamento = 2 dias antes do início das férias</span>
           </div>
-          <div style="overflow-x:auto"><table><thead><tr>
+          <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Mês</th><th>Qtd.</th><th>Total Salários</th><th>Total 1/3</th><th>Total a Pagar</th><th>Provisão Acumulada</th><th></th>
           </tr></thead><tbody id="finMesesBody"></tbody></table></div>
         </div>
@@ -422,7 +526,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
             <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterFin(this.value)"/></div>
           </div>
           <div class="filter-row" id="finFilters"></div>
-          <div style="overflow-x:auto"><table><thead><tr>
+          <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th><th>Total Férias</th>
             <th>P1 Início</th><th>Data Pgto P1</th><th>Mês Pgto P1</th>
             <th>P2 Início</th><th>Data Pgto P2</th><th>Mês Pgto P2</th><th>Provisão/Mês</th>
@@ -461,7 +565,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
       <div id="prov-view-anual">
         <div class="table-wrap">
           <div class="table-header"><span class="table-title">Resumo Anual — Provisão Acumulada vs Pagamentos Projetados</span></div>
-          <div style="overflow-x:auto"><table><thead><tr>
+          <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Mês</th>
             <th>Provisão do Mês</th>
             <th>Provisão Acumulada</th>
@@ -479,7 +583,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
           <div class="table-header">
             <span class="table-title" id="provMesTitle">Selecione um mês</span>
           </div>
-          <div style="overflow-x:auto"><table><thead><tr>
+          <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Colaborador</th><th>Departamento</th><th>Salário</th><th>Provisão/Mês</th>
             <th>Provisão Acum. até o Mês</th><th>Tem Pgto neste Mês?</th><th>Valor Pgto</th><th>Saldo após Pgto</th>
           </tr></thead><tbody id="provMensalBody"></tbody></table></div>
@@ -497,7 +601,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
             </div>
           </div>
           <div class="filter-row" id="provColabFilters"></div>
-          <div style="overflow-x:auto"><table><thead><tr>
+          <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Colaborador</th><th>Departamento</th><th>Salário</th><th>1/3</th>
             <th>Total Férias</th><th>Provisão/Mês</th><th>Provisão Anual</th>
             <th>P1 Início</th><th>Data Pgto P1</th><th>P2 Início</th><th>Data Pgto P2</th>
@@ -510,7 +614,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
       <div id="prov-view-departamento" style="display:none">
         <div class="table-wrap">
           <div class="table-header"><span class="table-title">Provisão Anual por Departamento</span></div>
-          <div style="overflow-x:auto"><table><thead><tr>
+          <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Departamento</th><th>Colaboradores</th><th>Folha Total</th>
             <th>Provisão Mensal</th><th>Provisão Anual</th>
             <th>Pgto Projetado</th><th>% da Provisão Total</th>
@@ -533,7 +637,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
           <span class="table-title" id="aprovadasGestorCount">—</span>
           <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterAprovadasGestor(this.value)"/></div>
         </div>
-        <div style="overflow-x:auto"><table><thead><tr>
+        <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
           <th>Nome</th><th>Conceder Até</th>
           <th>P1 Início</th><th>P1 Fim</th><th>Status P1</th>
           <th>P2 Início</th><th>P2 Fim</th><th>Status P2</th>
@@ -557,9 +661,42 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
           </div>
         </div>
         <div class="filter-row" id="historicoFilters"></div>
-        <div style="overflow-x:auto"><table><thead><tr>
+        <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
           <th>Data</th><th>Colaborador</th><th>Ação</th><th>Responsável</th><th>Detalhe</th>
         </tr></thead><tbody id="historicoBody"></tbody></table></div>
+      </div>
+    </div>
+
+
+    <!-- GRÁFICOS -->
+    <div class="section" id="sec-grafico">
+      <div class="page-header">
+        <div><div class="page-title">Gráficos — Evolução de Férias</div><div class="page-sub">Acompanhamento visual mensal da provisão, pagamentos e planejamento</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="setGraficoView('provisao')" id="gbtn-provisao">Provisão</button>
+          <button class="btn btn-outline btn-sm" onclick="setGraficoView('pagamentos')" id="gbtn-pagamentos">Pagamentos</button>
+          <button class="btn btn-outline btn-sm" onclick="setGraficoView('planejamento')" id="gbtn-planejamento">Planejamento</button>
+          <button class="btn btn-outline btn-sm" onclick="setGraficoView('comparativo')" id="gbtn-comparativo">Comparativo</button>
+        </div>
+      </div>
+      <div class="cards-row cols-4" id="graficoCards"></div>
+
+      <!-- Chart area -->
+      <div class="table-wrap" style="padding:24px 20px">
+        <div class="table-header" style="padding:0 0 16px 0;border-bottom:1px solid var(--border);margin-bottom:20px">
+          <span class="table-title" id="graficoTitle">—</span>
+          <div style="display:flex;align-items:center;gap:16px" id="graficoLegenda"></div>
+        </div>
+        <div style="position:relative;height:340px">
+          <canvas id="graficoCanvas" style="width:100%;height:100%"></canvas>
+        </div>
+      </div>
+
+      <!-- Data table below chart -->
+      <div class="table-wrap" style="margin-top:16px">
+        <div class="table-header"><span class="table-title" id="graficoTableTitle">Dados do Gráfico</span></div>
+        <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr id="graficoTableHead"></tr></thead>
+        <tbody id="graficoTableBody"></tbody></table></div>
       </div>
     </div>
 
@@ -599,7 +736,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
             <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterDeptoMensal(this.value)"/></div>
           </div>
           <div class="filter-row" id="deptoMensalFilters"></div>
-          <div style="overflow-x:auto"><table><thead><tr>
+          <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Colaborador</th><th>Departamento</th><th>Conceder Até</th>
             <th>Período</th><th>Início</th><th>Fim</th><th>Dias</th>
             <th>Status</th><th>Data Pgto</th><th>Estimativa Crédito</th>
@@ -879,7 +1016,7 @@ const ROLES_CSC=[
   {id:"csc_adm",label:"Administrativo",icon:"🗂️",dept:"CSC ADMINISTRATIVO",tabs:["setor","aprovadas-gestor","historico","calendario","bloqueios"]},
 ];
 const ROLE_DP={id:"dp",label:"Departamento Pessoal Interno",dept:null,
-  tabs:["painel","calendario","validar","aprovadas","alteracoes","financeiro","provisao","indicadores","bloqueios"]};
+  tabs:["painel","calendario","validar","aprovadas","alteracoes","financeiro","provisao","grafico","indicadores","bloqueios"]};
 const TAB_CONFIG={
   painel:{label:"📊 Painel Geral",sec:"sec-painel"},
   setor:{label:"👥 Meu Departamento",sec:"sec-setor"},
@@ -892,6 +1029,7 @@ const TAB_CONFIG={
   "aprovadas-gestor":{label:"✔ Aprovadas",sec:"sec-aprovadas-gestor"},
   historico:{label:"📋 Histórico",sec:"sec-historico"},
   provisao:{label:"🗂️ Provisão",sec:"sec-provisao"},
+  grafico:{label:"📉 Gráficos",sec:"sec-grafico"},
   bloqueios:{label:"🚫 Bloqueios",sec:"sec-bloqueios"},
 };
 const DEPT_COLORS={"FISCAL MATRIZ":"#EBF1FB","FISCAL CAXIAS":"#DCEEFB","CONTABIL MATRIZ":"#FFF3E0","CONTABIL CAXIAS":"#FFF8EC","PESSOAL MATRIZ":"#F3E5F5","PESSOAL CAXIAS":"#FAF0FF","PEQUENOS NEGOCIOS":"#E8F5E9","CSC MARKETING":"#FCE4EC","CSC FINANCEIRO":"#FFF9C4","CSC TECNOLOGIA":"#E8EAF6","CSC GENTE GESTAO":"#E0F2F1","CSC LEGALIZACAO":"#F9FBE7","CSC ADMINISTRATIVO":"#EFEBE9"};
@@ -976,6 +1114,7 @@ function doLogout(){
 function buildNav(tabs){
   const nav=document.getElementById("navTabs");nav.innerHTML="";
   tabs.forEach((t,i)=>{const d=document.createElement("div");d.className="nav-tab"+(i===0?" active":"");d.textContent=TAB_CONFIG[t].label;d.onclick=()=>switchTab(t);d.dataset.tab=t;nav.appendChild(d);});
+  buildMobileNav(tabs);
 }
 function switchTab(k){
   document.querySelectorAll(".nav-tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===k));
@@ -992,8 +1131,14 @@ function switchTab(k){
   if(k==="financeiro")renderFinanceiro();
   if(k==="indicadores")renderDepto();
   if(k==="provisao")renderProvisao();
+  if(k==="grafico")renderGrafico();
   if(k==="bloqueios")renderBloqueios();
   updateNavBadges();
+  // Update mobile nav active state
+  document.querySelectorAll('.mobile-nav-item[data-tab]').forEach(el=>{
+    el.classList.toggle('active', el.dataset.tab===k);
+  });
+  if(window.innerWidth<=768) window.scrollTo({top:0,behavior:'smooth'});
 }
 // ── HELPERS ──────────────────────────────────────────────────
 function fmtDate(s){if(!s)return"—";const[y,m,d]=s.split("-");return`${d}/${m}/${y}`;}
@@ -1713,7 +1858,7 @@ function renderDepto(){
           <div style="display:flex;gap:4px;flex-wrap:wrap">${mesesHtml||"<span style='color:var(--muted);font-size:12px'>Nenhuma data indicada</span>"}</div>
         </div>
       </div>
-      <div style="overflow-x:auto"><table><thead><tr>
+      <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
         <th>Colaborador</th><th>Conceder Até</th><th>1º Período</th><th>2º Período</th>
         <th>Status P1</th><th>Status P2</th><th>Estimativa Crédito</th><th>Data Pgto P1</th>
       </tr></thead><tbody>${rowsHtml}</tbody></table></div>
@@ -2089,6 +2234,320 @@ function responderAlteracao(id,aprovar){
   updateNavBadges();
 }
 
+
+// ── GRÁFICOS ─────────────────────────────────────────────────
+let graficoView = 'provisao';
+
+const GRAFICO_COLORS = {
+  provisao:   {line:'#4A90D9', fill:'rgba(74,144,217,0.12)',  label:'Provisão Acumulada'},
+  pagamentos: {line:'#2E7D32', fill:'rgba(46,125,50,0.12)',   label:'Pagamentos Projetados'},
+  saldo:      {line:'#1E2761', fill:'rgba(30,39,97,0.08)',    label:'Saldo'},
+  fiscal:     {line:'#0277BD', fill:'rgba(2,119,189,0.10)',   label:'Fiscal'},
+  contabil:   {line:'#E65100', fill:'rgba(230,81,0,0.10)',    label:'Contábil'},
+  pessoal:    {line:'#6A1B9A', fill:'rgba(106,27,154,0.10)',  label:'Pessoal'},
+  outros:     {line:'#1B5E20', fill:'rgba(27,94,32,0.10)',    label:'Outros'},
+};
+
+function setGraficoView(v){
+  graficoView = v;
+  ['provisao','pagamentos','planejamento','comparativo'].forEach(k=>{
+    const btn = document.getElementById('gbtn-'+k);
+    if(!btn) return;
+    btn.className = k===v ? 'btn btn-navy btn-sm' : 'btn btn-outline btn-sm';
+  });
+  renderGrafico();
+}
+
+function renderGrafico(){
+  const mm = buildMesesMap();
+  const tProv = colaboradores.reduce((a,c)=>a+calcFin(c).prov,0);
+  const tPgto = Object.values(mm).reduce((a,v)=>a+v.tot,0);
+  const tAnual = tProv*12;
+  const maxMes = Object.entries(mm).sort((a,b)=>b[1].tot-a[1].tot)[0];
+
+  document.getElementById('graficoCards').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Provisão Mensal</div><div class="stat-value" style="font-size:18px">${fmtBRL(tProv)}</div><div class="stat-sub">todos os colaboradores</div></div>
+    <div class="stat-card gold"><div class="stat-label">Provisão Anual</div><div class="stat-value" style="font-size:18px">${fmtBRL(tAnual)}</div><div class="stat-sub">acumulado 2027</div></div>
+    <div class="stat-card green"><div class="stat-label">Pgto Projetado</div><div class="stat-value" style="font-size:18px">${fmtBRL(tPgto)}</div><div class="stat-sub">${colaboradores.filter(c=>c.p1ini).length} colaboradores</div></div>
+    <div class="stat-card"><div class="stat-label">Maior Desembolso</div><div class="stat-value" style="font-size:16px">${maxMes?MESES_CURTO[parseInt(maxMes[0])]+" — "+fmtBRL(maxMes[1].tot):"—"}</div><div class="stat-sub">mês mais oneroso</div></div>`;
+
+  ['provisao','pagamentos','planejamento','comparativo'].forEach(k=>{
+    const btn=document.getElementById('gbtn-'+k);
+    if(btn) btn.className=k===graficoView?'btn btn-navy btn-sm':'btn btn-outline btn-sm';
+  });
+
+  if(graficoView==='provisao')    drawProvisaoChart(mm, tProv);
+  if(graficoView==='pagamentos')  drawPagamentosChart(mm, tProv);
+  if(graficoView==='planejamento')drawPlanejamentoChart();
+  if(graficoView==='comparativo') drawComparativoChart(mm, tProv);
+}
+
+// ── CORE CHART ENGINE (pure Canvas — no dependencies) ────────
+function getCanvas(){
+  const canvas = document.getElementById('graficoCanvas');
+  const container = canvas.parentElement;
+  canvas.width  = container.offsetWidth || 900;
+  canvas.height = container.offsetHeight || 340;
+  return {canvas, ctx: canvas.getContext('2d'), W: canvas.width, H: canvas.height};
+}
+
+function drawLineChart({series, labels, title, yFormat, tableHeads, tableRows}){
+  const {canvas,ctx,W,H} = getCanvas();
+  const PAD = {top:40, right:30, bottom:50, left:90};
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top - PAD.bottom;
+
+  ctx.clearRect(0,0,W,H);
+
+  // All values flat
+  const allVals = series.flatMap(s=>s.data);
+  const maxV = Math.max(...allVals, 1);
+  const minV = Math.min(...allVals.filter(v=>v>0), 0);
+  const range = maxV - minV || 1;
+
+  const xPos = i => PAD.left + (i / (labels.length-1)) * cW;
+  const yPos = v => PAD.top + cH - ((v - minV) / range) * cH;
+
+  // Grid lines
+  const gridLines = 5;
+  ctx.strokeStyle = '#E8EFF8';
+  ctx.lineWidth = 1;
+  ctx.font = '11px DM Sans, Arial';
+  ctx.fillStyle = '#6B7A9F';
+  ctx.textAlign = 'right';
+  for(let i=0; i<=gridLines; i++){
+    const v = minV + (range/gridLines)*i;
+    const y = yPos(v);
+    ctx.beginPath();ctx.moveTo(PAD.left, y);ctx.lineTo(W-PAD.right, y);ctx.stroke();
+    ctx.fillText(yFormat(v), PAD.left-8, y+4);
+  }
+
+  // X labels
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#6B7A9F';
+  labels.forEach((l,i)=>{
+    ctx.fillText(l, xPos(i), H-PAD.bottom+18);
+    // Tick
+    ctx.beginPath();ctx.strokeStyle='#D8E2F5';ctx.lineWidth=1;
+    ctx.moveTo(xPos(i),PAD.top+cH);ctx.lineTo(xPos(i),PAD.top+cH+5);ctx.stroke();
+  });
+
+  // Series
+  series.forEach(s=>{
+    const pts = s.data.map((v,i)=>({x:xPos(i),y:yPos(v)}));
+
+    // Fill
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, PAD.top+cH);
+    pts.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.lineTo(pts[pts.length-1].x, PAD.top+cH);
+    ctx.closePath();
+    ctx.fillStyle = s.fill;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+    ctx.stroke();
+
+    // Dots
+    pts.forEach((p,i)=>{
+      if(s.data[i]===0) return;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,4,0,Math.PI*2);
+      ctx.fillStyle='white';
+      ctx.fill();
+      ctx.strokeStyle=s.color;
+      ctx.lineWidth=2;
+      ctx.stroke();
+
+      // Value labels on dots
+      ctx.fillStyle=s.color;
+      ctx.font='bold 10px DM Sans, Arial';
+      ctx.textAlign='center';
+      const label = yFormat(s.data[i]);
+      if(s.data[i]>0) ctx.fillText(label, p.x, p.y-10);
+    });
+  });
+
+  // Title
+  ctx.font = 'bold 13px DM Sans, Arial';
+  ctx.fillStyle = '#1E2761';
+  ctx.textAlign = 'left';
+  document.getElementById('graficoTitle').textContent = title;
+
+  // Legend
+  const leg = document.getElementById('graficoLegenda');
+  leg.innerHTML = series.map(s=>`
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)">
+      <div style="width:20px;height:3px;background:${s.color};border-radius:2px"></div>
+      ${s.label}
+    </div>`).join('');
+
+  // Data table
+  if(tableHeads && tableRows){
+    document.getElementById('graficoTableHead').innerHTML = tableHeads.map(h=>`<th>${h}</th>`).join('');
+    document.getElementById('graficoTableBody').innerHTML = tableRows;
+  }
+}
+
+function fmtBRLShort(v){
+  if(v>=1000) return 'R$'+Math.round(v/1000)+'k';
+  return 'R$'+Math.round(v);
+}
+
+// ── VIEW 1: PROVISÃO ACUMULADA ───────────────────────────────
+function drawProvisaoChart(mm, tProv){
+  let acum=0;
+  const provData=[], pgtoData=[], saldoData=[];
+  const tableRows = MESES_NOME.map((m,i)=>{
+    acum+=tProv;
+    const pgto=(mm[i]||{tot:0}).tot;
+    const saldo=acum-pgto;
+    provData.push(acum); pgtoData.push(pgto); saldoData.push(saldo);
+    const sit=pgto>0?`<span class="badge badge-green">✓</span>`:`<span class="badge badge-gray">—</span>`;
+    return`<tr>
+      <td style="font-weight:600">${m}</td>
+      <td class="td-mono">${fmtBRL(tProv)}</td>
+      <td class="td-mono" style="font-weight:700;color:#1E2761">${fmtBRL(acum)}</td>
+      <td class="td-mono" style="color:${pgto>0?'#1B5E20':'var(--muted)'};font-weight:${pgto>0?700:400}">${pgto>0?fmtBRL(pgto):'—'}</td>
+      <td class="td-mono" style="color:${saldo>0?'#1B5E20':'#C62828'};font-weight:700">${fmtBRL(saldo)}</td>
+      <td>${sit}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('graficoTableTitle').textContent='Detalhamento — Provisão vs Pagamentos';
+
+  drawLineChart({
+    series:[
+      {data:provData,  color:'#4A90D9', fill:'rgba(74,144,217,0.10)',  label:'Provisão Acumulada'},
+      {data:saldoData, color:'#1E2761', fill:'rgba(30,39,97,0.06)',    label:'Saldo Disponível'},
+      {data:pgtoData,  color:'#2E7D32', fill:'rgba(46,125,50,0.10)',   label:'Pgto no Mês'},
+    ],
+    labels: MESES_CURTO,
+    title: 'Evolução da Provisão Acumulada × Pagamentos × Saldo — 2027',
+    yFormat: fmtBRLShort,
+    tableHeads:['Mês','Provisão/Mês','Acumulada','Pgto no Mês','Saldo','OK'],
+    tableRows,
+  });
+}
+
+// ── VIEW 2: PAGAMENTOS PROJETADOS ────────────────────────────
+function drawPagamentosChart(mm, tProv){
+  const pgtoData = MESES_NOME.map((_,i)=>(mm[i]||{tot:0}).tot);
+  const qtdData  = MESES_NOME.map((_,i)=>(mm[i]||{q:0}).q);
+  let acum=0;
+  const tableRows = MESES_NOME.map((m,i)=>{
+    acum+=tProv;
+    const pgto=pgtoData[i];
+    const qtd=qtdData[i];
+    return`<tr>
+      <td style="font-weight:600">${m}</td>
+      <td style="text-align:center">${qtd||'—'}</td>
+      <td class="td-mono" style="color:${pgto>0?'#1B5E20':'var(--muted)'};font-weight:${pgto>0?700:400}">${pgto>0?fmtBRL(pgto):'—'}</td>
+      <td class="td-mono">${fmtBRL(acum)}</td>
+      <td class="td-mono" style="color:${acum>=pgto?'#1B5E20':'#C62828'};font-weight:700">${pgto>0?fmtBRL(acum-pgto):'—'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('graficoTableTitle').textContent='Pagamentos Previstos por Mês';
+
+  drawLineChart({
+    series:[
+      {data:pgtoData, color:'#2E7D32', fill:'rgba(46,125,50,0.12)',  label:'Valor a Pagar'},
+    ],
+    labels: MESES_CURTO,
+    title: 'Pagamentos Projetados por Mês (2 dias antes do início) — 2027',
+    yFormat: fmtBRLShort,
+    tableHeads:['Mês','Qtd. Pgtos','Total a Pagar','Provisão Acum.','Saldo'],
+    tableRows,
+  });
+}
+
+// ── VIEW 3: PLANEJAMENTO ─────────────────────────────────────
+function drawPlanejamentoChart(){
+  // Number of collaborators with vacations starting each month (P1 or P2)
+  const p1Data=[], p2Data=[], totalData=[];
+  const tableRows = MESES_NOME.map((m,i)=>{
+    const p1=colaboradores.filter(c=>c.p1ini&&parseInt(c.p1ini.split('-')[1])-1===i).length;
+    const p2=colaboradores.filter(c=>c.p2ini&&parseInt(c.p2ini.split('-')[1])-1===i).length;
+    p1Data.push(p1); p2Data.push(p2); totalData.push(p1+p2);
+    return`<tr>
+      <td style="font-weight:600">${m}</td>
+      <td style="text-align:center;font-weight:${p1>0?700:400};color:${p1>0?'var(--navy)':'var(--muted)'}">${p1||'—'}</td>
+      <td style="text-align:center;font-weight:${p2>0?700:400};color:${p2>0?'#2E7D32':'var(--muted)'}">${p2||'—'}</td>
+      <td style="text-align:center;font-weight:700;color:${p1+p2>0?'#1E2761':'var(--muted)'}">${p1+p2||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('graficoTableTitle').textContent='Distribuição Mensal das Férias';
+
+  drawLineChart({
+    series:[
+      {data:totalData, color:'#1E2761', fill:'rgba(30,39,97,0.08)',   label:'Total Inícios'},
+      {data:p1Data,    color:'#4A90D9', fill:'rgba(74,144,217,0.10)', label:'1º Período'},
+      {data:p2Data,    color:'#2E7D32', fill:'rgba(46,125,50,0.10)',  label:'2º Período'},
+    ],
+    labels: MESES_CURTO,
+    title: 'Distribuição Mensal de Inícios de Férias — 2027',
+    yFormat: v=>Math.round(v)+'cx',
+    tableHeads:['Mês','1º Período','2º Período','Total'],
+    tableRows,
+  });
+}
+
+// ── VIEW 4: COMPARATIVO POR DEPARTAMENTO ─────────────────────
+function drawComparativoChart(mm, tProv){
+  // Provisão mensal por grupo de departamentos
+  const grupos = {
+    'Fiscal':     d=>d.includes('FISCAL'),
+    'Contábil':   d=>d.includes('CONTABIL'),
+    'Pessoal':    d=>d.includes('PESSOAL'),
+    'Peq/CSC':    d=>d.includes('PEQUENOS')||d.includes('CSC'),
+  };
+  const cores = ['#4A90D9','#E65100','#6A1B9A','#1B5E20'];
+  const series = Object.entries(grupos).map(([nome,fn],gi)=>{
+    const list = colaboradores.filter(c=>fn(c.dept));
+    const provMes = list.reduce((a,c)=>a+calcFin(c).prov,0);
+    let acum=0;
+    const data = MESES_NOME.map((_,i)=>{
+      acum+=provMes;
+      return acum;
+    });
+    return {data, color:cores[gi], fill:cores[gi].replace('#','rgba(')+',0.08)', label:nome, provMes, list};
+  });
+
+  // Fix fill colors
+  const fillCores=['rgba(74,144,217,0.10)','rgba(230,81,0,0.08)','rgba(106,27,154,0.08)','rgba(27,94,32,0.10)'];
+  series.forEach((s,i)=>s.fill=fillCores[i]);
+
+  const tableRows = series.map(s=>{
+    const pgto=s.list.filter(c=>c.p1ini).reduce((a,c)=>{const f=calcFin(c);return a+f.tot*(c.p2ini?2:1);},0);
+    return`<tr>
+      <td><div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border-radius:3px;background:${s.color}"></div><strong>${s.label}</strong></div></td>
+      <td style="text-align:center">${s.list.length}</td>
+      <td class="td-mono">${fmtBRL(s.provMes)}</td>
+      <td class="td-mono" style="font-weight:700">${fmtBRL(s.provMes*12)}</td>
+      <td class="td-mono" style="color:#1B5E20;font-weight:700">${pgto>0?fmtBRL(pgto):'—'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('graficoTableTitle').textContent='Comparativo por Grupo de Departamento';
+
+  drawLineChart({
+    series,
+    labels: MESES_CURTO,
+    title: 'Provisão Acumulada por Grupo de Departamento — 2027',
+    yFormat: fmtBRLShort,
+    tableHeads:['Grupo','Colaboradores','Provisão/Mês','Provisão Anual','Pgto Projetado'],
+    tableRows,
+  });
+}
+
 // ── BLOQUEIOS ────────────────────────────────────────────────
 function renderBloqueios(){
   document.getElementById("bloqueiosBody").innerHTML=BLOCKED.map(b=>`<tr><td>${deptBadge(b.dept)}</td><td class="td-mono">${fmtDate(b.ini)}</td><td class="td-mono">${fmtDate(b.fim)}</td><td>${b.motivo}</td></tr>`).join("");
@@ -2226,6 +2685,65 @@ function exportCSV(){
 function openModal(id){document.getElementById(id).classList.add("open");}
 function closeModal(id){document.getElementById(id).classList.remove("open");}
 function showToast(msg,type=""){const c=document.getElementById("toasts");const t=document.createElement("div");t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),3500);}
+
+// ── MOBILE NAV ───────────────────────────────────────────────
+function toggleMobileNav(){
+  const nav=document.getElementById('mobileNav');
+  const overlay=document.getElementById('mobileNavOverlay');
+  const btn=document.getElementById('hamburger');
+  const isOpen=nav.classList.contains('open');
+  nav.classList.toggle('open',!isOpen);
+  overlay.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+}
+function closeMobileNav(){
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('mobileNavOverlay').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+function buildMobileNav(tabs){
+  const nav=document.getElementById('mobileNav');
+  const tabIcons={
+    painel:'📊', setor:'👥', calendario:'📅', validar:'✅',
+    aprovadas:'✔', 'aprovadas-gestor':'✔', alteracoes:'🔄',
+    historico:'📋', financeiro:'💰', provisao:'🗂️',
+    grafico:'📉', indicadores:'📈', bloqueios:'🚫',
+  };
+  const allRoles=[ROLE_DP,...ROLES_OP,...ROLES_CSC];
+  const cfg=allRoles.find(r=>r.id===currentRole)||ROLE_DP;
+
+  nav.innerHTML=`
+    <div style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.08)">
+      <div style="font-size:12px;color:var(--accent-light);font-weight:600">${cfg.label}</div>
+    </div>
+    ${tabs.map(t=>`
+      <div class="mobile-nav-item${document.querySelector('.nav-tab.active')?.dataset?.tab===t?' active':''}" 
+           onclick="switchTab('${t}');closeMobileNav()" data-tab="${t}">
+        <span style="font-size:16px">${tabIcons[t]||'•'}</span>
+        <span>${TAB_CONFIG[t]?.label?.replace(/^\S+\s/,'')}</span>
+      </div>`).join('')}
+    <div class="mobile-nav-item" onclick="doLogout()" style="color:#EF9A9A;margin-top:4px">
+      <span style="font-size:16px">🚪</span><span>Sair</span>
+    </div>`;
+}
+
+
+
+// Close mobile nav on escape key
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') closeMobileNav();
+});
+
+function handleResize(){
+  const isMobile=window.innerWidth<=768;
+  const btnSair=document.getElementById('btnSair');
+  if(btnSair)btnSair.style.display=isMobile?'none':'';
+}
+window.addEventListener('resize',handleResize);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileNav();});
+handleResize();
+
 document.querySelectorAll(".modal-overlay").forEach(o=>{o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("open");});});
 calYear=2027;calMonth=0;
 </script>
