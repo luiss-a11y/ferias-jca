@@ -1352,13 +1352,26 @@ function filterSetor(q){const cfg=getCurrentCfg();renderSetorBody(colaboradores.
 function renderValidar(){
   const list=colaboradores.filter(c=>c.p1ini&&(c.statusP1==="Pendente"||(c.p2ini&&c.statusP2==="Pendente")));
   document.getElementById("validarCount").textContent=`${list.length} indicação(ões) pendente(s)`;
-  document.getElementById("validarBody").innerHTML=list.length?list.map(c=>`<tr>
-    <td><div class="td-name">${c.nome}</div></td><td>${deptBadge(c.dept)}</td>
-    <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
-    <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
-    <td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
-    <td><button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Analisar</button></td>
-  </tr>`).join(""):`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhuma validação pendente</td></tr>`;
+  document.getElementById("validarBody").innerHTML=list.length?list.map(c=>{
+    const imp=calcImpactoMes(c);
+    let impBadge='—';
+    if(imp){
+      const checks=[imp.p1,imp.p2].filter(Boolean);
+      const temAlerta=checks.some(p=>p.ultrapassa);
+      const temWarn=checks.some(p=>p.pctDepois>0&&!p.ultrapassa);
+      if(temAlerta) impBadge=`<span style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap">🔴 Acima do limite</span>`;
+      else if(temWarn) impBadge=`<span style="background:#FFF8E1;color:#F57F17;border:1px solid #FFE082;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap">🟡 Acima da média</span>`;
+      else impBadge=`<span style="background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap">✅ Equilibrado</span>`;
+    }
+    return`<tr>
+      <td><div class="td-name">${c.nome}</div></td><td>${deptBadge(c.dept)}</td>
+      <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
+      <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
+      <td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
+      <td style="text-align:center">${impBadge}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Analisar</button></td>
+    </tr>`;
+  }).join(""):`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhuma validação pendente</td></tr>`;
 }
 
 // ── VALIDAÇÕES APROVADAS ─────────────────────────────────────
@@ -2743,6 +2756,7 @@ function renderAlertas(){
   document.getElementById('alertasCount').textContent=`${criticos.length} colaboradores em estado crítico`;
   renderAlertasBody(criticos);
   renderAlertasDept(criticos);
+  renderEquilibrio();
 }
 
 function setAlertaFiltro(n){
@@ -3764,44 +3778,9 @@ function renderEquilibrioWarn(colab){
   </div>`;
 }
 
-// ── Patch openValidarModal to show equilibrio warning ────────
-const _origOpenValidarModal = openValidarModal;
-function openValidarModal(id){
-  _origOpenValidarModal(id);
-  if(currentColab) renderEquilibrioWarn(currentColab);
-}
 
-// ── Patch renderValidar to add financial impact column ────────
-const _origRenderValidar = renderValidar;
-function renderValidar(){
-  const list=colaboradores.filter(c=>c.p1ini&&(c.statusP1==="Pendente"||(c.p2ini&&c.statusP2==="Pendente")));
-  document.getElementById("validarCount").textContent=`${list.length} indicação(ões) pendente(s)`;
-  document.getElementById("validarBody").innerHTML=list.length?list.map(c=>{
-    // Calculate financial impact badge
-    const imp = calcImpactoMes(c);
-    let impBadge = '—';
-    if(imp){
-      const checks=[imp.p1,imp.p2].filter(Boolean);
-      const temAlerta=checks.some(p=>p.ultrapassa);
-      const temWarn=checks.some(p=>p.pctDepois>0&&!p.ultrapassa);
-      if(temAlerta)
-        impBadge=`<span style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap">🔴 Acima do limite</span>`;
-      else if(temWarn)
-        impBadge=`<span style="background:#FFF8E1;color:#F57F17;border:1px solid #FFE082;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap">🟡 Acima da média</span>`;
-      else
-        impBadge=`<span style="background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap">✅ Equilibrado</span>`;
-    }
-    return`<tr>
-      <td><div class="td-name">${c.nome}</div></td>
-      <td>${deptBadge(c.dept)}</td>
-      <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
-      <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
-      <td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
-      <td style="text-align:center">${impBadge}</td>
-      <td><button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Analisar</button></td>
-    </tr>`;
-  }).join(""):`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhuma validação pendente</td></tr>`;
-}
+
+
 
 // ── EQUILÍBRIO FINANCEIRO ─────────────────────────────────────
 const EQUILIBRIO_TOLERANCIA = 0.10; // 10% acima da média
@@ -3901,10 +3880,7 @@ function renderEquilibrio(){
 
 // ── PATCH renderAlertas to include equilibrio ─────────────────
 const _origRenderAlertas = renderAlertas;
-function renderAlertas(){
-  _origRenderAlertas();
-  renderEquilibrio();
-}
+
 
 // ── BLOQUEIOS ────────────────────────────────────────────────
 function renderBloqueios(){
@@ -4012,6 +3988,7 @@ function openValidarModal(id){
   document.getElementById("validarP2Vazio").style.display=hp?"none":"block";document.getElementById("validarP2Form").style.display=hp?"block":"none";
   if(hp){document.getElementById("inputStatusP2").value=c.statusP2||"Pendente";document.getElementById("motivoP2").value=c.motivoP2||"";document.getElementById("motivoP2Group").style.display=c.statusP2==="Recusado"?"block":"none";}
   document.getElementById("inputObsDP").value="";openModal("modalValidar");
+  if(currentColab) renderEquilibrioWarn(currentColab);
 }
 function submitValidar(){
   const sP1=document.getElementById("inputStatusP1").value,mP1=document.getElementById("motivoP1").value.trim();
