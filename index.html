@@ -429,7 +429,10 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     <div class="section" id="sec-painel">
       <div class="page-header">
         <div><div class="page-title">Painel Geral</div><div class="page-sub">Visão consolidada de todos os departamentos</div></div>
-        <button class="btn btn-primary btn-sm" onclick="exportCSV()">↓ Exportar CSV</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="exportCSV()">↓ Exportar CSV</button>
+          <button class="btn btn-navy btn-sm" onclick="gerarPainelDiretoria()">🏛️ Painel Diretoria</button>
+        </div>
       </div>
       <div id="painelAlertaBanner"></div>
       <div class="cards-row cols-4" id="painelCards"></div>
@@ -540,7 +543,10 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     <div class="section" id="sec-financeiro">
       <div class="page-header">
         <div><div class="page-title">Módulo Financeiro</div><div class="page-sub">Provisão mensal, custo projetado e datas de pagamento — apenas DP Interno</div></div>
-        <button class="btn btn-primary btn-sm" onclick="exportFinCSV()">↓ Exportar CSV</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="exportFinCSV()">↓ Exportar CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="gerarRelatorioFinanceiro()">📄 Gerar Relatório</button>
+        </div>
       </div>
       <div class="cards-row cols-4" id="finCards"></div>
 
@@ -2777,6 +2783,505 @@ function renderPainelAlertaBanner(){
 // ── ROW HIGHLIGHTING IN PAINEL ────────────────────────────────
 // Patch renderPainelBody to add criticality row classes
 const _origRenderPainelBody = renderPainelBody;
+
+
+// ── RELATÓRIO FINANCEIRO ──────────────────────────────────────
+function gerarRelatorioFinanceiro(){
+  const mm = buildMesesMap();
+  const tProv = colaboradores.reduce((a,c)=>a+calcFin(c).prov,0);
+  const hoje = new Date();
+  const dtHoje = `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`;
+  const horaHoje = `${String(hoje.getHours()).padStart(2,'0')}:${String(hoje.getMinutes()).padStart(2,'0')}`;
+
+  // Collaborators with vacation dates (processed)
+  const processados = colaboradores.filter(c=>c.p1ini);
+  const aprovados   = processados.filter(c=>['Validado','Comunicado'].includes(c.statusP1));
+  const pendentes   = processados.filter(c=>c.statusP1==='Pendente');
+
+  // Totals
+  const totalGeral = processados.reduce((a,c)=>{const f=calcFin(c);return a+f.tot*(c.p2ini?2:1);},0);
+  const totalAprov = aprovados.reduce((a,c)=>{const f=calcFin(c);return a+f.tot*(c.p2ini?2:1);},0);
+
+  // By department
+  const depts = [...new Set(colaboradores.map(c=>c.dept))].sort();
+  const deptRows = depts.map(dept=>{
+    const list = processados.filter(c=>c.dept===dept);
+    if(!list.length) return '';
+    const total = list.reduce((a,c)=>{const f=calcFin(c);return a+f.tot*(c.p2ini?2:1);},0);
+    const pct = totalGeral>0?(total/totalGeral*100).toFixed(1)+'%':'—';
+    return `<tr>
+      <td>${dept}</td>
+      <td style="text-align:center">${list.length}</td>
+      <td style="text-align:right">${fmtBRL(list.reduce((a,c)=>a+c.salario,0))}</td>
+      <td style="text-align:right">${fmtBRL(list.reduce((a,c)=>a+calcFin(c).t,0))}</td>
+      <td style="text-align:right;font-weight:700">${fmtBRL(total)}</td>
+      <td style="text-align:center">${pct}</td>
+    </tr>`;
+  }).join('');
+
+  // Monthly payments
+  let acum=0;
+  const mesesRows = MESES_NOME.map((m,i)=>{
+    acum+=tProv;
+    const d=mm[i]||{q:0,s:0,t3:0,tot:0};
+    if(d.q===0) return `<tr style="color:#999"><td>${m}</td><td style="text-align:center">—</td><td style="text-align:right">—</td><td style="text-align:right">—</td><td style="text-align:right">—</td><td style="text-align:right">${fmtBRL(acum)}</td></tr>`;
+    return `<tr>
+      <td><strong>${m}</strong></td>
+      <td style="text-align:center">${d.q}</td>
+      <td style="text-align:right">${fmtBRL(d.s)}</td>
+      <td style="text-align:right">${fmtBRL(d.t3)}</td>
+      <td style="text-align:right;font-weight:700;color:#1B5E20">${fmtBRL(d.tot)}</td>
+      <td style="text-align:right">${fmtBRL(acum)}</td>
+    </tr>`;
+  }).join('');
+
+  // Individual detail rows
+  const detalheRows = processados.map(c=>{
+    const f=calcFin(c);
+    const total=f.tot*(c.p2ini?2:1);
+    const status=c.statusP1==='Validado'?'Validado':c.statusP1==='Comunicado'?'Comunicado':'Pendente DP';
+    const pgtoP1=f.p1?fmtDate(f.p1):'—';
+    const pgtoP2=f.p2?fmtDate(f.p2):'—';
+    return `<tr>
+      <td>${c.nome}</td>
+      <td style="font-size:11px">${c.dept}</td>
+      <td style="text-align:right">${fmtBRL(c.salario)}</td>
+      <td style="text-align:right">${fmtBRL(f.t)}</td>
+      <td style="text-align:right;font-weight:700">${fmtBRL(f.tot)}</td>
+      <td style="text-align:center;font-size:11px">${fmtDate(c.p1ini)} a ${fmtDate(c.p1fim)}</td>
+      <td style="text-align:center;font-size:11px">${c.p2ini?fmtDate(c.p2ini)+' a '+fmtDate(c.p2fim):'—'}</td>
+      <td style="text-align:right;font-weight:700;color:#1B5E20">${fmtBRL(total)}</td>
+      <td style="text-align:center;font-size:11px">${pgtoP1}</td>
+      <td style="text-align:center">
+        <span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;
+          background:${status==='Validado'?'#E8F5E9':status==='Comunicado'?'#E3F2FD':'#FFF8E1'};
+          color:${status==='Validado'?'#1B5E20':status==='Comunicado'?'#0D47A1':'#E65100'}">${status}</span>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const relatorio = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<title>Relatório de Férias 2027 — JCA Contadores</title>
+<style>
+  @page{size:A4 landscape;margin:15mm 12mm}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:11px;color:#1E2761;background:#fff}
+  .header{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #1E2761;margin-bottom:16px}
+  .logo-box{background:#1E2761;color:white;font-weight:800;font-size:18px;padding:8px 14px;border-radius:8px}
+  .header-title{font-size:20px;font-weight:700;color:#1E2761;margin-top:4px}
+  .header-sub{font-size:11px;color:#6B7A9F;margin-top:3px}
+  .header-right{text-align:right;font-size:10px;color:#6B7A9F;line-height:1.8}
+  .section-title{font-size:13px;font-weight:700;color:#1E2761;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #4A90D9}
+  .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  .summary-card{background:#F0F4FF;border-radius:6px;padding:10px 12px;border-left:3px solid #4A90D9}
+  .summary-card.green{border-left-color:#2E7D32}
+  .summary-card.gold{border-left-color:#F57F17}
+  .summary-card.red{border-left-color:#C62828}
+  .card-label{font-size:9px;font-weight:700;color:#6B7A9F;text-transform:uppercase;letter-spacing:.3px}
+  .card-value{font-size:16px;font-weight:700;color:#1E2761;margin-top:2px}
+  .card-sub{font-size:9px;color:#6B7A9F;margin-top:2px}
+  table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:10px}
+  thead th{background:#1E2761;color:white;padding:6px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  tbody tr:nth-child(even){background:#F8FAFF}
+  tbody tr:hover{background:#EBF1FB}
+  tbody td{padding:5px 8px;border-bottom:1px solid #E8EFF8}
+  tfoot td{background:#1E2761;color:white;padding:6px 8px;font-weight:700}
+  .note{font-size:9px;color:#6B7A9F;margin-top:4px;font-style:italic}
+  .footer{margin-top:20px;padding-top:10px;border-top:1px solid #D8E2F5;display:flex;justify-content:space-between;font-size:9px;color:#6B7A9F}
+  @media print{
+    .no-print{display:none}
+    body{font-size:10px}
+  }
+  .print-btn{position:fixed;top:16px;right:16px;background:#1E2761;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;z-index:100;display:flex;align-items:center;gap:8px}
+  .print-btn:hover{background:#151D4A}
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+
+<div class="header">
+  <div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+      <div class="logo-box">JCA</div>
+      <div>
+        <div class="header-title">Relatório de Custos de Férias 2027</div>
+        <div class="header-sub">JCA Contadores — Departamento Pessoal Interno</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div><strong>Emitido em:</strong> ${dtHoje} às ${horaHoje}</div>
+    <div><strong>Competência:</strong> 2027</div>
+    <div><strong>Total colaboradores:</strong> ${colaboradores.length}</div>
+    <div><strong>Com férias indicadas:</strong> ${processados.length}</div>
+    <div style="margin-top:4px;padding:4px 8px;background:#E8F5E9;border-radius:4px;color:#1B5E20;font-weight:700">USO INTERNO — CONFIDENCIAL</div>
+  </div>
+</div>
+
+<!-- Resumo -->
+<div class="summary-grid">
+  <div class="summary-card">
+    <div class="card-label">Colaboradores com datas</div>
+    <div class="card-value">${processados.length}</div>
+    <div class="card-sub">de ${colaboradores.length} no total</div>
+  </div>
+  <div class="summary-card green">
+    <div class="card-label">Validados pelo DP</div>
+    <div class="card-value">${aprovados.length}</div>
+    <div class="card-sub">${fmtBRL(totalAprov)}</div>
+  </div>
+  <div class="summary-card gold">
+    <div class="card-label">Custo Total Projetado</div>
+    <div class="card-value">${fmtBRL(totalGeral)}</div>
+    <div class="card-sub">sal + 1/3 constitucional</div>
+  </div>
+  <div class="summary-card">
+    <div class="card-label">Provisão Mensal</div>
+    <div class="card-value">${fmtBRL(tProv)}</div>
+    <div class="card-sub">provisão anual: ${fmtBRL(tProv*12)}</div>
+  </div>
+</div>
+
+<!-- Por departamento -->
+<div class="section-title">Custo por Departamento</div>
+<table>
+  <thead><tr>
+    <th>Departamento</th><th>Colaboradores</th><th>Total Salários</th>
+    <th>Total 1/3</th><th>Total a Pagar</th><th>% do Total</th>
+  </tr></thead>
+  <tbody>${deptRows}</tbody>
+  <tfoot><tr>
+    <td>TOTAL GERAL</td>
+    <td style="text-align:center">${processados.length}</td>
+    <td style="text-align:right">${fmtBRL(processados.reduce((a,c)=>a+c.salario,0))}</td>
+    <td style="text-align:right">${fmtBRL(processados.reduce((a,c)=>a+calcFin(c).t,0))}</td>
+    <td style="text-align:right">${fmtBRL(totalGeral)}</td>
+    <td style="text-align:center">100%</td>
+  </tr></tfoot>
+</table>
+
+<!-- Projeção mensal -->
+<div class="section-title">Projeção de Pagamentos por Mês</div>
+<p class="note">Pagamento realizado 2 dias antes do início das férias. Meses sem pagamentos indicados em cinza.</p>
+<table style="margin-top:8px">
+  <thead><tr>
+    <th>Mês</th><th>Qtd. Pgtos</th><th>Total Salários</th>
+    <th>Total 1/3</th><th>Total a Pagar</th><th>Provisão Acumulada</th>
+  </tr></thead>
+  <tbody>${mesesRows}</tbody>
+  <tfoot><tr>
+    <td>TOTAL ANUAL</td>
+    <td style="text-align:center">${processados.length}</td>
+    <td>—</td><td>—</td>
+    <td style="text-align:right">${fmtBRL(totalGeral)}</td>
+    <td style="text-align:right">${fmtBRL(tProv*12)}</td>
+  </tr></tfoot>
+</table>
+
+<!-- Detalhamento individual -->
+<div class="section-title">Detalhamento Individual — Colaboradores com Férias Indicadas</div>
+<table>
+  <thead><tr>
+    <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th>
+    <th>Total Férias</th><th>1º Período</th><th>2º Período</th>
+    <th>Total a Pagar</th><th>Data Pgto P1</th><th>Status</th>
+  </tr></thead>
+  <tbody>${detalheRows}</tbody>
+  <tfoot><tr>
+    <td colspan="2">TOTAL</td>
+    <td style="text-align:right">${fmtBRL(processados.reduce((a,c)=>a+c.salario,0))}</td>
+    <td style="text-align:right">${fmtBRL(processados.reduce((a,c)=>a+calcFin(c).t,0))}</td>
+    <td style="text-align:right">${fmtBRL(processados.reduce((a,c)=>a+calcFin(c).tot,0))}</td>
+    <td colspan="3" style="text-align:right">${fmtBRL(totalGeral)}</td>
+    <td colspan="2"></td>
+  </tr></tfoot>
+</table>
+
+<div class="footer">
+  <div>JCA Contadores · Departamento Pessoal Interno · Planejamento de Férias 2027</div>
+  <div>Gerado em ${dtHoje} às ${horaHoje} · Uso Interno — Confidencial</div>
+</div>
+
+</body></html>`;
+
+  const blob = new Blob([relatorio], {type:'text/html;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url,'_blank');
+  if(!win) showToast('Permita pop-ups para gerar o relatório','warn');
+  else showToast('📄 Relatório gerado! Use Ctrl+P para salvar como PDF.','success');
+}
+
+
+// ── PAINEL DIRETORIA ──────────────────────────────────────────
+function gerarPainelDiretoria(){
+  const hoje = new Date();
+  const dtHoje = `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`;
+  const mesAno = hoje.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+
+  // ── Indicadores gerais ──────────────────────────────────────
+  const total       = colaboradores.length;
+  const comDatas    = colaboradores.filter(c=>c.p1ini).length;
+  const validados   = colaboradores.filter(c=>c.statusP1==='Validado'||c.statusP1==='Comunicado').length;
+  const semDatas    = total - comDatas;
+  const pctPlano    = Math.round(comDatas/total*100);
+  const pctValid    = Math.round(validados/total*100);
+  const emDobro     = colaboradores.filter(c=>c.situacao==='Férias em Dobro').length;
+  const venc30      = colaboradores.filter(c=>{if(!c.conceder)return false;const d=(new Date(c.conceder)-hoje)/86400000;return d>=0&&d<=30;}).length;
+  const venc60      = colaboradores.filter(c=>{if(!c.conceder)return false;const d=(new Date(c.conceder)-hoje)/86400000;return d>30&&d<=60;}).length;
+
+  // ── Financeiro (sem salários individuais) ───────────────────
+  const mm       = buildMesesMap();
+  const tProv    = colaboradores.reduce((a,c)=>a+calcFin(c).prov,0);
+  const tPgto    = Object.values(mm).reduce((a,v)=>a+v.tot,0);
+  const tAnual   = tProv*12;
+
+  // ── Por departamento ────────────────────────────────────────
+  const depts = [...new Set(colaboradores.map(c=>c.dept))].sort();
+  const deptData = depts.map(dept=>{
+    const list = colaboradores.filter(c=>c.dept===dept);
+    const com  = list.filter(c=>c.p1ini).length;
+    const val  = list.filter(c=>['Validado','Comunicado'].includes(c.statusP1)).length;
+    const crit = list.filter(c=>getNivel(c)>=3).length;
+    const pct  = Math.round(com/list.length*100);
+    const pctV = Math.round(val/list.length*100);
+    const prov = list.reduce((a,c)=>a+calcFin(c).prov*12,0);
+    return{dept,total:list.length,com,val,crit,pct,pctV,prov};
+  });
+
+  // ── Distribuição mensal ─────────────────────────────────────
+  const distMensal = MESES_CURTO.map((_,i)=>({
+    mes:MESES_CURTO[i],
+    p1:colaboradores.filter(c=>c.p1ini&&parseInt(c.p1ini.split('-')[1])-1===i).length,
+    p2:colaboradores.filter(c=>c.p2ini&&parseInt(c.p2ini.split('-')[1])-1===i).length,
+    pgto:(mm[i]||{tot:0}).tot,
+  }));
+
+  // ── Mês com mais férias ────────────────────────────────────
+  const peakMes = [...distMensal].sort((a,b)=>(b.p1+b.p2)-(a.p1+a.p2))[0];
+
+  // ── HTML do relatório ───────────────────────────────────────
+  // Build dept rows for table
+  const deptTableRows = deptData.map((d,i)=>`
+    <tr style="${i%2===0?'background:#F8FAFF':''}">
+      <td><strong>${d.dept.replace('PEQUENOS NEGOCIOS','Peq. Negócios').replace('GENTE GESTAO','G&G').replace('LEGALIZACAO','Legalização')}</strong></td>
+      <td style="text-align:center">${d.total}</td>
+      <td style="text-align:center">${d.com}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:8px;background:#E8EFF8;border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${d.pct}%;background:${d.pct>=80?'#2E7D32':d.pct>=50?'#F57F17':'#C62828'};border-radius:4px"></div>
+          </div>
+          <span style="font-weight:700;min-width:30px;font-size:11px;color:${d.pct>=80?'#1B5E20':d.pct>=50?'#E65100':'#B71C1C'}">${d.pct}%</span>
+        </div>
+      </td>
+      <td style="text-align:center">${d.val}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:8px;background:#E8EFF8;border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${d.pctV}%;background:#4A90D9;border-radius:4px"></div>
+          </div>
+          <span style="font-weight:700;min-width:30px;font-size:11px;color:#1565C0">${d.pctV}%</span>
+        </div>
+      </td>
+      <td style="text-align:center">${d.crit>0?`<span style="background:#FFEBEE;color:#B71C1C;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">${d.crit} ⚠</span>`:'<span style="color:#1B5E20">✓</span>'}</td>
+      <td style="text-align:right;font-size:11px">${fmtBRL(d.prov)}</td>
+    </tr>`).join('');
+
+  // Build monthly dist bars (inline SVG-style with divs)
+  const maxDist = Math.max(...distMensal.map(m=>m.p1+m.p2),1);
+  const distBars = distMensal.map(m=>{
+    const tot=m.p1+m.p2;
+    const h1=Math.round((m.p1/maxDist)*80);
+    const h2=Math.round((m.p2/maxDist)*80);
+    return`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+      <div style="font-size:9px;font-weight:700;color:${tot>0?'#1E2761':'#BDBDBD'}">${tot||''}</div>
+      <div style="display:flex;gap:2px;align-items:flex-end;height:80px">
+        <div style="width:10px;height:${h1}px;background:#4A90D9;border-radius:2px 2px 0 0"></div>
+        <div style="width:10px;height:${h2}px;background:#2E7D32;border-radius:2px 2px 0 0"></div>
+      </div>
+      <div style="font-size:9px;color:#6B7A9F">${m.mes}</div>
+    </div>`;
+  }).join('');
+
+  // Risk summary
+  const riskItems = [
+    emDobro>0?`<div style="background:#FFEBEE;border-left:4px solid #B71C1C;border-radius:6px;padding:10px 14px;margin-bottom:8px"><span style="font-weight:700;color:#B71C1C">🔴 Férias em Dobro:</span> <strong>${emDobro} colaborador${emDobro>1?'es':''}</strong> com período aquisitivo vencido — risco trabalhista e financeiro.</div>`:'',
+    venc30>0?`<div style="background:#FFF3E0;border-left:4px solid #E65100;border-radius:6px;padding:10px 14px;margin-bottom:8px"><span style="font-weight:700;color:#E65100">🟠 Vence em 30 dias:</span> <strong>${venc30} colaborador${venc30>1?'es':''}</strong> com prazo de concessão expirando em até 30 dias.</div>`:'',
+    venc60>0?`<div style="background:#FFF8E1;border-left:4px solid #F57F17;border-radius:6px;padding:10px 14px;margin-bottom:8px"><span style="font-weight:700;color:#F57F17">🟡 Vence em 60 dias:</span> <strong>${venc60} colaborador${venc60>1?'es':''}</strong> com prazo expirando entre 30 e 60 dias.</div>`:'',
+    (emDobro+venc30+venc60)===0?`<div style="background:#E8F5E9;border-left:4px solid #2E7D32;border-radius:6px;padding:10px 14px"><span style="font-weight:700;color:#1B5E20">✅ Sem alertas críticos</span> — todos os colaboradores estão dentro dos prazos de concessão.</div>`:'',
+  ].join('');
+
+  const painel = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Painel da Diretoria — Férias 2027 · JCA Contadores</title>
+<style>
+  @page{size:A4 portrait;margin:12mm 14mm}
+  @media print{.no-print{display:none!important}.page-break{page-break-before:always}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:11px;color:#1E2761;background:#fff;line-height:1.4}
+  /* Header */
+  .header{background:linear-gradient(135deg,#1E2761 0%,#2A3A8C 100%);color:white;padding:20px 24px;border-radius:12px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+  .logo{background:rgba(255,255,255,.15);padding:10px 16px;border-radius:8px;font-size:22px;font-weight:800;letter-spacing:1px}
+  .header-center h1{font-size:18px;font-weight:700;margin-bottom:4px}
+  .header-center p{font-size:11px;opacity:.8}
+  .header-right{text-align:right;font-size:10px;opacity:.85;line-height:2}
+  .confidential{background:rgba(255,255,255,.2);padding:3px 10px;border-radius:10px;font-size:10px;font-weight:700;display:inline-block;margin-top:4px}
+  /* KPI Cards */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .kpi{background:#F0F4FF;border-radius:10px;padding:14px 16px;position:relative;overflow:hidden}
+  .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+  .kpi.blue::before{background:#4A90D9}
+  .kpi.navy::before{background:#1E2761}
+  .kpi.green::before{background:#2E7D32}
+  .kpi.gold::before{background:#F57F17}
+  .kpi.red::before{background:#C62828}
+  .kpi-label{font-size:9px;font-weight:700;color:#6B7A9F;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+  .kpi-value{font-size:26px;font-weight:800;color:#1E2761;line-height:1}
+  .kpi-sub{font-size:10px;color:#6B7A9F;margin-top:4px}
+  .kpi-bar{height:4px;background:#D8E2F5;border-radius:2px;margin-top:8px;overflow:hidden}
+  .kpi-bar-fill{height:100%;border-radius:2px;transition:width .6s}
+  /* Section */
+  .section{margin-bottom:20px}
+  .section-title{font-size:13px;font-weight:700;color:#1E2761;padding-bottom:6px;border-bottom:2px solid #4A90D9;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:10px}
+  thead th{background:#1E2761;color:white;padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  tbody td{padding:7px 10px;border-bottom:1px solid #EEF2FF}
+  /* Two-col layout */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  /* Chart */
+  .chart-container{background:#F8FAFF;border-radius:8px;padding:14px;border:1px solid #E8EFF8}
+  .chart-title{font-size:11px;font-weight:700;color:#1E2761;margin-bottom:10px}
+  .chart-bars{display:flex;align-items:flex-end;gap:4px;height:100px;padding-bottom:4px}
+  /* Insights */
+  .insight-box{background:#EBF1FB;border-radius:8px;padding:14px 16px;border-left:4px solid #4A90D9}
+  .insight-title{font-size:11px;font-weight:700;color:#1E2761;margin-bottom:8px}
+  .insight-item{font-size:10px;color:#1E2761;margin-bottom:5px;display:flex;gap:6px}
+  /* Footer */
+  .footer{margin-top:20px;padding-top:10px;border-top:1px solid #E8EFF8;display:flex;justify-content:space-between;font-size:9px;color:#6B7A9F}
+  /* Print btn */
+  .print-btn{position:fixed;bottom:20px;right:20px;background:#1E2761;color:white;border:none;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px}
+  .print-btn:hover{background:#151D4A}
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">JCA</div>
+  <div class="header-center">
+    <h1>Planejamento de Férias 2027</h1>
+    <p>Relatório Executivo — Departamento Pessoal Interno</p>
+  </div>
+  <div class="header-right">
+    <div>Emitido em ${dtHoje}</div>
+    <div>Competência: 2027</div>
+    <div class="confidential">USO RESTRITO — DIRETORIA</div>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid">
+  <div class="kpi blue">
+    <div class="kpi-label">Total de Colaboradores</div>
+    <div class="kpi-value">${total}</div>
+    <div class="kpi-sub">base ativa em 2027</div>
+  </div>
+  <div class="kpi green">
+    <div class="kpi-label">Planejamento Concluído</div>
+    <div class="kpi-value">${pctPlano}%</div>
+    <div class="kpi-sub">${comDatas} de ${total} com datas indicadas</div>
+    <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pctPlano}%;background:#2E7D32"></div></div>
+  </div>
+  <div class="kpi navy">
+    <div class="kpi-label">Validados pelo DP</div>
+    <div class="kpi-value">${pctValid}%</div>
+    <div class="kpi-sub">${validados} aprovados de ${total}</div>
+    <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pctValid}%;background:#1E2761"></div></div>
+  </div>
+  <div class="kpi gold">
+    <div class="kpi-label">Provisão Anual Férias</div>
+    <div class="kpi-value" style="font-size:18px">${fmtBRL(tAnual)}</div>
+    <div class="kpi-sub">provisão mensal: ${fmtBRL(tProv)}</div>
+  </div>
+</div>
+
+<!-- Situação por Departamento -->
+<div class="section">
+  <div class="section-title">📊 Situação por Departamento</div>
+  <table>
+    <thead><tr>
+      <th>Departamento</th><th>Total</th><th>Indicados</th>
+      <th style="min-width:120px">Progresso Indicação</th>
+      <th>Validados</th><th style="min-width:120px">Progresso Validação</th>
+      <th>Alertas</th><th>Provisão Anual</th>
+    </tr></thead>
+    <tbody>${deptTableRows}</tbody>
+  </table>
+</div>
+
+<!-- Dois painéis lado a lado -->
+<div class="two-col">
+  <!-- Distribuição Mensal -->
+  <div class="chart-container">
+    <div class="chart-title">📅 Distribuição Mensal de Inícios de Férias</div>
+    <div class="chart-bars">${distBars}</div>
+    <div style="display:flex;gap:12px;margin-top:8px;font-size:9px;color:#6B7A9F">
+      <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#4A90D9;border-radius:2px"></div>1º Período</div>
+      <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#2E7D32;border-radius:2px"></div>2º Período</div>
+      <div style="margin-left:auto;font-weight:700">Pico: ${peakMes.mes} (${peakMes.p1+peakMes.p2}cx)</div>
+    </div>
+  </div>
+
+  <!-- Alertas de risco -->
+  <div>
+    <div class="section-title" style="margin-bottom:10px">🚨 Alertas de Criticidade</div>
+    ${riskItems}
+    ${(emDobro+venc30+venc60)>0?`<div style="font-size:10px;color:#6B7A9F;margin-top:8px">Total: <strong>${emDobro+venc30+venc60} colaboradores</strong> necessitam atenção.</div>`:''}
+  </div>
+</div>
+
+<!-- Insights Estratégicos -->
+<div class="section">
+  <div class="section-title">💡 Destaques para a Diretoria</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="insight-box">
+      <div class="insight-title">Avanço do Planejamento</div>
+      <div class="insight-item">• ${comDatas} de ${total} colaboradores (${pctPlano}%) já têm datas indicadas.</div>
+      <div class="insight-item">• ${semDatas} ainda aguardam indicação dos gestores.</div>
+      <div class="insight-item">• ${validados} períodos já foram formalmente validados pelo DP.</div>
+    </div>
+    <div class="insight-box">
+      <div class="insight-title">Impacto Financeiro</div>
+      <div class="insight-item">• Provisão mensal acumulada: <strong>${fmtBRL(tProv)}</strong></div>
+      <div class="insight-item">• Custo total projetado: <strong>${fmtBRL(tPgto)}</strong></div>
+      <div class="insight-item">• Mês com maior desembolso: <strong>${Object.entries(buildMesesMap()).sort((a,b)=>b[1].tot-a[1].tot)[0]?MESES_NOME[Object.entries(buildMesesMap()).sort((a,b)=>b[1].tot-a[1].tot)[0][0]]:'—'}</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div>JCA Contadores · Departamento Pessoal Interno · Planejamento de Férias 2027</div>
+  <div>Emitido em ${dtHoje} · Uso Restrito — Diretoria</div>
+</div>
+
+</body></html>`;
+
+  const blob = new Blob([painel],{type:'text/html;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url,'_blank');
+  if(!win) showToast('Permita pop-ups para abrir o painel','warn');
+  else showToast('🏛️ Painel da Diretoria gerado!','success');
+}
 
 // ── BLOQUEIOS ────────────────────────────────────────────────
 function renderBloqueios(){
