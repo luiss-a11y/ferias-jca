@@ -312,6 +312,19 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 
 <body>
 
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;animation:pulse 1.5s ease-in-out infinite">JCA</div>
+  <div style="color:white;font-size:15px;font-weight:600" id="loadingMsg">Carregando...</div>
+  <div style="color:var(--accent-light);font-size:12px" id="loadingSubMsg">Conectando ao Google Sheets</div>
+  <div style="width:200px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;margin-top:4px">
+    <div id="loadingBar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .4s ease"></div>
+  </div>
+</div>
+<style>
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+</style>
+
+
 <!-- LOGIN PRINCIPAL -->
 <div class="login-wrap" id="loginScreen">
   <div class="login-bg"></div>
@@ -370,6 +383,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     </div>
     <div class="topbar-right">
       <span class="role-badge" id="roleBadge">—</span>
+      <span id="syncStatus" style="font-size:11px;color:var(--accent-light);display:none"></span>
       <button class="btn btn-outline btn-sm" onclick="doLogout()" id="btnSair">Sair</button>
       <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -1082,6 +1096,175 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 
 
 <script>
+// ══════════════════════════════════════════════════════
+// GOOGLE SHEETS INTEGRATION
+// ══════════════════════════════════════════════════════
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylA5iNA-7w7adP-qPhw1TEnlfCpTP2AZzCS6JAZMmL4R4XEJynvu0lPQEqJScbE23H/exec';
+
+// ── Campos da planilha ────────────────────────────────
+const SHEET_COLS = ['id','nome','dept','salario','admissao','pa_ini','pa_fim',
+  'conceder','p1ini','p1fim','p2ini','p2fim','obs',
+  'statusP1','statusP2','situacao','motivoP1','motivoP2','hist','altReq'];
+
+// ── Loading UI ────────────────────────────────────────
+function showLoading(msg='Carregando...', sub='Conectando ao Google Sheets', pct=0){
+  const el = document.getElementById('loadingOverlay');
+  if(el){ el.style.display='flex'; }
+  const msgEl=document.getElementById('loadingMsg');
+  const subEl=document.getElementById('loadingSubMsg');
+  const bar =document.getElementById('loadingBar');
+  if(msgEl) msgEl.textContent=msg;
+  if(subEl) subEl.textContent=sub;
+  if(bar)   bar.style.width=pct+'%';
+}
+function hideLoading(){ 
+  const el=document.getElementById('loadingOverlay');
+  if(el) el.style.display='none';
+}
+function setSyncStatus(msg, ok=true){
+  const el=document.getElementById('syncStatus');
+  if(!el) return;
+  el.style.display='inline';
+  el.textContent=msg;
+  el.style.color=ok?'#A5D6A7':'#EF9A9A';
+  if(ok) setTimeout(()=>{el.style.display='none';},3000);
+}
+
+// ── Serialize / Deserialize ───────────────────────────
+function colabToRow(c){
+  return {
+    id:        c.id,
+    nome:      c.nome,
+    dept:      c.dept,
+    salario:   c.salario,
+    admissao:  c.admissao,
+    pa_ini:    c.pa_ini,
+    pa_fim:    c.pa_fim,
+    conceder:  c.conceder,
+    p1ini:     c.p1ini||'',
+    p1fim:     c.p1fim||'',
+    p2ini:     c.p2ini||'',
+    p2fim:     c.p2fim||'',
+    obs:       c.obs||'',
+    statusP1:  c.statusP1||'Pendente',
+    statusP2:  c.statusP2||'Pendente',
+    situacao:  c.situacao||'Dentro do Prazo',
+    motivoP1:  c.motivoP1||'',
+    motivoP2:  c.motivoP2||'',
+    hist:      JSON.stringify(c.hist||[]),
+    altReq:    JSON.stringify(c.altReq||{p1ini:'',p1fim:'',p2ini:'',p2fim:'',justif:'',status:''}),
+  };
+}
+function rowToColab(row){
+  let hist=[], altReq={p1ini:'',p1fim:'',p2ini:'',p2fim:'',justif:'',status:''};
+  try{ hist=JSON.parse(row.hist||'[]'); }catch(e){}
+  try{ altReq=JSON.parse(row.altReq||'{}'); }catch(e){}
+  return{
+    id:       parseInt(row.id)||0,
+    nome:     row.nome||'',
+    dept:     row.dept||'',
+    salario:  parseFloat(row.salario)||0,
+    admissao: row.admissao||'',
+    pa_ini:   row.pa_ini||'',
+    pa_fim:   row.pa_fim||'',
+    conceder: row.conceder||'',
+    p1ini:    row.p1ini||'',
+    p1fim:    row.p1fim||'',
+    p2ini:    row.p2ini||'',
+    p2fim:    row.p2fim||'',
+    obs:      row.obs||'',
+    statusP1: row.statusP1||'Pendente',
+    statusP2: row.statusP2||'Pendente',
+    situacao: row.situacao||'Dentro do Prazo',
+    motivoP1: row.motivoP1||'',
+    motivoP2: row.motivoP2||'',
+    hist, altReq,
+  };
+}
+
+// ── Fetch from Sheets ─────────────────────────────────
+async function fetchFromSheets(){
+  try{
+    const res  = await fetch(SHEETS_URL, {redirect:'follow'});
+    const data = await res.json();
+    if(Array.isArray(data) && data.length>0){
+      colaboradores = data.map(rowToColab).filter(c=>c.id>0);
+      return true;
+    }
+    return false; // empty sheet — seed it
+  }catch(e){
+    console.warn('Sheets fetch error:', e);
+    return null; // error
+  }
+}
+
+// ── Save to Sheets ────────────────────────────────────
+let saveTimer = null;
+function scheduleSync(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(syncToSheets, 800);
+}
+async function syncToSheets(){
+  setSyncStatus('⏳ Salvando...', true);
+  try{
+    const payload = colaboradores.map(colabToRow);
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {'Content-Type':'text/plain'}, // Apps Script needs text/plain for doPost
+      redirect: 'follow',
+    });
+    setSyncStatus('✅ Salvo no Sheets', true);
+  }catch(e){
+    console.warn('Sheets save error:', e);
+    setSyncStatus('❌ Erro ao salvar', false);
+  }
+}
+
+// ── Seed sheet with initial data ──────────────────────
+async function seedSheets(){
+  setSyncStatus('⏳ Populando planilha...', true);
+  try{
+    const payload = colaboradores.map(colabToRow);
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {'Content-Type':'text/plain'},
+      redirect: 'follow',
+    });
+    setSyncStatus('✅ Planilha populada!', true);
+  }catch(e){
+    console.warn('Seed error:', e);
+    setSyncStatus('❌ Erro ao popular', false);
+  }
+}
+
+// ── Init: load or seed on app start ──────────────────
+async function initSheets(){
+  showLoading('Buscando dados...','Conectando ao Google Sheets', 20);
+  const result = await fetchFromSheets();
+  if(result === true){
+    showLoading('Dados carregados!','', 100);
+    setSyncStatus('✅ Sheets conectado', true);
+  } else if(result === false){
+    // Empty sheet — seed with fictional data
+    showLoading('Primeira execução...','Populando planilha com dados fictícios', 50);
+    await seedSheets();
+    showLoading('Pronto!','', 100);
+  } else {
+    // Error — use in-memory data
+    showLoading('Modo offline','Não foi possível conectar ao Sheets', 100);
+    setSyncStatus('⚠️ Offline — dados em memória', false);
+  }
+  setTimeout(hideLoading, 600);
+}
+
+// ── Auto-save patches ─────────────────────────────────
+// Called after any data modification
+function afterSave(){
+  scheduleSync();
+}
+
 const FERIADOS=[
   {d:"2027-01-01",nome:"Confraternização Universal"},{d:"2027-02-08",nome:"Carnaval (segunda-feira)"},
   {d:"2027-02-09",nome:"Carnaval (terça-feira)"},{d:"2027-02-10",nome:"Quarta-feira de Cinzas"},
@@ -1228,7 +1411,7 @@ function doLoginCsc(){
 function entrarApp(){
   document.getElementById("loginScreen").style.display="none";document.getElementById("appScreen").style.display="block";
   const all=[ROLE_DP,...ROLES_OP,...ROLES_CSC];const cfg=all.find(r=>r.id===currentRole)||ROLE_DP;
-  document.getElementById("roleBadge").textContent=cfg.label;buildNav(cfg.tabs);switchTab(cfg.tabs[0]);setTimeout(updateNavBadges,100);
+  document.getElementById("roleBadge").textContent=cfg.label;buildNav(cfg.tabs);switchTab(cfg.tabs[0]);setTimeout(updateNavBadges,100);if(currentRole==="dp")initSheets();
 }
 function doLogout(){
   currentRole=null;selectedCscRole=null;
@@ -2255,7 +2438,7 @@ function submitSolicitarAlt(){
   if(!c.hist)c.hist=[];
   c.hist.push({dt:hdt,acao:"Alteração solicitada",user:"Gestor",det:`Nova P1: ${fmtDate(p1ini)} → ${fmtDate(p1fim)}${p2ini?" | Nova P2: "+fmtDate(p2ini)+" → "+fmtDate(p2fim):""} | Justif: ${justif}`});
   closeModal("modalSolicitarAlt");
-  showToast("✅ Solicitação enviada ao DP Interno!","success");
+  showToast("✅ Solicitação enviada ao DP Interno!","success");afterSave();
   renderAprovadasGestor();
   updateNavBadges();
 }
@@ -2329,7 +2512,7 @@ function submitEditarDP(){
   c.hist.push({dt:hdt,acao:"Alteração pelo DP",user:"DP Interno",
     det:`P1: ${oldP1} → ${fmtDate(p1ini)} a ${fmtDate(p1fim)}${p2ini?" | P2: "+oldP2+" → "+fmtDate(p2ini)+" a "+fmtDate(p2fim):""} | Justif: ${justif}`});
   closeModal("modalEditarDP");
-  showToast("✅ Férias alteradas e registradas no histórico!","success");
+  showToast("✅ Férias alteradas e registradas no histórico!","success");afterSave();
   if(document.getElementById("painelCards"))renderPainel();
   if(document.getElementById("aprovadasCount"))renderAprovadas();
   updateNavBadges();
@@ -2380,7 +2563,7 @@ function responderAlteracao(id,aprovar){
   }
   renderAlteracoes();
   if(document.getElementById("painelCards"))renderPainel();
-  updateNavBadges();
+  updateNavBadges();afterSave();
 }
 
 
@@ -3012,6 +3195,19 @@ function gerarRelatorioMensal(m){
   .footer{margin-top:16px;padding-top:8px;border-top:1px solid #E8EFF8;display:flex;justify-content:space-between;font-size:9px;color:#6B7A9F}
   .print-btn{position:fixed;bottom:20px;right:20px;background:#1E2761;color:white;border:none;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px}
 </style></head><body>
+
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;animation:pulse 1.5s ease-in-out infinite">JCA</div>
+  <div style="color:white;font-size:15px;font-weight:600" id="loadingMsg">Carregando...</div>
+  <div style="color:var(--accent-light);font-size:12px" id="loadingSubMsg">Conectando ao Google Sheets</div>
+  <div style="width:200px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;margin-top:4px">
+    <div id="loadingBar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .4s ease"></div>
+  </div>
+</div>
+<style>
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+</style>
+
 <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
 <div class="header">
   <div class="logo">JCA</div>
@@ -3123,6 +3319,19 @@ function gerarRelatorioConsolidado(){
   .footer{margin-top:16px;padding-top:8px;border-top:1px solid #E8EFF8;display:flex;justify-content:space-between;font-size:9px;color:#6B7A9F}
   .print-btn{position:fixed;bottom:20px;right:20px;background:#1E2761;color:white;border:none;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px}
 </style></head><body>
+
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;animation:pulse 1.5s ease-in-out infinite">JCA</div>
+  <div style="color:white;font-size:15px;font-weight:600" id="loadingMsg">Carregando...</div>
+  <div style="color:var(--accent-light);font-size:12px" id="loadingSubMsg">Conectando ao Google Sheets</div>
+  <div style="width:200px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;margin-top:4px">
+    <div id="loadingBar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .4s ease"></div>
+  </div>
+</div>
+<style>
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+</style>
+
 <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
 <div class="header">
   <div class="logo">JCA</div>
@@ -3276,6 +3485,19 @@ function gerarRelatorioFinanceiro(){
 </style>
 </head>
 <body>
+
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;animation:pulse 1.5s ease-in-out infinite">JCA</div>
+  <div style="color:white;font-size:15px;font-weight:600" id="loadingMsg">Carregando...</div>
+  <div style="color:var(--accent-light);font-size:12px" id="loadingSubMsg">Conectando ao Google Sheets</div>
+  <div style="width:200px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;margin-top:4px">
+    <div id="loadingBar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .4s ease"></div>
+  </div>
+</div>
+<style>
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+</style>
+
 
 <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
 
@@ -3548,6 +3770,19 @@ function gerarPainelDiretoria(){
 </style>
 </head>
 <body>
+
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;animation:pulse 1.5s ease-in-out infinite">JCA</div>
+  <div style="color:white;font-size:15px;font-weight:600" id="loadingMsg">Carregando...</div>
+  <div style="color:var(--accent-light);font-size:12px" id="loadingSubMsg">Conectando ao Google Sheets</div>
+  <div style="width:200px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;margin-top:4px">
+    <div id="loadingBar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .4s ease"></div>
+  </div>
+</div>
+<style>
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+</style>
+
 
 <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
 
@@ -3970,7 +4205,7 @@ function submitDatas(){
   if(!c.hist)c.hist=[];
   const det=`P1: ${fmtDate(p1ini)} → ${fmtDate(p1fim)}`+(p2ini?` | P2: ${fmtDate(p2ini)} → ${fmtDate(p2fim)}`:"");
   c.hist.push({dt:hdtD,acao:"Datas indicadas",user:"Gestor",det});
-  closeModal("modalDatas");showToast("✅ Indicação salva! O DP Interno será notificado.","success");renderSetor();updateNavBadges();
+  closeModal("modalDatas");showToast("✅ Indicação salva! O DP Interno será notificado.","success");renderSetor();updateNavBadges();afterSave();
 }
 
 // ── MODAL VALIDAR ────────────────────────────────────────────
@@ -4008,7 +4243,7 @@ function submitValidar(){
   showToast(sP1==="Validado"?"✅ Validado!":sP1==="Recusado"?"❌ Recusa registrada":"Atualizado!",sP1==="Validado"?"success":sP1==="Recusado"?"error":"");
   if(document.getElementById("painelCards"))renderPainel();if(document.getElementById("validarCount"))renderValidar();
   if(sP1==="Validado"||sP1==="Comunicado"&&document.getElementById("aprovadasCount"))renderAprovadas();
-  updateNavBadges();
+  updateNavBadges();afterSave();
 }
 
 // ── UTILS ────────────────────────────────────────────────────
