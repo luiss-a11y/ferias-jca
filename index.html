@@ -313,6 +313,29 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .ano-btn{padding:5px 14px;border-radius:6px;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted)}
 .ano-btn.active{background:var(--navy);color:white}
 .ano-btn:hover:not(.active){background:var(--border);color:var(--navy)}
+
+#saveBar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#1E2761;
+  border-top:4px solid #F59E0B;
+  padding:14px 28px;
+  z-index:9999;
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.4);
+}
+#saveBar.visible{display:flex!important}
+.savebar-dot{width:10px;height:10px;background:#F59E0B;border-radius:50%;animation:pulse 1s ease-in-out infinite;flex-shrink:0}
+.savebar-msg{color:white;font-weight:700;font-size:14px}
+.savebar-sub{color:rgba(255,255,255,.7);font-size:12px;margin-top:2px}
+.savebar-btn-discard{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.savebar-btn-save{background:#F59E0B;border:none;color:#1E2761;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit}
+.savebar-btn-discard:hover{background:rgba(255,255,255,.2)}
+.savebar-btn-save:hover{background:#FBBF24}
+
 </style>
 </head>
 
@@ -887,6 +910,9 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   </div>
 </div>
 
+  <!-- BARRA DE SALVAMENTO -->
+  <div id="saveBar"></div>
+
 <!-- MODAL: INDICAR DATAS -->
 <div class="modal-overlay" id="modalDatas">
   <div class="modal">
@@ -1120,21 +1146,6 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   </div>
 </div>
 
-
-<!-- BARRA DE SALVAMENTO -->
-<div id="saveBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);border-top:3px solid #F59E0B;padding:14px 28px;z-index:500;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 -4px 24px rgba(0,0,0,.35)">
-  <div style="display:flex;align-items:center;gap:12px">
-    <div style="width:10px;height:10px;background:#F59E0B;border-radius:50%;animation:pulse 1s ease-in-out infinite"></div>
-    <div>
-      <div style="color:white;font-weight:700;font-size:14px" id="saveBarMsg">Alterações pendentes</div>
-      <div style="color:var(--accent-light);font-size:12px" id="saveBarSub">Salve para garantir que os dados não sejam perdidos</div>
-    </div>
-  </div>
-  <div style="display:flex;gap:10px">
-    <button onclick="descartarAlteracoes()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Descartar</button>
-    <button onclick="confirmarSalvar()" style="background:var(--accent);border:none;color:var(--navy);padding:8px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px">💾 Salvar agora</button>
-  </div>
-</div>
 
 <div class="toast-container" id="toasts"></div>
 
@@ -4365,17 +4376,27 @@ function showSaveBar(msg, sub){
   pendingChanges = true;
   const bar = document.getElementById('saveBar');
   if(!bar) return;
-  bar.style.display = 'flex';
-  document.querySelector('.main').style.paddingBottom = '80px';
-  document.getElementById('saveBarMsg').textContent = msg || 'Alterações pendentes';
-  document.getElementById('saveBarSub').textContent = sub || 'Salve para garantir que os dados não sejam perdidos';
+  bar.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="savebar-dot"></div>
+      <div>
+        <div class="savebar-msg">${msg||'Alterações pendentes'}</div>
+        <div class="savebar-sub">${sub||'Salve para não perder os dados'}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="savebar-btn-discard" onclick="descartarAlteracoes()">Descartar</button>
+      <button class="savebar-btn-save" onclick="confirmarSalvar()">💾 Salvar agora</button>
+    </div>`;
+  bar.classList.add('visible');
+  document.querySelector('.main') && (document.querySelector('.main').style.paddingBottom='80px');
 }
 
 function hideSaveBar(){
   pendingChanges = false;
   pendingSnapshot = null;
   const bar = document.getElementById('saveBar');
-  if(bar) bar.style.display = 'none';
+  if(bar){ bar.classList.remove('visible'); bar.innerHTML=''; }
   const main = document.querySelector('.main');
   if(main) main.style.paddingBottom = '';
 }
