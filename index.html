@@ -395,7 +395,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     </div>
     <div class="topbar-right">
       <span class="role-badge" id="roleBadge">—</span>
-      <span id="syncStatus" style="font-size:11px;color:var(--accent-light);display:none"></span>
+      <span id="syncStatus" style="font-size:12px;font-weight:600;color:var(--accent-light);display:none;padding:4px 10px;background:rgba(255,255,255,.08);border-radius:6px"></span>
       <button id="btnReset" onclick="resetCache()" style="display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer" title="Limpar cache e recarregar dados">↺ Reset</button>
       <button class="btn btn-outline btn-sm" onclick="doLogout()" id="btnSair">Sair</button>
       <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
@@ -1120,6 +1120,22 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   </div>
 </div>
 
+
+<!-- BARRA DE SALVAMENTO -->
+<div id="saveBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);border-top:3px solid var(--accent);padding:12px 24px;z-index:90;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.2)">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="width:10px;height:10px;background:#F59E0B;border-radius:50%;animation:pulse 1s ease-in-out infinite"></div>
+    <div>
+      <div style="color:white;font-weight:700;font-size:14px" id="saveBarMsg">Alterações pendentes</div>
+      <div style="color:var(--accent-light);font-size:12px" id="saveBarSub">Salve para garantir que os dados não sejam perdidos</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button onclick="descartarAlteracoes()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Descartar</button>
+    <button onclick="confirmarSalvar()" style="background:var(--accent);border:none;color:var(--navy);padding:8px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px">💾 Salvar agora</button>
+  </div>
+</div>
+
 <div class="toast-container" id="toasts"></div>
 
 
@@ -1154,8 +1170,10 @@ function setSyncStatus(msg, ok=true){
   if(!el) return;
   el.style.display='inline';
   el.textContent=msg;
-  el.style.color=ok?'#A5D6A7':'#EF9A9A';
-  if(ok) setTimeout(()=>{el.style.display='none';},3000);
+  el.style.color=ok?'#A5D6A7':'#FFCC80';
+  clearTimeout(el._timer);
+  // Success: hide after 3s. Warning: keep visible until next save
+  if(ok) el._timer=setTimeout(()=>{el.style.display='none';},3000);
 }
 
 // ── Serialize / Deserialize ───────────────────────────
@@ -1244,26 +1262,37 @@ async function fetchFromSheets(){
 }
 
 // ── Save to Sheets ────────────────────────────────────
+
+async function syncToSheets(){
+  setSyncStatus('⏳ Salvando no Sheets...', true);
+  try{
+    const payload = colaboradores.map(colabToRow);
+    const res = await fetch(SHEETS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {'Content-Type':'text/plain'},
+      redirect: 'follow',
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json().catch(()=>({}));
+    if(data.ok || res.ok){
+      saveLocal(); // confirma localStorage após Sheets salvo
+      setSyncStatus('✅ Salvo', true);
+    } else {
+      throw new Error('Sheets retornou erro');
+    }
+  }catch(e){
+    console.warn('Sheets save error:', e);
+    setSyncStatus('⚠️ Sheets indisponível — salvo localmente', false);
+    // Local já foi salvo antes — dados não perdidos
+  }
+}
+
+// Timer apenas para sincronização de background (ex: após carregar)
 let saveTimer = null;
 function scheduleSync(){
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(syncToSheets, 800);
-}
-async function syncToSheets(){
-  setSyncStatus('⏳ Salvando...', true);
-  try{
-    const payload = colaboradores.map(colabToRow);
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {'Content-Type':'text/plain'}, // Apps Script needs text/plain for doPost
-      redirect: 'follow',
-    });
-    setSyncStatus('✅ Salvo no Sheets', true);
-  }catch(e){
-    console.warn('Sheets save error:', e);
-    setSyncStatus('❌ Erro ao salvar', false);
-  }
+  saveTimer = setTimeout(syncToSheets, 1500);
 }
 
 // ── Seed sheet with initial data ──────────────────────
@@ -1343,10 +1372,10 @@ async function initSheets(){
   setTimeout(hideLoading, 400);
 }
 
-// ── Auto-save: localStorage first (instant), Sheets async ─────
-function afterSave(){
-  saveLocal();       // instant — persists between sessions
-  scheduleSync();    // async — syncs to Sheets in background
+// ── afterSave: mostra barra de salvar (ação manual) ────────────
+function afterSave(msg, sub){
+  saveLocal(); // salva localmente sempre (segurança)
+  showSaveBar(msg, sub);
 }
 
 // ── Load local data on every login (not just DP) ──────────────
@@ -1532,6 +1561,7 @@ function entrarApp(){
 function doLogout(){
   currentRole=null;selectedCscRole=null;
   showResetBtn(false);
+  hideSaveBar();
   document.getElementById("appScreen").style.display="none";document.getElementById("loginScreen").style.display="flex";
   document.getElementById("inputSenha").value="";
   document.querySelectorAll(".role-card").forEach(c=>c.classList.remove("selected"));
@@ -2521,6 +2551,7 @@ function updateNavBadges(){
 
 // ── SOLICITAR ALTERAÇÃO (GESTOR) ─────────────────────────────
 function openSolicitarAlteracao(id){
+  tirarSnapshot();
   currentColab=colaboradores.find(c=>c.id===id);
   const c=currentColab;
   document.getElementById("modalAltGestorName").textContent=c.nome;
@@ -2578,13 +2609,14 @@ function submitSolicitarAlt(){
   if(!c.hist)c.hist=[];
   c.hist.push({dt:hdt,acao:"Alteração solicitada",user:"Gestor",det:`Nova P1: ${fmtDate(p1ini)} → ${fmtDate(p1fim)}${p2ini?" | Nova P2: "+fmtDate(p2ini)+" → "+fmtDate(p2fim):""} | Justif: ${justif}`});
   closeModal("modalSolicitarAlt");
-  showToast("✅ Solicitação enviada ao DP Interno!","success");afterSave();
+  showToast("✅ Solicitação registrada!","success");afterSave("Solicitação pendente de salvar","Clique em Salvar para enviar ao servidor");
   renderAprovadasGestor();
   updateNavBadges();
 }
 
 // ── EDITAR APROVADAS (DP) ────────────────────────────────────
 function openEditarDP(id){
+  tirarSnapshot();
   currentColab=colaboradores.find(c=>c.id===id);
   const c=currentColab;
   document.getElementById("modalEditarDPName").textContent=c.nome;
@@ -2652,7 +2684,7 @@ function submitEditarDP(){
   c.hist.push({dt:hdt,acao:"Alteração pelo DP",user:"DP Interno",
     det:`P1: ${oldP1} → ${fmtDate(p1ini)} a ${fmtDate(p1fim)}${p2ini?" | P2: "+oldP2+" → "+fmtDate(p2ini)+" a "+fmtDate(p2fim):""} | Justif: ${justif}`});
   closeModal("modalEditarDP");
-  showToast("✅ Férias alteradas e registradas no histórico!","success");afterSave();
+  showToast("✅ Alteração aplicada!","success");afterSave("Edição pendente de salvar","Clique em Salvar para confirmar no servidor");
   if(document.getElementById("painelCards"))renderPainel();
   if(document.getElementById("aprovadasCount"))renderAprovadas();
   updateNavBadges();
@@ -2703,7 +2735,7 @@ function responderAlteracao(id,aprovar){
   }
   renderAlteracoes();
   if(document.getElementById("painelCards"))renderPainel();
-  updateNavBadges();afterSave();
+  updateNavBadges();afterSave("Resposta à alteração pendente de salvar","Clique em Salvar para confirmar no servidor");
 }
 
 
@@ -4324,6 +4356,57 @@ function showResetBtn(show){
   if(b) b.style.display=show?'inline-block':'none';
 }
 
+
+// ── BARRA DE SALVAMENTO ───────────────────────────────────────
+let pendingChanges = false;
+let pendingSnapshot = null; // snapshot before change for discard
+
+function showSaveBar(msg, sub){
+  pendingChanges = true;
+  const bar = document.getElementById('saveBar');
+  if(!bar) return;
+  bar.style.display = 'flex';
+  document.getElementById('saveBarMsg').textContent = msg || 'Alterações pendentes';
+  document.getElementById('saveBarSub').textContent = sub || 'Salve para garantir que os dados não sejam perdidos';
+}
+
+function hideSaveBar(){
+  pendingChanges = false;
+  pendingSnapshot = null;
+  const bar = document.getElementById('saveBar');
+  if(bar) bar.style.display = 'none';
+}
+
+async function confirmarSalvar(){
+  const btn = document.querySelector('#saveBar button:last-child');
+  if(btn){ btn.textContent = '⏳ Salvando...'; btn.disabled = true; }
+  saveLocal();
+  try{
+    await syncToSheets();
+    showToast('✅ Dados salvos com sucesso!', 'success');
+  } catch(e){
+    showToast('⚠️ Salvo localmente — Sheets indisponível', '');
+  }
+  if(btn){ btn.innerHTML = '💾 Salvar agora'; btn.disabled = false; }
+  hideSaveBar();
+}
+
+function descartarAlteracoes(){
+  if(!confirm('Descartar as alterações não salvas?')) return;
+  if(pendingSnapshot){
+    colaboradores = JSON.parse(JSON.stringify(pendingSnapshot));
+  }
+  hideSaveBar();
+  // Re-render current tab
+  const activeTab = document.querySelector('.nav-tab.active');
+  if(activeTab) switchTab(activeTab.dataset.tab);
+  showToast('Alterações descartadas', '');
+}
+
+function tirarSnapshot(){
+  pendingSnapshot = JSON.parse(JSON.stringify(colaboradores));
+}
+
 // ── SELETOR DE ANO ────────────────────────────────────────────
 function setAno(ano, origem){
   anoSelecionado = ano;
@@ -4397,6 +4480,7 @@ function calToday(){const n=new Date();calYear=n.getFullYear();calMonth=n.getMon
 
 // ── MODAL INDICAR DATAS ──────────────────────────────────────
 function openDatasModal(id){
+  tirarSnapshot();
   currentColab=colaboradores.find(c=>c.id===id);const c=currentColab;
   document.getElementById("modalDatasName").textContent=c.nome;
   const _paOk=new Date(c.pa_fim)<new Date();
@@ -4467,13 +4551,14 @@ function submitDatas(){
   if(!c.hist)c.hist=[];
   const det=`P1: ${fmtDate(p1ini)} → ${fmtDate(p1fim)}`+(p2ini?` | P2: ${fmtDate(p2ini)} → ${fmtDate(p2fim)}`:"");
   c.hist.push({dt:hdtD,acao:"Datas indicadas",user:"Gestor",det});
-  closeModal("modalDatas");showToast("✅ Indicação salva! O DP Interno será notificado.","success");renderSetor();updateNavBadges();afterSave();
+  closeModal("modalDatas");showToast("✅ Datas indicadas!","success");renderSetor();updateNavBadges();afterSave("Indicação de datas pendente de salvar","Clique em Salvar para enviar ao servidor");
 }
 
 // ── MODAL VALIDAR ────────────────────────────────────────────
 function onStatusP1Change(){document.getElementById("motivoP1Group").style.display=document.getElementById("inputStatusP1").value==="Recusado"?"block":"none";}
 function onStatusP2Change(){document.getElementById("motivoP2Group").style.display=document.getElementById("inputStatusP2").value==="Recusado"?"block":"none";}
 function openValidarModal(id){
+  tirarSnapshot();
   currentColab=colaboradores.find(c=>c.id===id);const c=currentColab;
   document.getElementById("modalValidarName").textContent=c.nome;
   document.getElementById("modalValidarDetail").innerHTML=`<div class="detail-item"><label>Departamento</label><span>${c.dept}</span></div><div class="detail-item"><label>Conceder Até</label><span style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"}">${fmtDate(c.conceder)}</span></div><div class="detail-item"><label>Obs. Gestor</label><span>${c.obs||"—"}</span></div>`;
