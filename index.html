@@ -1266,30 +1266,74 @@ async function seedSheets(){
   }
 }
 
-// ── Init: load or seed on app start ──────────────────
+// ── localStorage helpers ─────────────────────────────
+const LS_KEY = 'jca_ferias_2027';
+
+function saveLocal(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(colaboradores));
+  }catch(e){ console.warn('localStorage save error:', e); }
+}
+
+function loadLocal(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    if(Array.isArray(data) && data.length > 0){
+      colaboradores = data;
+      return true;
+    }
+  }catch(e){ console.warn('localStorage load error:', e); }
+  return false;
+}
+
+// ── Session flag — only load from Sheets once per page load ──
+let sheetsInitialized = false;
+
+// ── Init: localStorage → Sheets (once per page load) ─────────
 async function initSheets(){
+  // If already initialized this session, just sync in background
+  if(sheetsInitialized){
+    syncToSheets();
+    return;
+  }
+  sheetsInitialized = true;
+
+  // 1. Try localStorage first (instant)
+  const fromLocal = loadLocal();
+  if(fromLocal){
+    setSyncStatus('✅ Dados locais carregados', true);
+    hideLoading();
+    // Sync current data to Sheets in background
+    syncToSheets();
+    return;
+  }
+
+  // 2. No local data — fetch from Sheets
   showLoading('Buscando dados...','Conectando ao Google Sheets', 20);
   const result = await fetchFromSheets();
   if(result === true){
-    showLoading('Dados carregados!','', 100);
+    saveLocal();
     setSyncStatus('✅ Sheets conectado', true);
-  } else if(result === false){
-    // Empty sheet — seed with fictional data
-    showLoading('Primeira execução...','Populando planilha com dados fictícios', 50);
-    await seedSheets();
-    showLoading('Pronto!','', 100);
   } else {
-    // Error — use in-memory data
-    showLoading('Modo offline','Não foi possível conectar ao Sheets', 100);
-    setSyncStatus('⚠️ Offline — dados em memória', false);
+    // First run or offline — save initial data locally + seed Sheets
+    showLoading('Primeira execução...','Salvando dados iniciais...', 50);
+    saveLocal();
+    seedSheets(); // non-blocking
   }
-  setTimeout(hideLoading, 600);
+  setTimeout(hideLoading, 400);
 }
 
-// ── Auto-save patches ─────────────────────────────────
-// Called after any data modification
+// ── Auto-save: localStorage first (instant), Sheets async ─────
 function afterSave(){
-  scheduleSync();
+  saveLocal();       // instant — persists between sessions
+  scheduleSync();    // async — syncs to Sheets in background
+}
+
+// ── Load local data on every login (not just DP) ──────────────
+function loadOnLogin(){
+  loadLocal(); // always refresh from localStorage on login
 }
 
 const FERIADOS=[
@@ -1455,7 +1499,14 @@ function doLoginCsc(){
 function entrarApp(){
   document.getElementById("loginScreen").style.display="none";document.getElementById("appScreen").style.display="block";
   const all=[ROLE_DP,...ROLES_OP,...ROLES_CSC];const cfg=all.find(r=>r.id===currentRole)||ROLE_DP;
-  document.getElementById("roleBadge").textContent=cfg.label;buildNav(cfg.tabs);switchTab(cfg.tabs[0]);setTimeout(updateNavBadges,100);if(currentRole==="dp")initSheets();
+  document.getElementById("roleBadge").textContent=cfg.label;buildNav(cfg.tabs);
+  // Always load from localStorage to ensure latest persisted data
+  // (covers page refresh scenarios — in-session switches are already in memory)
+  if(!sheetsInitialized) loadLocal();
+  switchTab(cfg.tabs[0]);
+  setTimeout(updateNavBadges,100);
+  // DP triggers Sheets sync (loads once, then syncs on changes)
+  if(currentRole==="dp") initSheets();
 }
 function doLogout(){
   currentRole=null;selectedCscRole=null;
