@@ -1557,7 +1557,20 @@ function getHolidayName(s){return FERIADOS.find(f=>f.d===s)?.nome||"";}
 function isVencendo(d){if(!d)return false;return(new Date(d)-new Date())/86400000<60;}
 function getAllRoles(){return[ROLE_DP,...ROLES_OP,...ROLES_CSC];}
 function getCurrentCfg(){return getAllRoles().find(r=>r.id===currentRole)||ROLE_DP;}
-function calcFin(c){const t=c.salario/3,tot=c.salario+t,prov=tot/12,p1=c.p1ini?subDays(c.p1ini,2):null,p2=c.p2ini?subDays(c.p2ini,2):null;return{t,tot,prov,p1,p2,m1:p1?getMes(p1):-1,m2:p2?getMes(p2):-1};}
+function calcFin(c){
+  // Cada período = 15 dias corridos
+  // Proporcional: salário/30 × 15 = salário/2
+  // 1/3 constitucional proporcional: (salário/2)/3 = salário/6
+  // Total por período: salário/2 + salário/6 = salário × 2/3
+  const diasPeriodo = 15;
+  const salDia = c.salario / 30;
+  const t   = (salDia * diasPeriodo) / 3;          // 1/3 proporcional aos 15 dias
+  const tot = salDia * diasPeriodo + t;             // total por período de 15 dias
+  const prov = (c.salario + c.salario/3) / 12;     // provisão mensal (base 30 dias — não muda)
+  const p1=c.p1ini?subDays(c.p1ini,2):null;
+  const p2=c.p2ini?subDays(c.p2ini,2):null;
+  return{t,tot,prov,p1,p2,m1:p1?getMes(p1):-1,m2:p2?getMes(p2):-1};
+}
 function getDayBlockReason(dateStr,dept){
   if(!dateStr)return null;const dow=getWeekday(dateStr);
   if(dow===0)return"Domingo — não é permitido iniciar férias.";
