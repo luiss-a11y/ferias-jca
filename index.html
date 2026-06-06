@@ -1122,7 +1122,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 
 
 <!-- BARRA DE SALVAMENTO -->
-<div id="saveBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);border-top:3px solid var(--accent);padding:12px 24px;z-index:90;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.2)">
+<div id="saveBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);border-top:3px solid #F59E0B;padding:14px 28px;z-index:500;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 -4px 24px rgba(0,0,0,.35)">
   <div style="display:flex;align-items:center;gap:12px">
     <div style="width:10px;height:10px;background:#F59E0B;border-radius:50%;animation:pulse 1s ease-in-out infinite"></div>
     <div>
@@ -4366,6 +4366,7 @@ function showSaveBar(msg, sub){
   const bar = document.getElementById('saveBar');
   if(!bar) return;
   bar.style.display = 'flex';
+  document.querySelector('.main').style.paddingBottom = '80px';
   document.getElementById('saveBarMsg').textContent = msg || 'Alterações pendentes';
   document.getElementById('saveBarSub').textContent = sub || 'Salve para garantir que os dados não sejam perdidos';
 }
@@ -4375,6 +4376,8 @@ function hideSaveBar(){
   pendingSnapshot = null;
   const bar = document.getElementById('saveBar');
   if(bar) bar.style.display = 'none';
+  const main = document.querySelector('.main');
+  if(main) main.style.paddingBottom = '';
 }
 
 async function confirmarSalvar(){
