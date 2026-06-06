@@ -396,6 +396,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     <div class="topbar-right">
       <span class="role-badge" id="roleBadge">—</span>
       <span id="syncStatus" style="font-size:11px;color:var(--accent-light);display:none"></span>
+      <button id="btnReset" onclick="resetCache()" style="display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer" title="Limpar cache e recarregar dados">↺ Reset</button>
       <button class="btn btn-outline btn-sm" onclick="doLogout()" id="btnSair">Sair</button>
       <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -1183,14 +1184,15 @@ function colabToRow(c){
   };
 }
 function rowToColab(row){
+  if(!row || !row.id) return null;
   let hist=[], altReq={p1ini:'',p1fim:'',p2ini:'',p2fim:'',justif:'',status:''};
-  try{ hist=JSON.parse(row.hist||'[]'); }catch(e){}
-  try{ altReq=JSON.parse(row.altReq||'{}'); }catch(e){}
-  return{
+  try{ const h=row.hist; if(h&&h!=='[]'&&h!==''){hist=JSON.parse(h);} }catch(e){}
+  try{ const a=row.altReq; if(a&&a!=='{}'&&a!==''){altReq={...altReq,...JSON.parse(a)};} }catch(e){}
+  const colab = {
     id:       parseInt(row.id)||0,
-    nome:     row.nome||'',
-    dept:     row.dept||'',
-    salario:  parseFloat(row.salario)||0,
+    nome:     String(row.nome||'').trim(),
+    dept:     String(row.dept||'').trim(),
+    salario:  parseFloat(String(row.salario).replace(',','.'))||0,
     admissao: row.admissao||'',
     pa_ini:   row.pa_ini||'',
     pa_fim:   row.pa_fim||'',
@@ -1207,6 +1209,12 @@ function rowToColab(row){
     motivoP2: row.motivoP2||'',
     hist, altReq,
   };
+  // Match base data from initial if fields are missing
+  if(!colab.nome || !colab.salario){
+    const base = COLABORADORES_INICIAL.find(c=>c.id===colab.id);
+    if(base) return {...base, ...colab, salario:base.salario, nome:base.nome, dept:base.dept};
+  }
+  return colab;
 }
 
 // ── Fetch from Sheets ─────────────────────────────────
@@ -1215,13 +1223,23 @@ async function fetchFromSheets(){
     const res  = await fetch(SHEETS_URL, {redirect:'follow'});
     const data = await res.json();
     if(Array.isArray(data) && data.length>0){
-      colaboradores = data.map(rowToColab).filter(c=>c.id>0);
-      return true;
+      const parsed = data.map(rowToColab).filter(c=>c&&c.id>0&&c.nome);
+      if(parsed.length >= COLABORADORES_INICIAL.length * 0.5){
+        // Merge: keep initial base data, overlay Sheets data (dates, status etc.)
+        colaboradores = COLABORADORES_INICIAL.map(base=>{
+          const fromSheet = parsed.find(s=>s.id===base.id);
+          return fromSheet ? {...base, ...fromSheet} : base;
+        });
+        // Add any extra rows from sheet not in initial
+        parsed.filter(s=>!COLABORADORES_INICIAL.find(b=>b.id===s.id))
+              .forEach(s=>colaboradores.push(s));
+        return true;
+      }
     }
-    return false; // empty sheet — seed it
+    return false; // empty or too few rows — seed it
   }catch(e){
     console.warn('Sheets fetch error:', e);
-    return null; // error
+    return null; // error — use in-memory
   }
 }
 
@@ -1463,6 +1481,9 @@ let colaboradores=[
   {id:30,nome:"Leonardo Paz Cardoso",dept:"CSC ADMINISTRATIVO",salario:3000,admissao:"2022-10-03",pa_ini:"2026-10-03",pa_fim:"2027-10-02",conceder:"2028-09-02",p1ini:"",p1fim:"",p2ini:"",p2fim:"",obs:"",statusP1:"Pendente",statusP2:"Pendente",situacao:"Dentro do Prazo",motivoP1:"",motivoP2:"",hist:[],altReq:{p1ini:"",p1fim:"",p2ini:"",p2fim:"",justif:"",status:""}},
 ];
 let anoSelecionado=2027;
+// Backup dos dados iniciais (fallback se Sheets/localStorage falharem)
+const COLABORADORES_INICIAL = JSON.parse(JSON.stringify(colaboradores));
+
 let currentRole=null,currentColab=null,filterAtivo="Todos",filterFinAtivo="Todos",filterAprAtivo="Todos",selectedCscRole=null,finMesSel=-1;
 let calYear=2027,calMonth=0;
 
@@ -1506,10 +1527,11 @@ function entrarApp(){
   switchTab(cfg.tabs[0]);
   setTimeout(updateNavBadges,100);
   // DP triggers Sheets sync (loads once, then syncs on changes)
-  if(currentRole==="dp") initSheets();
+  if(currentRole==="dp"){ initSheets(); showResetBtn(true); } else { showResetBtn(false); }
 }
 function doLogout(){
   currentRole=null;selectedCscRole=null;
+  showResetBtn(false);
   document.getElementById("appScreen").style.display="none";document.getElementById("loginScreen").style.display="flex";
   document.getElementById("inputSenha").value="";
   document.querySelectorAll(".role-card").forEach(c=>c.classList.remove("selected"));
@@ -4283,6 +4305,24 @@ function renderEquilibrio(){
 const _origRenderAlertas = renderAlertas;
 
 
+
+
+// ── RESET CACHE ───────────────────────────────────────────────
+function resetCache(){
+  if(!confirm('Limpar cache local e recarregar dados do Google Sheets?')) return;
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
+  sheetsInitialized = false;
+  colaboradores = JSON.parse(JSON.stringify(COLABORADORES_INICIAL));
+  initSheets().then(()=>{
+    showToast('✅ Cache limpo — dados recarregados do Sheets','success');
+    switchTab('painel');
+  });
+}
+// Show reset button only for DP
+function showResetBtn(show){
+  const b=document.getElementById('btnReset');
+  if(b) b.style.display=show?'inline-block':'none';
+}
 
 // ── SELETOR DE ANO ────────────────────────────────────────────
 function setAno(ano, origem){
