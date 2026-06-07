@@ -429,6 +429,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     <div class="topbar-right">
       <span class="role-badge" id="roleBadge">—</span>
       <span id="syncStatus" style="font-size:12px;font-weight:600;color:var(--accent-light);display:none;padding:4px 10px;background:rgba(255,255,255,.08);border-radius:6px"></span>
+      <button onclick="refreshApp()" title="Atualizar dados" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px;line-height:1" id="btnRefresh">↺</button>
       <button id="btnReset" onclick="resetCache()" style="display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer" title="Limpar cache e recarregar dados">↺ Reset</button>
       <button class="btn btn-outline btn-sm" onclick="doLogout()" id="btnSair">Sair</button>
       <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
@@ -612,7 +613,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     <!-- FINANCEIRO -->
     <div class="section" id="sec-financeiro">
       <div class="page-header">
-        <div><div class="page-title">Módulo Financeiro</div><div class="page-sub">Provisão mensal, custo projetado e datas de pagamento — apenas DP Interno</div></div>
+        <div><div class="page-title">Módulo Financeiro</div><div class="page-sub">Provisão mensal, custo projetado e datas de pagamento — apenas períodos Validados ou Comunicados</div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <div class="ano-selector" id="finAnoSel">
             <span>Ano</span>
@@ -1363,36 +1364,32 @@ let sheetsInitialized = false;
 
 // ── Init: localStorage → Sheets (once per page load) ─────────
 async function initSheets(){
-  // If already initialized this session, just sync in background
   if(sheetsInitialized){
     syncToSheets();
     return;
   }
   sheetsInitialized = true;
 
-  // 1. Try localStorage first (instant)
-  const fromLocal = loadLocal();
-  if(fromLocal){
-    setSyncStatus('✅ Dados locais carregados', true);
-    hideLoading();
-    // Sync current data to Sheets in background
-    syncToSheets();
-    return;
-  }
-
-  // 2. No local data — fetch from Sheets
-  showLoading('Buscando dados...','Conectando ao Google Sheets', 20);
+  // DP sempre busca Sheets primeiro — garante dados de outros usuários
+  showLoading('Buscando dados atualizados...','Conectando ao Google Sheets',20);
   const result = await fetchFromSheets();
-  if(result === true){
+
+  if(result===true){
     saveLocal();
-    setSyncStatus('✅ Sheets conectado', true);
+    setSyncStatus('✅ Dados atualizados do Sheets',true);
+    setTimeout(hideLoading,300);
+  } else if(result===false){
+    // Sheets vazio — seed com dados atuais
+    showLoading('Primeira execução...','Populando planilha...',50);
+    saveLocal();
+    await seedSheets();
+    setTimeout(hideLoading,400);
   } else {
-    // First run or offline — save initial data locally + seed Sheets
-    showLoading('Primeira execução...','Salvando dados iniciais...', 50);
-    saveLocal();
-    seedSheets(); // non-blocking
+    // Sheets indisponível — fallback localStorage
+    const fromLocal=loadLocal();
+    setSyncStatus(fromLocal?'⚠️ Sheets offline — dados locais':'⚠️ Offline — dados iniciais',false);
+    setTimeout(hideLoading,300);
   }
-  setTimeout(hideLoading, 400);
 }
 
 // ── afterSave: mostra barra de salvar (ação manual) ────────────
@@ -1794,15 +1791,16 @@ function exportAprovadasCSV(){
 function buildMesesMap(){
   const mm={};
   const ANO=anoSelecionado;
+  const STATUS_OK=['Validado','Comunicado'];
   colaboradores.forEach(c=>{
     const f=calcFin(c);
-    // Only include payments that fall within selected year
-    if(f.p1!==null && f.p1.startsWith(ANO+'')){
+    // Only include VALIDATED/COMMUNICATED payments within selected year
+    if(f.p1!==null && f.p1.startsWith(ANO+'') && STATUS_OK.includes(c.statusP1)){
       if(!mm[f.m1])mm[f.m1]={q:0,s:0,t3:0,tot:0,colabs:[]};
       mm[f.m1].q++;mm[f.m1].s+=c.salario;mm[f.m1].t3+=f.t;mm[f.m1].tot+=f.tot;
       mm[f.m1].colabs.push({c,periodo:"P1",pgto:f.p1});
     }
-    if(f.p2!==null && f.p2.startsWith(ANO+'')){
+    if(f.p2!==null && f.p2.startsWith(ANO+'') && STATUS_OK.includes(c.statusP2)){
       if(!mm[f.m2])mm[f.m2]={q:0,s:0,t3:0,tot:0,colabs:[]};
       mm[f.m2].q++;mm[f.m2].s+=c.salario;mm[f.m2].t3+=f.t;mm[f.m2].tot+=f.tot;
       mm[f.m2].colabs.push({c,periodo:"P2",pgto:f.p2});
@@ -4462,6 +4460,27 @@ const _origRenderAlertas = renderAlertas;
 
 
 
+
+
+// ── ATUALIZAR SEM DESLOGAR ────────────────────────────────────
+async function refreshApp(){
+  const btn = document.getElementById('btnRefresh');
+  if(btn){ btn.style.opacity='.4'; btn.style.pointerEvents='none'; }
+  setSyncStatus('⏳ Atualizando...', true);
+  // Reload from Sheets if DP, otherwise from localStorage
+  if(currentRole==='dp'){
+    const result = await fetchFromSheets();
+    if(result===true){ saveLocal(); setSyncStatus('✅ Dados atualizados', true); }
+    else { loadLocal(); setSyncStatus('⚠️ Sheets indisponível — dados locais', false); }
+  } else {
+    loadLocal();
+    setSyncStatus('✅ Dados atualizados', true);
+  }
+  // Re-render current active tab
+  const activeTab = document.querySelector('.nav-tab.active');
+  if(activeTab) switchTab(activeTab.dataset.tab);
+  if(btn){ btn.style.opacity='1'; btn.style.pointerEvents=''; }
+}
 
 // ── RESET CACHE ───────────────────────────────────────────────
 function resetCache(){
