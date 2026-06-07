@@ -3,9 +3,5 @@
     "api/sheets.js": {
       "runtime": "@vercel/node"
     }
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  }
 }
-
