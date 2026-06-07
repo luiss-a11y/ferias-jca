@@ -4150,35 +4150,44 @@ function gerarPainelDiretoria(){
 // ── EQUILÍBRIO NO FLUXO DE VALIDAÇÃO ─────────────────────────
 
 function calcImpactoMes(colab){
-  // Calculates financial impact of approving this collaborator's vacation
-  // Returns info for P1 and P2 months
   if(!colab.p1ini) return null;
-  const mm  = buildMesesMap();
-  const eq  = calcEquilibrio();
-  const f   = calcFin(colab);
+  const eq = calcEquilibrio();
+  const f  = calcFin(colab);
+
+  // "Atual" = only APPROVED/COMUNICADO payments in the month (excluding this colab)
+  // "Com aprovação" = atual + this colab's payment
+  function calcAprovadosMes(mIdx){
+    if(mIdx<0) return 0;
+    return colaboradores
+      .filter(c => c.id !== colab.id && ['Validado','Comunicado'].includes(c.statusP1))
+      .reduce((acc, c) => {
+        const fc = calcFin(c);
+        const ANO = anoSelecionado;
+        if(fc.p1 && fc.p1.startsWith(ANO+'') && parseInt(fc.p1.split('-')[1])-1 === mIdx)
+          acc += fc.tot;
+        if(fc.p2 && fc.p2.startsWith(ANO+'') && parseInt(fc.p2.split('-')[1])-1 === mIdx)
+          acc += fc.tot;
+        return acc;
+      }, 0);
+  }
 
   function analisarMes(mIdx, valor){
     if(mIdx<0) return null;
-    const atual   = (mm[mIdx]||{tot:0}).tot;
-    // Exclude this collaborator if already counted
-    const jaContado = (mm[mIdx]||{colabs:[]}).colabs.some(x=>x.c.id===colab.id);
-    const base    = jaContado ? atual : atual;
-    const comAprov= jaContado ? atual : atual + valor;
-    const pctAtual= ((base/eq.media)-1)*100;
-    const pctDepois=((comAprov/eq.media)-1)*100;
-    const ultrapassa = comAprov > eq.limite;
-    const jaUltrapassa = base > eq.limite;
+    const base     = calcAprovadosMes(mIdx);      // só aprovados, sem este colab
+    const comAprov = base + valor;                 // com este colab aprovado
+    const pctAtual  = ((base/eq.media)-1)*100;
+    const pctDepois = ((comAprov/eq.media)-1)*100;
     return{
       mes: mIdx,
       mesNome: MESES_NOME[mIdx],
       valorAtual: base,
       valorDepois: comAprov,
       valorColaborador: valor,
-      pctAtual: Math.round(pctAtual),
+      pctAtual:  Math.round(pctAtual),
       pctDepois: Math.round(pctDepois),
-      ultrapassa,
-      jaUltrapassa,
-      media: eq.media,
+      ultrapassa:   comAprov > eq.limite,
+      jaUltrapassa: base     > eq.limite,
+      media:  eq.media,
       limite: eq.limite,
     };
   }
