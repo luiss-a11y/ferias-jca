@@ -1262,26 +1262,42 @@ function rowToColab(row){
 // ── Fetch from Sheets ─────────────────────────────────
 async function fetchFromSheets(){
   try{
-    const res  = await fetch(SHEETS_URL, {redirect:'follow'});
-    const data = await res.json();
+    // Timeout de 8 segundos
+    const controller = new AbortController();
+    const timeout = setTimeout(()=>controller.abort(), 8000);
+    const res = await fetch(SHEETS_URL, {redirect:'follow', signal:controller.signal});
+    clearTimeout(timeout);
+
+    const text = await res.text();
+    let data;
+    try{ data = JSON.parse(text); }
+    catch(e){
+      console.warn('Sheets retornou resposta inválida:', text.substring(0,200));
+      return null;
+    }
+
     if(Array.isArray(data) && data.length>0){
       const parsed = data.map(rowToColab).filter(c=>c&&c.id>0&&c.nome);
       if(parsed.length >= COLABORADORES_INICIAL.length * 0.5){
-        // Merge: keep initial base data, overlay Sheets data (dates, status etc.)
         colaboradores = COLABORADORES_INICIAL.map(base=>{
           const fromSheet = parsed.find(s=>s.id===base.id);
-          return fromSheet ? {...base, ...fromSheet} : base;
+          return fromSheet ? {...base,...fromSheet} : base;
         });
-        // Add any extra rows from sheet not in initial
         parsed.filter(s=>!COLABORADORES_INICIAL.find(b=>b.id===s.id))
               .forEach(s=>colaboradores.push(s));
         return true;
       }
+      return false;
     }
-    return false; // empty or too few rows — seed it
+    return false;
   }catch(e){
-    console.warn('Sheets fetch error:', e);
-    return null; // error — use in-memory
+    if(e.name==='AbortError'){
+      console.warn('Sheets timeout — usando dados locais');
+      setSyncStatus('⚠️ Sheets demorou — dados locais',false);
+    } else {
+      console.warn('Sheets fetch error:',e.message);
+    }
+    return null;
   }
 }
 
@@ -1385,9 +1401,19 @@ async function initSheets(){
     await seedSheets();
     setTimeout(hideLoading,400);
   } else {
-    // Sheets indisponível — fallback localStorage
-    const fromLocal=loadLocal();
-    setSyncStatus(fromLocal?'⚠️ Sheets offline — dados locais':'⚠️ Offline — dados iniciais',false);
+    // Sheets indisponível — fallback localStorage silencioso
+    const fromLocal = loadLocal();
+    if(fromLocal){
+      setSyncStatus('⚠️ Sheets offline — reconectando...',false);
+      // Retry once after 3 seconds
+      setTimeout(async()=>{
+        const retry = await fetchFromSheets();
+        if(retry===true){ saveLocal(); setSyncStatus('✅ Sheets reconectado',true); renderCurrentTab(); }
+        else setSyncStatus('⚠️ Sheets offline — dados locais',false);
+      }, 3000);
+    } else {
+      setSyncStatus('⚠️ Sem conexão — dados iniciais',false);
+    }
     setTimeout(hideLoading,300);
   }
 }
@@ -4285,6 +4311,7 @@ function renderEquilibrioWarn(colab){
         </div>
         <div style="font-size:11px;color:var(--muted)">Limite mensal: <strong>${fmtBRL(alertas[0].limite)}</strong> (provisão média + 10%)</div>
         ${detalhes}
+        ${temAlerta ? sugestoesHtml(colab, f.tot, alertas[0].limite, alertas[0].media) : ''}
       </div>
     </div>
   </div>`;
@@ -4463,6 +4490,10 @@ const _origRenderAlertas = renderAlertas;
 
 
 // ── ATUALIZAR SEM DESLOGAR ────────────────────────────────────
+async function renderCurrentTab(){
+  const activeTab=document.querySelector('.nav-tab.active');
+  if(activeTab) switchTab(activeTab.dataset.tab);
+}
 async function refreshApp(){
   const btn = document.getElementById('btnRefresh');
   if(btn){ btn.style.opacity='.4'; btn.style.pointerEvents='none'; }
