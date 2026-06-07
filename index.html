@@ -1263,9 +1263,13 @@ function rowToColab(row){
 async function fetchFromSheets(){
   try{
     // Timeout de 8 segundos
+    // Google Apps Script CORS fix: use no redirect option
     const controller = new AbortController();
-    const timeout = setTimeout(()=>controller.abort(), 8000);
-    const res = await fetch(SHEETS_URL, {redirect:'follow', signal:controller.signal});
+    const timeout = setTimeout(()=>controller.abort(), 10000);
+    const res = await fetch(SHEETS_URL, {
+      method: 'GET',
+      signal: controller.signal,
+    });
     clearTimeout(timeout);
 
     const text = await res.text();
@@ -4223,6 +4227,57 @@ function calcImpactoMes(colab){
     p2: colab.p2ini ? analisarMes(m2, f.tot) : null,
     totalFerias: f.tot * (colab.p2ini?2:1),
   };
+}
+
+
+
+// ── SUGESTÕES DE MESES ALTERNATIVOS ──────────────────────────
+function sugestoesHtml(colab, custoP1, limite, media){
+  const ANO = anoSelecionado;
+  const STATUS_OK = ['Validado','Comunicado'];
+
+  const mesAnalise = MESES_NOME.map((nome,m)=>{
+    const aprovado = colaboradores
+      .filter(c=>c.id!==colab.id&&STATUS_OK.includes(c.statusP1))
+      .reduce((acc,c)=>{
+        const fc=calcFin(c);
+        if(fc.p1&&fc.p1.startsWith(ANO+'')&&parseInt(fc.p1.split('-')[1])-1===m) acc+=fc.tot;
+        if(fc.p2&&fc.p2.startsWith(ANO+'')&&parseInt(fc.p2.split('-')[1])-1===m) acc+=fc.tot;
+        return acc;
+      },0);
+    const comColab = aprovado + custoP1;
+    const saldo    = limite - comColab;
+    const pct      = Math.round((comColab/media-1)*100);
+    return{m,nome,aprovado,comColab,saldo,pct,ok:comColab<=limite};
+  });
+
+  const sugestoes = mesAnalise.filter(s=>s.ok).sort((a,b)=>b.saldo-a.saldo);
+
+  if(!sugestoes.length) return `
+    <div style="margin-top:12px;background:rgba(255,255,255,.5);border-radius:8px;padding:10px 14px">
+      <div style="font-size:12px;font-weight:700;color:#B71C1C;margin-bottom:4px">⛔ Nenhum mês disponível</div>
+      <div style="font-size:11px;color:var(--muted)">Todos os meses de ${ANO} estão no limite. Considere redistribuir outros colaboradores.</div>
+    </div>`;
+
+  const rows = sugestoes.slice(0,4).map(s=>{
+    const cor  = s.saldo>limite*0.3?'#1B5E20':'#E65100';
+    const icon = s.saldo>limite*0.3?'🟢':'🟡';
+    const pctTxt = s.pct>0?`+${s.pct}%`:s.pct<0?`${s.pct}%`:'na média';
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span>${icon}</span>
+        <span style="font-weight:600;font-size:12px;color:var(--navy)">${s.nome}</span>
+        <span style="font-size:11px;color:var(--muted)">${pctTxt} sobre a média</span>
+      </div>
+      <span style="font-size:12px;font-weight:700;color:${cor}">+R$ ${Math.round(s.saldo).toLocaleString('pt-BR')} de saldo</span>
+    </div>`;
+  }).join('');
+
+  return`<div style="margin-top:12px;background:rgba(255,255,255,.6);border-radius:8px;padding:12px 14px">
+    <div style="font-size:12px;font-weight:700;color:#1B5E20;margin-bottom:8px">✅ Meses com saldo disponível para este colaborador</div>
+    ${rows}
+    ${sugestoes.length>4?`<div style="font-size:11px;color:var(--muted);margin-top:6px">+${sugestoes.length-4} outros meses disponíveis</div>`:''}
+  </div>`;
 }
 
 function renderEquilibrioWarn(colab){
