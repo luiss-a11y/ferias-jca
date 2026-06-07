@@ -4251,13 +4251,28 @@ function renderEquilibrioWarn(colab){
     </div>`;
   }).join('');
 
+  // Build clear summary sentence
+  const nomeFirst = colab.nome.split(' ')[0];
+  const sumLines = alertas.map(p=>{
+    const pct = Math.abs(Math.round(p.pctDepois));
+    const sentido = p.pctDepois>=0?'acima':'abaixo';
+    const emoji = p.ultrapassa?'🔴':p.pctDepois>0?'🟡':'✅';
+    return `${emoji} <strong>${MESES_NOME[p.mes]}:</strong> vai para <strong>${fmtBRL(p.valorDepois)}</strong> — ${pct}% ${sentido} da média`;
+  }).join('<br>');
+
   el.style.display='block';
   el.innerHTML=`<div style="background:${bgCor};border:1.5px solid ${bdCor};border-left:4px solid ${cor};border-radius:8px;padding:14px 16px">
     <div style="display:flex;align-items:flex-start;gap:10px">
       <span style="font-size:20px;flex-shrink:0">${icon}</span>
       <div style="flex:1">
-        <div style="font-weight:700;color:${cor};font-size:13px;margin-bottom:2px">${titulo}</div>
-        <div style="font-size:12px;color:var(--muted)">Custo desta aprovação: <strong>${fmtBRL(impacto.totalFerias)}</strong> · Limite mensal: <strong>${fmtBRL(alertas[0].limite)}</strong></div>
+        <div style="font-weight:700;color:${cor};font-size:13px;margin-bottom:6px">${titulo}</div>
+        <!-- Summary sentence -->
+        <div style="background:rgba(255,255,255,.6);border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;line-height:1.8">
+          Validar <strong>${nomeFirst}</strong>
+          (salário <strong>${fmtBRL(colab.salario)}</strong> · férias <strong>${fmtBRL(impacto.totalFerias)}</strong>)<br>
+          ${sumLines}
+        </div>
+        <div style="font-size:11px;color:var(--muted)">Limite mensal: <strong>${fmtBRL(alertas[0].limite)}</strong> (provisão média + 10%)</div>
         ${detalhes}
       </div>
     </div>
@@ -4312,7 +4327,63 @@ function renderEquilibrio(){
   const el = document.getElementById('equilibrioMeses');
   if(!el) return;
   const maxVal = Math.max(...mesesAlerta.map(m=>m.tot), limite*1.1);
-  el.innerHTML = mesesAlerta.length ? mesesAlerta.map(m=>{
+  // Ranked collaborators by financial impact potential
+  const ranked = colaboradores
+    .filter(c=>c.p1ini)
+    .map(c=>{
+      const imp = calcImpactoMes(c);
+      if(!imp) return null;
+      const checks = [imp.p1,imp.p2].filter(Boolean);
+      const maxOver = Math.max(...checks.map(p=>p.valorColaborador));
+      const temAlerta = checks.some(p=>p.ultrapassa);
+      const temWarn   = checks.some(p=>p.pctDepois>0&&!p.ultrapassa);
+      return{c, imp, maxOver, temAlerta, temWarn, nivel: temAlerta?2:temWarn?1:0};
+    })
+    .filter(Boolean)
+    .sort((a,b)=>b.maxOver-a.maxOver);
+
+  const rankEl = document.createElement('div');
+  rankEl.style.cssText='margin-bottom:20px';
+  rankEl.innerHTML=`
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">
+      📋 Colaboradores por Impacto Financeiro Potencial
+    </div>
+    <div style="overflow-x:auto"><table style="width:100%;font-size:11px;border-collapse:collapse">
+      <thead><tr style="background:var(--navy);color:white">
+        <th style="padding:7px 10px;text-align:left">#</th>
+        <th style="padding:7px 10px;text-align:left">Colaborador</th>
+        <th style="padding:7px 10px;text-align:left">Departamento</th>
+        <th style="padding:7px 10px;text-align:right">Salário</th>
+        <th style="padding:7px 10px;text-align:right">Custo Férias</th>
+        <th style="padding:7px 10px;text-align:left">Mês P1</th>
+        <th style="padding:7px 10px;text-align:left">Mês P2</th>
+        <th style="padding:7px 10px;text-align:center">Impacto</th>
+      </tr></thead>
+      <tbody>${ranked.map((r,i)=>{
+        const f=calcFin(r.c);
+        const badge=r.temAlerta
+          ?`<span style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">🔴 Acima limite</span>`
+          :r.temWarn
+            ?`<span style="background:#FFF8E1;color:#F57F17;border:1px solid #FFE082;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">🟡 Acima média</span>`
+            :`<span style="background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">✅ OK</span>`;
+        const p1mes=r.imp.p1?MESES_NOME[r.imp.p1.mes]:'—';
+        const p2mes=r.imp.p2?MESES_NOME[r.imp.p2.mes]:'—';
+        return`<tr style="${i%2===0?'background:#F8FAFF':''}">
+          <td style="padding:6px 10px;color:var(--muted);font-weight:700">${i+1}º</td>
+          <td style="padding:6px 10px;font-weight:600;color:var(--navy)">${r.c.nome}</td>
+          <td style="padding:6px 10px">${deptBadge(r.c.dept)}</td>
+          <td style="padding:6px 10px;text-align:right;font-family:monospace">${fmtBRL(r.c.salario)}</td>
+          <td style="padding:6px 10px;text-align:right;font-weight:700;color:#1B5E20;font-family:monospace">${fmtBRL(f.tot*2)}</td>
+          <td style="padding:6px 10px">${p1mes}</td>
+          <td style="padding:6px 10px">${p2mes}</td>
+          <td style="padding:6px 10px;text-align:center">${badge}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+  el.insertBefore(rankEl, el.firstChild);
+
+  // append month bars
+  const monthBarsHtml = mesesAlerta.length ? mesesAlerta.map(m=>{
     const barW    = Math.round((m.tot/maxVal)*100);
     const limW    = Math.round((m.limite/maxVal)*100);
     const medW    = Math.round((m.media/maxVal)*100);
@@ -4362,6 +4433,11 @@ function renderEquilibrio(){
   `<div style="background:#E8F5E9;border:1px solid #A5D6A7;border-radius:8px;padding:16px;text-align:center;color:#1B5E20;font-weight:600">
     ✅ Nenhum mês com pagamento indicado ainda — equilíbrio OK.
   </div>`;
+
+  // Append month bars section
+  const monthDiv = document.createElement('div');
+  monthDiv.innerHTML = monthBarsHtml;
+  el.appendChild(monthDiv);
 }
 
 // ── PATCH renderAlertas to include equilibrio ─────────────────
