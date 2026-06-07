@@ -649,7 +649,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
         <div class="table-wrap">
           <div class="table-header"><span class="table-title" id="finDeptDetTitle">Detalhamento Individual</span></div>
           <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
-            <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th><th>Total Férias</th><th>Período</th><th>Data Pagamento</th>
+            <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th><th>Total/Período (15d)</th><th>Período</th><th>Data Pagamento</th>
           </tr></thead><tbody id="finDeptDetBody"></tbody></table></div>
         </div>
       </div>
@@ -672,7 +672,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
           </div>
           <div class="filter-row" id="finFilters"></div>
           <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
-            <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th><th>Total Férias</th>
+            <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th><th>Total/Período (15d)</th>
             <th>P1 Início</th><th>Data Pgto P1</th><th>Mês Pgto P1</th>
             <th>P2 Início</th><th>Data Pgto P2</th><th>Mês Pgto P2</th><th>Provisão/Mês</th>
           </tr></thead><tbody id="finBody"></tbody></table></div>
@@ -753,7 +753,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
           <div class="filter-row" id="provColabFilters"></div>
           <div class="table-scroll-hint">Deslize para ver mais</div><div style="overflow-x:auto"><table><thead><tr>
             <th>Colaborador</th><th>Departamento</th><th>Salário</th><th>1/3</th>
-            <th>Total Férias</th><th>Provisão/Mês</th><th>Provisão Anual</th>
+            <th>Total/Período (15d)</th><th>Provisão/Mês</th><th>Provisão Anual</th>
             <th>P1 Início</th><th>Data Pgto P1</th><th>P2 Início</th><th>Data Pgto P2</th>
             <th>Total Pgto Previsto</th>
           </tr></thead><tbody id="provColabBody"></tbody></table></div>
@@ -1938,7 +1938,7 @@ function renderFinBody(src){
   </tr>`;}).join("");
 }
 function exportFinCSV(){
-  const rows=[["Nome","Departamento","Salário","1/3","Total Férias","P1 Início","Data Pgto P1","Mês P1","P2 Início","Data Pgto P2","Mês P2","Provisão/Mês"]];
+  const rows=[["Nome","Departamento","Salário","1/3","Total/Período (15d)","P1 Início","Data Pgto P1","Mês P1","P2 Início","Data Pgto P2","Mês P2","Provisão/Mês"]];
   colaboradores.forEach(c=>{const f=calcFin(c);rows.push([c.nome,c.dept,c.salario.toFixed(2),f.t.toFixed(2),f.tot.toFixed(2),fmtDate(c.p1ini),f.p1?fmtDate(f.p1):"—",f.p1?MESES_CURTO[f.m1]:"—",fmtDate(c.p2ini),f.p2?fmtDate(f.p2):"—",f.p2?MESES_CURTO[f.m2]:"—",f.prov.toFixed(2)]);});
   const csv=rows.map(r=>r.join(";")).join("\n");const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);a.download="financeiro_2027.csv";a.click();showToast("CSV exportado!","success");
 }
@@ -2171,7 +2171,7 @@ function exportProvCSV() {
   }
   rows.push([]);
   rows.push(['=== DETALHAMENTO POR COLABORADOR ===']);
-  rows.push(['Nome','Departamento','Salário','1/3','Total Férias','Provisão/Mês','Provisão Anual','P1 Início','Data Pgto P1','P2 Início','Data Pgto P2','Total Pgto Previsto']);
+  rows.push(['Nome','Departamento','Salário','1/3','Total/Período (15d)','Provisão/Mês','Provisão Anual','P1 Início','Data Pgto P1','P2 Início','Data Pgto P2','Total Pgto Previsto']);
   colaboradores.forEach(c=>{
     const f=calcFin(c);const pgto=(c.p1ini?f.tot:0)+(c.p2ini?f.tot:0);
     rows.push([c.nome,c.dept,c.salario.toFixed(2),f.t.toFixed(2),f.tot.toFixed(2),f.prov.toFixed(2),(f.prov*12).toFixed(2),fmtDate(c.p1ini),f.p1?fmtDate(f.p1):'—',fmtDate(c.p2ini),f.p2?fmtDate(f.p2):'—',pgto>0?pgto.toFixed(2):'—']);
@@ -3824,7 +3824,7 @@ function gerarRelatorioFinanceiro(){
 <table>
   <thead><tr>
     <th>Nome</th><th>Departamento</th><th>Salário Base</th><th>1/3 Constit.</th>
-    <th>Total Férias</th><th>1º Período</th><th>2º Período</th>
+    <th>Total/Período (15d)</th><th>1º Período</th><th>2º Período</th>
     <th>Total a Pagar</th><th>Data Pgto P1</th><th>Status</th>
   </tr></thead>
   <tbody>${detalheRows}</tbody>
@@ -4253,6 +4253,8 @@ function renderEquilibrioWarn(colab){
 
   // Build clear summary sentence
   const nomeFirst = colab.nome.split(' ')[0];
+  const f = calcFin(colab);
+  const nPeriodos = colab.p2ini ? 2 : 1;
   const sumLines = alertas.map(p=>{
     const pct = Math.abs(Math.round(p.pctDepois));
     const sentido = p.pctDepois>=0?'acima':'abaixo';
@@ -4269,8 +4271,10 @@ function renderEquilibrioWarn(colab){
         <!-- Summary sentence -->
         <div style="background:rgba(255,255,255,.6);border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;line-height:1.8">
           Validar <strong>${nomeFirst}</strong>
-          (salário <strong>${fmtBRL(colab.salario)}</strong> · férias <strong>${fmtBRL(impacto.totalFerias)}</strong>)<br>
-          ${sumLines}
+          · Salário: <strong>${fmtBRL(colab.salario)}</strong>
+          · <strong>${nPeriodos}x</strong> período${nPeriodos>1?'s':''} de 15 dias
+          · <strong>${fmtBRL(f.tot)}</strong>/período${nPeriodos>1?` (total: ${fmtBRL(impacto.totalFerias)})`:''}
+          <br>${sumLines}
         </div>
         <div style="font-size:11px;color:var(--muted)">Limite mensal: <strong>${fmtBRL(alertas[0].limite)}</strong> (provisão média + 10%)</div>
         ${detalhes}
@@ -4354,7 +4358,7 @@ function renderEquilibrio(){
         <th style="padding:7px 10px;text-align:left">Colaborador</th>
         <th style="padding:7px 10px;text-align:left">Departamento</th>
         <th style="padding:7px 10px;text-align:right">Salário</th>
-        <th style="padding:7px 10px;text-align:right">Custo Férias</th>
+        <th style="padding:7px 10px;text-align:right">Custo/Período</th><th style="padding:7px 10px;text-align:right">Total (P1+P2)</th>
         <th style="padding:7px 10px;text-align:left">Mês P1</th>
         <th style="padding:7px 10px;text-align:left">Mês P2</th>
         <th style="padding:7px 10px;text-align:center">Impacto</th>
@@ -4373,7 +4377,7 @@ function renderEquilibrio(){
           <td style="padding:6px 10px;font-weight:600;color:var(--navy)">${r.c.nome}</td>
           <td style="padding:6px 10px">${deptBadge(r.c.dept)}</td>
           <td style="padding:6px 10px;text-align:right;font-family:monospace">${fmtBRL(r.c.salario)}</td>
-          <td style="padding:6px 10px;text-align:right;font-weight:700;color:#1B5E20;font-family:monospace">${fmtBRL(f.tot*2)}</td>
+          <td style="padding:6px 10px;text-align:right;font-family:monospace">${fmtBRL(f.tot)}</td><td style="padding:6px 10px;text-align:right;font-weight:700;color:#1B5E20;font-family:monospace">${fmtBRL(f.tot*(r.c.p2ini?2:1))}</td>
           <td style="padding:6px 10px">${p1mes}</td>
           <td style="padding:6px 10px">${p2mes}</td>
           <td style="padding:6px 10px;text-align:center">${badge}</td>
