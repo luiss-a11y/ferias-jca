@@ -1268,6 +1268,7 @@ async function fetchFromSheets(){
     const timeout = setTimeout(()=>controller.abort(), 10000);
     const res = await fetch(SHEETS_URL, {
       method: 'GET',
+      redirect: 'follow',
       signal: controller.signal,
     });
     clearTimeout(timeout);
@@ -1315,7 +1316,6 @@ async function syncToSheets(){
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {'Content-Type':'text/plain'},
-      redirect: 'follow',
     });
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json().catch(()=>({}));
