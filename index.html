@@ -430,7 +430,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
       <span class="role-badge" id="roleBadge">—</span>
       <span id="syncStatus" style="font-size:12px;font-weight:600;color:var(--accent-light);display:none;padding:4px 10px;background:rgba(255,255,255,.08);border-radius:6px"></span>
       <button onclick="refreshApp()" title="Atualizar dados" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px;line-height:1" id="btnRefresh">↺</button>
-      <button id="btnReset" onclick="resetCache()" style="display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer" title="Limpar cache e recarregar dados">↺ Reset</button>
+      
       <button class="btn btn-outline btn-sm" onclick="doLogout()" id="btnSair">Sair</button>
       <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -1261,51 +1261,23 @@ function rowToColab(row){
 }
 
 // ── Fetch from Sheets ─────────────────────────────────
-async function fetchFromSheets(){
-  try{
-    // Try Apps Script URL directly (works when CORS is configured)
-    const controller = new AbortController();
-    const timeout = setTimeout(()=>controller.abort(), 10000);
-    const res = await fetch(SHEETS_URL, {redirect:'follow', signal: controller.signal});
-    clearTimeout(timeout);
-    const text = await res.text();
-
-    // Try parsing as direct JSON array first (Apps Script doGet response)
-    let data = null;
-    try{
-      data = JSON.parse(text);
-    }catch(e){
-      // Try gviz format: google.visualization.Query.setResponse({...});
-      try{
-        const marker = 'setResponse(';
-        const start  = text.indexOf(marker);
-        if(start !== -1){
-          // Find the matching closing ) by counting brackets
-          let depth=0, i=start+marker.length, begin=i;
-          for(;i<text.length;i++){
-            if(text[i]==='{') depth++;
-            else if(text[i]==='}'){depth--;if(depth===0){i++;break;}}
-          }
-          data = JSON.parse(text.slice(begin, i));
-          // gviz wraps in table object
-          if(data.table){
-            const cols = data.table.cols.map(c=>c.label||c.id);
-            const rows = (data.table.rows||[]).map(row=>{
-              const obj={};
-              cols.forEach((col,ci)=>{
-                const cell=row.c?row.c[ci]:null;
-                obj[col]=cell?(cell.v!==null&&cell.v!==undefined?String(cell.v):''):'';
-              });
-              return obj;
-            });
-            data = rows;
-          }
-        }
-      }catch(e2){ console.warn('gviz parse error:', e2.message); }
+function fetchFromSheets(){
+  return new Promise((resolve)=>{
+    const cbName='jca_cb_'+Date.now();
+    const script=document.createElement('script');
+    const timer=setTimeout(()=>{
+      cleanup();
+      setSyncStatus('⚠️ Sheets demorou — dados locais',false);
+      resolve(null);
+    },10000);
+    function cleanup(){
+      clearTimeout(timer);delete window[cbName];
+      if(script.parentNode)script.parentNode.removeChild(script);
     }
-
-    if(Array.isArray(data) && data.length>0){
-      const parsed = data.map(rowToColab).filter(c=>c&&c.id>0&&c.nome);
+    window[cbName]=function(data){
+      cleanup();
+      if(!Array.isArray(data)||data.length===0){resolve(false);return;}
+      const parsed=data.map(rowToColab).filter(c=>c&&c.id>0&&c.nome);
       if(parsed.length>=COLABORADORES_INICIAL.length*0.5){
         colaboradores=COLABORADORES_INICIAL.map(base=>{
           const s=parsed.find(x=>x.id===base.id);
@@ -1313,21 +1285,15 @@ async function fetchFromSheets(){
         });
         parsed.filter(s=>!COLABORADORES_INICIAL.find(b=>b.id===s.id))
               .forEach(s=>colaboradores.push(s));
-        console.log('Sheets carregado:', colaboradores.length, 'colaboradores');
-        return true;
-      }
-    }
-    console.log('Sheets vazio ou insuficiente:', data);
-    return false;
-  }catch(e){
-    if(e.name==='AbortError') setSyncStatus('⚠️ Sheets demorou — dados locais',false);
-    else console.warn('Sheets fetch error:',e.message);
-    return null;
-  }
+        console.log('Sheets carregado:',colaboradores.length,'colaboradores');
+        resolve(true);
+      } else resolve(false);
+    };
+    script.onerror=()=>{cleanup();resolve(null);};
+    script.src=SHEETS_URL+'?callback='+cbName+'&t='+Date.now();
+    document.body.appendChild(script);
+  });
 }
-
-// ── Save to Sheets ────────────────────────────────────
-
 async function syncToSheets(){
   setSyncStatus('⏳ Salvando no Sheets...', true);
   try{
@@ -1435,13 +1401,7 @@ async function initSheets(){
     if(!fromLocal) saveLocal(); // salva estado inicial localmente
     setSyncStatus('⚠️ Planilha vazia — clique em ↺ para popular', false);
     setTimeout(hideLoading,300);
-    // Show populate button
-    const btn=document.getElementById('btnReset');
-    if(btn){
-      btn.textContent='↺ Popular Planilha';
-      btn.title='Popular planilha com dados atuais';
-      btn.style.display='inline-block';
-    }
+
   } else {
     // Sheets indisponível — fallback localStorage silencioso
     const fromLocal = loadLocal();
@@ -4943,6 +4903,7 @@ handleResize();
 
 document.querySelectorAll(".modal-overlay").forEach(o=>{o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("open");});});
 calYear=2027;calMonth=0;
+
 </script>
 </body>
 </html>
