@@ -1,35 +1,57 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylA5iNA-7w7adP-qPhw1TEnlfCpTP2AZzCS6JAZMmL4R4XEJynvu0lPQEqJScbE23H/exec';
 
 export default async function handler(req, res) {
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.status(200).end();
+    return;
   }
 
   try {
     if (req.method === 'GET') {
-      const response = await fetch(APPS_SCRIPT_URL, { redirect: 'follow' });
-      const text = await response.text();
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(200).send(text);
-    }
-
-    if (req.method === 'POST') {
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify(req.body),
-        headers: { 'Content-Type': 'text/plain' },
+      const upstream = await fetch(APPS_SCRIPT_URL, {
+        method: 'GET',
         redirect: 'follow',
       });
-      const text = await response.text();
+      const text = await upstream.text();
       res.setHeader('Content-Type', 'application/json');
-      return res.status(200).send(text);
+      res.status(200).send(text);
+
+    } else if (req.method === 'POST') {
+      // Lê body manualmente (bodyParser está desabilitado)
+      const rawBody = await new Promise((resolve, reject) => {
+        let chunks = '';
+        req.on('data', chunk => { chunks += chunk.toString(); });
+        req.on('end', () => resolve(chunks));
+        req.on('error', reject);
+      });
+
+      const upstream = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: rawBody,
+        redirect: 'follow',
+      });
+      const text = await upstream.text();
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).send(text);
+
+    } else {
+      res.status(405).json({ error: 'Method not allowed' });
     }
-  } catch (e) {
-    return res.status(500).json({ error: e.message });
+  } catch (err) {
+    console.error('Proxy error:', err);
+    res.status(500).json({ error: err.message });
   }
 }
 
+// CRÍTICO: desabilita o bodyParser automático do Vercel
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
