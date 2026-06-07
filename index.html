@@ -334,6 +334,8 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   margin:16px;
   box-shadow:0 8px 40px rgba(0,0,0,.5);
   animation:saveCardIn .2s ease;
+  position:relative;
+  z-index:9999;
 }
 @keyframes saveCardIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
 .savebar-dot{width:12px;height:12px;background:#F59E0B;border-radius:50%;animation:pulse 1s ease-in-out infinite;flex-shrink:0}
@@ -4626,7 +4628,7 @@ function submitValidar(){
   showToast(sP1==="Validado"?"✅ Validado!":sP1==="Recusado"?"❌ Recusa registrada":"Atualizado!",sP1==="Validado"?"success":sP1==="Recusado"?"error":"");
   if(document.getElementById("painelCards"))renderPainel();if(document.getElementById("validarCount"))renderValidar();
   if(sP1==="Validado"||sP1==="Comunicado"&&document.getElementById("aprovadasCount"))renderAprovadas();
-  updateNavBadges();afterSave();
+  updateNavBadges();afterSave(sP1==="Validado"?"Validação pendente de salvar":sP1==="Recusado"?"Recusa pendente de salvar":"Atualização pendente de salvar","Clique em Salvar para confirmar no servidor");
 }
 
 // ── UTILS ────────────────────────────────────────────────────
