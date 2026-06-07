@@ -1680,8 +1680,10 @@ function renderPainelBody(q=""){
   document.getElementById("painelBody").innerHTML=src.map(c=>{const _nl=getNivelLabel(getNivel(c));return`<tr class="${_nl.rowCls}">
     <td><div class="td-name">${c.nome}</div></td><td>${deptBadge(c.dept)}</td>
     <td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
-    <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
-    <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
+    <td class="td-mono" style="background:#EBF5FF;border-left:3px solid #90CAF9">${fmtDate(c.p1ini)}</td>
+    <td class="td-mono" style="background:#EBF5FF;border-right:3px solid #90CAF9">${fmtDate(c.p1fim)}</td>
+    <td class="td-mono" style="background:#E8F5E9;border-left:3px solid #A5D6A7">${fmtDate(c.p2ini)}</td>
+    <td class="td-mono" style="background:#E8F5E9;border-right:3px solid #A5D6A7">${fmtDate(c.p2fim)}</td>
     <td>${statusBadge(c.statusP1)}</td><td>${c.p2ini?statusBadge(c.statusP2):"<span style='color:var(--muted);font-size:11px'>—</span>"}</td>
     <td><span class="badge badge-gray" style="font-size:10px">${c.situacao}</span></td>
     <td style="display:flex;gap:4px;flex-wrap:wrap">
@@ -1708,8 +1710,10 @@ function renderSetorBody(list){
   document.getElementById("setorBody").innerHTML=list.map(c=>`<tr>
     <td><div class="td-name">${c.nome}</div></td><td>${deptBadge(c.dept)}</td>
     <td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
-    <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
-    <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
+    <td class="td-mono" style="background:#EBF5FF;border-left:3px solid #90CAF9">${fmtDate(c.p1ini)}</td>
+    <td class="td-mono" style="background:#EBF5FF;border-right:3px solid #90CAF9">${fmtDate(c.p1fim)}</td>
+    <td class="td-mono" style="background:#E8F5E9;border-left:3px solid #A5D6A7">${fmtDate(c.p2ini)}</td>
+    <td class="td-mono" style="background:#E8F5E9;border-right:3px solid #A5D6A7">${fmtDate(c.p2fim)}</td>
     <td>${statusBadge(c.statusP1)}</td><td>${c.p2ini?statusBadge(c.statusP2):"<span style='color:var(--muted);font-size:11px'>—</span>"}</td>
     <td><button class="btn btn-primary btn-sm" onclick="openDatasModal(${c.id})">${c.p1ini?"Editar":"Indicar"}</button></td>
   </tr>`).join("");
@@ -1733,8 +1737,10 @@ function renderValidar(){
     }
     return`<tr>
       <td><div class="td-name">${c.nome}</div></td><td>${deptBadge(c.dept)}</td>
-      <td class="td-mono">${fmtDate(c.p1ini)}</td><td class="td-mono">${fmtDate(c.p1fim)}</td>
-      <td class="td-mono">${fmtDate(c.p2ini)}</td><td class="td-mono">${fmtDate(c.p2fim)}</td>
+      <td class="td-mono" style="background:#EBF5FF;border-left:3px solid #90CAF9">${fmtDate(c.p1ini)}</td>
+      <td class="td-mono" style="background:#EBF5FF;border-right:3px solid #90CAF9">${fmtDate(c.p1fim)}</td>
+      <td class="td-mono" style="background:#E8F5E9;border-left:3px solid #A5D6A7">${fmtDate(c.p2ini)}</td>
+      <td class="td-mono" style="background:#E8F5E9;border-right:3px solid #A5D6A7">${fmtDate(c.p2fim)}</td>
       <td class="td-mono" style="color:${isVencendo(c.conceder)?"#B71C1C":"inherit"};font-weight:${isVencendo(c.conceder)?600:400}">${fmtDate(c.conceder)}</td>
       <td style="text-align:center">${impBadge}</td>
       <td><button class="btn btn-outline btn-sm" onclick="openValidarModal(${c.id})">Analisar</button></td>
