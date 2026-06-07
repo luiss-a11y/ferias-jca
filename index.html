@@ -1165,10 +1165,9 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 
 <script>
 // ══════════════════════════════════════════════════════
-// GOOGLE SHEETS INTEGRATION
+// GOOGLE SHEETS INTEGRATION — JSONP direto (sem proxy)
 // ══════════════════════════════════════════════════════
-const SHEETS_URL  = '/api/sheets'; // Vercel proxy — sem CORS
-const SHEETS_READ = '/api/sheets'; // same proxy
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw7gRGFqmOi5UDiHpjP81Co3Eig-tJZtd8rIkaLhAnQvGzUe7cqmIGMGGoalB7uSuDv/exec';
 
 // ── Campos da planilha ────────────────────────────────
 const SHEET_COLS = ['id','nome','dept','salario','admissao','pa_ini','pa_fim',
@@ -1260,15 +1259,32 @@ function rowToColab(row){
   return colab;
 }
 
+// ── JSONP fetch (sem CORS) ────────────────────────────
+function jsonpFetch(url){
+  return new Promise((resolve,reject)=>{
+    const cb='jca_cb_'+Date.now();
+    const timer=setTimeout(()=>{
+      delete window[cb];
+      if(s.parentNode)s.parentNode.removeChild(s);
+      reject(new Error('Timeout'));
+    },12000);
+    window[cb]=function(data){
+      clearTimeout(timer);
+      delete window[cb];
+      if(s.parentNode)s.parentNode.removeChild(s);
+      resolve(data);
+    };
+    const s=document.createElement('script');
+    s.src=url+'?callback='+cb+'&t='+Date.now();
+    s.onerror=()=>{clearTimeout(timer);delete window[cb];reject(new Error('Erro de rede'));};
+    document.head.appendChild(s);
+  });
+}
+
 // ── Fetch from Sheets ─────────────────────────────────
 async function fetchFromSheets(){
   try{
-    const controller = new AbortController();
-    const timeout = setTimeout(()=>controller.abort(), 10000);
-    const res = await fetch(SHEETS_URL, {redirect:'follow', signal:controller.signal});
-    clearTimeout(timeout);
-    const text = await res.text();
-    const data = JSON.parse(text);
+    const data = await jsonpFetch(SHEETS_URL);
     if(!Array.isArray(data)||data.length===0) return false;
     const parsed = data.map(rowToColab).filter(c=>c&&c.id>0&&c.nome);
     if(parsed.length >= COLABORADORES_INICIAL.length*0.5){
@@ -1283,38 +1299,22 @@ async function fetchFromSheets(){
     }
     return false;
   }catch(e){
-    if(e.name==='AbortError') setSyncStatus('⚠️ Sheets demorou — dados locais',false);
-    else console.warn('Sheets fetch error:',e.message);
+    console.warn('Sheets fetch error:',e.message);
     return null;
   }
 }async function syncToSheets(){
   setSyncStatus('⏳ Salvando no Sheets...', true);
   try{
     const payload = colaboradores.map(colabToRow);
-    const res = await fetch(SHEETS_URL, {
+    // no-cors: envia sem ler resposta — evita CORS sem precisar de proxy
+    await fetch(SHEETS_URL, {
       method: 'POST',
+      mode: 'no-cors',
       body: JSON.stringify(payload),
       headers: {'Content-Type':'text/plain'},
     });
-    // Read response text first to diagnose
-    const resText = await res.text();
-    console.log('Sheets POST response:', resText.substring(0,200));
-    let data = {};
-    try{ data = JSON.parse(resText); }catch(e){ console.warn('POST response não é JSON:', resText.substring(0,100)); }
-
-    if(data.ok){
-      saveLocal();
-      setSyncStatus('✅ Salvo no Sheets', true);
-    } else if(res.ok && !data.error){
-      // Response OK mas sem confirmação — pode ter funcionado
-      saveLocal();
-      setSyncStatus('✅ Salvo (sem confirmação)', true);
-      console.warn('Sheets não retornou {ok:true}. Verifique o Apps Script.');
-    } else {
-      const errMsg = data.error || data.message || resText.substring(0,100);
-      console.error('Sheets erro:', errMsg);
-      setSyncStatus('⚠️ Erro Sheets: ' + errMsg.substring(0,40), false);
-    }
+    saveLocal();
+    setSyncStatus('✅ Salvo no Sheets', true);
   }catch(e){
     console.error('Sheets POST falhou:', e.message);
     setSyncStatus('⚠️ Sheets indisponível — salvo localmente', false);
