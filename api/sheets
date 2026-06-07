@@ -1,7 +1,6 @@
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylA5iNA-7w7adP-qPhw1TEnlfCpTP2AZzCS6JAZMmL4R4XEJynvu0lPQEqJScbE23H/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyYif4FPTwhA3-qM5slzMH3ae7S_L69VIOEhD0Zq8KP6-gHzsI0GIHTKaXm9GzroBXY/exec';
 
 export default async function handler(req, res) {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -22,7 +21,6 @@ export default async function handler(req, res) {
       res.status(200).send(text);
 
     } else if (req.method === 'POST') {
-      // Lê body manualmente (bodyParser está desabilitado)
       const rawBody = await new Promise((resolve, reject) => {
         let chunks = '';
         req.on('data', chunk => { chunks += chunk.toString(); });
@@ -49,7 +47,6 @@ export default async function handler(req, res) {
   }
 }
 
-// CRÍTICO: desabilita o bodyParser automático do Vercel
 export const config = {
   api: {
     bodyParser: false,
