@@ -314,26 +314,34 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
 .ano-btn.active{background:var(--navy);color:white}
 .ano-btn:hover:not(.active){background:var(--border);color:var(--navy)}
 
-#saveBar{
-  position:fixed;bottom:0;left:0;right:0;
-  background:#1E2761;
-  border-top:4px solid #F59E0B;
-  padding:14px 28px;
-  z-index:9999;
+/* Save overlay — centered */
+#saveBarOverlay{
   display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.45);
+  z-index:9998;
   align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:12px;
-  box-shadow:0 -4px 24px rgba(0,0,0,.4);
+  justify-content:center;
 }
-#saveBar.visible{display:flex!important}
-.savebar-dot{width:10px;height:10px;background:#F59E0B;border-radius:50%;animation:pulse 1s ease-in-out infinite;flex-shrink:0}
-.savebar-msg{color:white;font-weight:700;font-size:14px}
-.savebar-sub{color:rgba(255,255,255,.7);font-size:12px;margin-top:2px}
-.savebar-btn-discard{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
-.savebar-btn-save{background:#F59E0B;border:none;color:#1E2761;padding:9px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit}
-.savebar-btn-discard:hover{background:rgba(255,255,255,.2)}
+#saveBarOverlay.visible{display:flex!important}
+#saveBar{
+  background:#1E2761;
+  border:2px solid #F59E0B;
+  border-radius:16px;
+  padding:28px 32px;
+  width:100%;
+  max-width:460px;
+  margin:16px;
+  box-shadow:0 8px 40px rgba(0,0,0,.5);
+  animation:saveCardIn .2s ease;
+}
+@keyframes saveCardIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.savebar-dot{width:12px;height:12px;background:#F59E0B;border-radius:50%;animation:pulse 1s ease-in-out infinite;flex-shrink:0}
+.savebar-msg{color:white;font-weight:700;font-size:16px}
+.savebar-sub{color:rgba(255,255,255,.65);font-size:13px;margin-top:4px}
+.savebar-btn-discard{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex:1}
+.savebar-btn-save{background:#F59E0B;border:none;color:#1E2761;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;flex:2}
+.savebar-btn-discard:hover{background:rgba(255,255,255,.15)}
 .savebar-btn-save:hover{background:#FBBF24}
 
 </style>
@@ -910,8 +918,10 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   </div>
 </div>
 
-  <!-- BARRA DE SALVAMENTO -->
-  <div id="saveBar"></div>
+  <!-- SALVAMENTO CENTRALIZADO -->
+  <div id="saveBarOverlay">
+    <div id="saveBar"></div>
+  </div>
 
 <!-- MODAL: INDICAR DATAS -->
 <div class="modal-overlay" id="modalDatas">
@@ -1545,7 +1555,9 @@ function selectRoleCsc(r){document.querySelectorAll("#cscRoles .role-card").forE
 function doLogin(){
   if(!currentRole){showToast("Selecione um perfil","warn");return;}
   const s=document.getElementById("inputSenha").value,e=document.getElementById("senhaErro");
-  if(s!=="26170621"){e.style.display="block";document.getElementById("inputSenha").style.borderColor="#B71C1C";document.getElementById("inputSenha").focus();return;}
+  // DP uses 26170621, operational gestores use 1234
+  const senhaEsperada = currentRole==="dp" ? "26170621" : "1234";
+  if(s!==senhaEsperada){e.style.display="block";document.getElementById("inputSenha").style.borderColor="#B71C1C";document.getElementById("inputSenha").focus();return;}
   e.style.display="none";
   if(currentRole==="csc_gateway"){document.getElementById("loginScreen").style.display="none";document.getElementById("cscScreen").style.display="flex";document.getElementById("inputSenhaCsc").value="";return;}
   entrarApp();
@@ -4374,31 +4386,31 @@ let pendingSnapshot = null; // snapshot before change for discard
 
 function showSaveBar(msg, sub){
   pendingChanges = true;
-  const bar = document.getElementById('saveBar');
-  if(!bar) return;
+  const overlay = document.getElementById('saveBarOverlay');
+  const bar     = document.getElementById('saveBar');
+  if(!overlay||!bar) return;
   bar.innerHTML = `
-    <div style="display:flex;align-items:center;gap:14px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
       <div class="savebar-dot"></div>
       <div>
         <div class="savebar-msg">${msg||'Alterações pendentes'}</div>
-        <div class="savebar-sub">${sub||'Salve para não perder os dados'}</div>
+        <div class="savebar-sub">${sub||'Salve para garantir que os dados não sejam perdidos'}</div>
       </div>
     </div>
     <div style="display:flex;gap:10px">
       <button class="savebar-btn-discard" onclick="descartarAlteracoes()">Descartar</button>
       <button class="savebar-btn-save" onclick="confirmarSalvar()">💾 Salvar agora</button>
     </div>`;
-  bar.classList.add('visible');
-  document.querySelector('.main') && (document.querySelector('.main').style.paddingBottom='80px');
+  overlay.classList.add('visible');
 }
 
 function hideSaveBar(){
   pendingChanges = false;
   pendingSnapshot = null;
-  const bar = document.getElementById('saveBar');
-  if(bar){ bar.classList.remove('visible'); bar.innerHTML=''; }
-  const main = document.querySelector('.main');
-  if(main) main.style.paddingBottom = '';
+  const overlay = document.getElementById('saveBarOverlay');
+  const bar     = document.getElementById('saveBar');
+  if(overlay) overlay.classList.remove('visible');
+  if(bar) bar.innerHTML = '';
 }
 
 async function confirmarSalvar(){
