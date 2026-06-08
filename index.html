@@ -338,6 +338,7 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
   z-index:9999;
 }
 @keyframes saveCardIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .savebar-dot{width:12px;height:12px;background:#F59E0B;border-radius:50%;animation:pulse 1s ease-in-out infinite;flex-shrink:0}
 .savebar-msg{color:white;font-weight:700;font-size:16px}
 .savebar-sub{color:rgba(255,255,255,.65);font-size:13px;margin-top:4px}
@@ -428,8 +429,11 @@ tbody td{padding:11px 14px;font-size:13px;color:var(--text)}
     </div>
     <div class="topbar-right">
       <span class="role-badge" id="roleBadge">—</span>
-      <span id="syncStatus" style="font-size:12px;font-weight:600;color:var(--accent-light);display:none;padding:4px 10px;background:rgba(255,255,255,.08);border-radius:6px"></span>
-      <button onclick="refreshApp()" title="Atualizar dados" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px;line-height:1" id="btnRefresh">↺</button>
+      <button onclick="refreshApp()" id="btnRefresh" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:20px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:white;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all .2s;min-width:140px;justify-content:center">
+        <span id="btnRefreshIcon" style="font-size:15px;display:inline-block;transition:transform .3s">🔄</span>
+        <span id="btnRefreshLabel">Sincronizar</span>
+      </button>
+      <span id="syncStatus" style="display:none"></span>
       
       <button class="btn btn-outline btn-sm" onclick="doLogout()" id="btnSair">Sair</button>
       <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
@@ -1190,14 +1194,39 @@ function hideLoading(){
   if(el) el.style.display='none';
 }
 function setSyncStatus(msg, ok=true){
-  const el=document.getElementById('syncStatus');
-  if(!el) return;
-  el.style.display='inline';
-  el.textContent=msg;
-  el.style.color=ok?'#A5D6A7':'#FFCC80';
-  clearTimeout(el._timer);
-  // Success: hide after 3s. Warning: keep visible until next save
-  if(ok) el._timer=setTimeout(()=>{el.style.display='none';},3000);
+  const btn   = document.getElementById('btnRefresh');
+  const icon  = document.getElementById('btnRefreshIcon');
+  const label = document.getElementById('btnRefreshLabel');
+  if(!btn) return;
+  // Stop spinning
+  if(icon) icon.style.animation='';
+  if(ok===true){
+    btn.style.background='#2E7D32';
+    btn.style.borderColor='#A5D6A7';
+    if(icon)  icon.textContent='✅';
+    if(label) label.textContent='Atualizado';
+    clearTimeout(btn._timer);
+    btn._timer=setTimeout(()=>{
+      btn.style.background='rgba(255,255,255,.1)';
+      btn.style.borderColor='rgba(255,255,255,.25)';
+      if(icon)  icon.textContent='🔄';
+      if(label) label.textContent='Sincronizar';
+    },3000);
+  } else if(ok===false){
+    btn.style.background='rgba(230,81,0,.7)';
+    btn.style.borderColor='#FFCC80';
+    if(icon)  icon.textContent='⚠️';
+    if(label) label.textContent='Offline';
+  } else {
+    // loading state
+    btn.style.background='rgba(74,144,217,.4)';
+    btn.style.borderColor='rgba(74,144,217,.6)';
+    if(icon){
+      icon.textContent='🔄';
+      icon.style.animation='spin 1s linear infinite';
+    }
+    if(label) label.textContent='Sincronizando...';
+  }
 }
 
 // ── Serialize / Deserialize ───────────────────────────
@@ -4547,9 +4576,14 @@ async function renderCurrentTab(){
   if(activeTab) switchTab(activeTab.dataset.tab);
 }
 async function refreshApp(){
-  const btn = document.getElementById('btnRefresh');
-  if(btn){ btn.style.opacity='.4'; btn.style.pointerEvents='none'; }
-  setSyncStatus('⏳ Atualizando...', true);
+  const btn   = document.getElementById('btnRefresh');
+  const icon  = document.getElementById('btnRefreshIcon');
+  const label = document.getElementById('btnRefreshLabel');
+  if(btn){ btn.style.opacity='.8'; btn.style.pointerEvents='none'; }
+  // Show loading state
+  if(icon){ icon.textContent='🔄'; icon.style.animation='spin 1s linear infinite'; }
+  if(label) label.textContent='Sincronizando...';
+  setSyncStatus('⏳', null);
   // Todos os perfis buscam do Sheets para ver dados atualizados
   const result = await fetchFromSheets();
   if(result===true){ saveLocal(); setSyncStatus('✅ Dados atualizados', true); }
