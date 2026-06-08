@@ -1635,9 +1635,11 @@ function entrarApp(){
   setTimeout(updateNavBadges,100);
   // DP triggers Sheets sync (loads once, then syncs on changes)
   if(currentRole==="dp"){ initSheets(); showResetBtn(true); } else { showResetBtn(false); }
+  startAutoSync();
 }
 function doLogout(){
   currentRole=null;selectedCscRole=null;
+  stopAutoSync();
   showResetBtn(false);
   hideSaveBar();
   document.getElementById("appScreen").style.display="none";document.getElementById("loginScreen").style.display="flex";
@@ -4593,6 +4595,74 @@ async function refreshApp(){
   const activeTab = document.querySelector('.nav-tab.active');
   if(activeTab) switchTab(activeTab.dataset.tab);
   if(btn){ btn.style.opacity='1'; btn.style.pointerEvents=''; }
+}
+
+// ── AUTO-SYNC ─────────────────────────────────────────
+let autoSyncInterval = null;
+let lastSyncHash = '';
+
+function startAutoSync(){
+  stopAutoSync();
+  autoSyncInterval = setInterval(silentSync, 30000);
+}
+
+function stopAutoSync(){
+  if(autoSyncInterval){ clearInterval(autoSyncInterval); autoSyncInterval = null; }
+}
+
+function getSyncHash(){
+  // Hash rápido para detectar mudanças relevantes
+  if(currentRole==='dp'){
+    return colaboradores.filter(c=>c.p1ini&&c.statusP1==='Pendente').length + '|' +
+           colaboradores.filter(c=>c.altReq&&c.altReq.status==='Solicitado').length;
+  }
+  const cfg = getCurrentCfg();
+  if(cfg && cfg.dept){
+    return colaboradores.filter(c=>c.dept===cfg.dept&&c.p1ini)
+      .map(c=>c.id+':'+c.statusP1+':'+c.statusP2).join(',');
+  }
+  return '';
+}
+
+async function silentSync(){
+  // Não sincroniza se modal aberto ou salvamento em andamento
+  if(document.querySelector('.modal-overlay.open')) return;
+  if(pendingChanges) return;
+
+  const hashAntes = getSyncHash();
+  const result = await fetchFromSheets();
+  if(result !== true) return;
+
+  saveLocal();
+  const hashDepois = getSyncHash();
+
+  if(hashDepois !== hashAntes){
+    // Há mudanças! Atualiza a aba atual e pisca o botão
+    const activeTab = document.querySelector('.nav-tab.active');
+    if(activeTab) switchTab(activeTab.dataset.tab);
+    updateNavBadges();
+    flashSyncButton();
+  }
+}
+
+function flashSyncButton(){
+  const btn   = document.getElementById('btnRefresh');
+  const icon  = document.getElementById('btnRefreshIcon');
+  const label = document.getElementById('btnRefreshLabel');
+  if(!btn) return;
+  btn.style.background='#2E7D32';
+  btn.style.borderColor='#A5D6A7';
+  btn.style.animation='pulse .6s ease 3';
+  if(icon)  icon.textContent='✅';
+  if(label) label.textContent='Novo!';
+  clearTimeout(btn._flashTimer);
+  btn._flashTimer = setTimeout(()=>{
+    btn.style.animation='';
+    btn.style.background='rgba(255,255,255,.1)';
+    btn.style.borderColor='rgba(255,255,255,.25)';
+    if(icon)  icon.textContent='🔄';
+    if(label) label.textContent='Sincronizar';
+  }, 6000);
 }
 
 // ── RESET CACHE ───────────────────────────────────────────────
