@@ -1,4 +1,3 @@
-<!-- v2 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -4551,15 +4550,11 @@ async function refreshApp(){
   const btn = document.getElementById('btnRefresh');
   if(btn){ btn.style.opacity='.4'; btn.style.pointerEvents='none'; }
   setSyncStatus('⏳ Atualizando...', true);
-  // Reload from Sheets if DP, otherwise from localStorage
-  if(currentRole==='dp'){
-    const result = await fetchFromSheets();
-    if(result===true){ saveLocal(); setSyncStatus('✅ Dados atualizados', true); }
-    else { loadLocal(); setSyncStatus('⚠️ Sheets indisponível — dados locais', false); }
-  } else {
-    loadLocal();
-    setSyncStatus('✅ Dados atualizados', true);
-  }
+  // Todos os perfis buscam do Sheets para ver dados atualizados
+  const result = await fetchFromSheets();
+  if(result===true){ saveLocal(); setSyncStatus('✅ Dados atualizados', true); }
+  else if(result===false){ setSyncStatus('⚠️ Planilha vazia', false); }
+  else { loadLocal(); setSyncStatus('⚠️ Sheets indisponível — dados locais', false); }
   // Re-render current active tab
   const activeTab = document.querySelector('.nav-tab.active');
   if(activeTab) switchTab(activeTab.dataset.tab);
