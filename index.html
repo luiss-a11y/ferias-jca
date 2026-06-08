@@ -1331,19 +1331,38 @@ async function fetchFromSheets(){
     console.warn('Sheets fetch error:',e.message);
     return null;
   }
-}async function syncToSheets(){
-  setSyncStatus('⏳ Salvando no Sheets...', true);
+}async function syncToSheets(forceAll=false){
+  setSyncStatus('⏳ Salvando...', null);
   try{
-    const payload = colaboradores.map(colabToRow);
-    // no-cors: envia sem ler resposta — evita CORS sem precisar de proxy
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify(payload),
-      headers: {'Content-Type':'text/plain'},
-    });
+    // Descobre quais colaboradores mudaram comparando com snapshot
+    let toSync = colaboradores;
+    if(!forceAll && pendingSnapshot){
+      toSync = colaboradores.filter(c=>{
+        const snap = pendingSnapshot.find(s=>s.id===c.id);
+        if(!snap) return true; // novo
+        return JSON.stringify(colabToRow(c)) !== JSON.stringify(colabToRow(snap));
+      });
+    }
+
+    if(toSync.length === 0){
+      setSyncStatus('✅ Salvo no Sheets', true);
+      return;
+    }
+
+    // Envia cada colaborador alterado individualmente
+    const promises = toSync.map(c =>
+      fetch(SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({ type: 'update', data: colabToRow(c) }),
+        headers: {'Content-Type':'text/plain'},
+      }).catch(()=>{})
+    );
+    await Promise.all(promises);
+
     saveLocal();
     setSyncStatus('✅ Salvo no Sheets', true);
+    console.log(`Sheets: ${toSync.length} colaborador(es) atualizado(s)`);
   }catch(e){
     console.error('Sheets POST falhou:', e.message);
     setSyncStatus('⚠️ Sheets indisponível — salvo localmente', false);
