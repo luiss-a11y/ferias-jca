@@ -2514,7 +2514,8 @@ function renderAprovadasGestor(){
     <td>${c.altReq&&c.altReq.status==="Solicitado"
       ?`<span class="badge badge-yellow">⏳ Aguard. DP</span>`
       :`<button class="btn btn-outline btn-sm" onclick="openSolicitarAlteracao(${c.id})">✎ Solicitar Alteração</button>`}</td>
-  </tr>`).join(""):`<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--muted)">Nenhuma aprovação ainda no seu departamento</td></tr>`;
+    <td><button class="btn btn-sm" style="background:#1B5E20;color:#fff;border:none;gap:4px" onclick="gerarComunicado(${c.id})">📄 Comunicado</button></td>
+  </tr>`).join(""):`<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--muted)">Nenhuma aprovação ainda no seu departamento</td></tr>`;
 }
 function filterAprovadasGestor(q){
   const cfg=getCurrentCfg();const dept=cfg.dept;
@@ -2532,7 +2533,116 @@ function filterAprovadasGestor(q){
   </tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">Nenhum resultado</td></tr>`;
 }
 
-// ── HISTÓRICO ────────────────────────────────────────────────
+// ── GERAR COMUNICADO DE FÉRIAS ────────────────────────────
+function gerarComunicado(id){
+  const c = colaboradores.find(x=>x.id===id);
+  if(!c) return;
+
+  function fmtBR(d){ if(!d) return '—'; const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
+  function diasEntre(ini,fim){
+    const a=new Date(ini+'T12:00:00'), b=new Date(fim+'T12:00:00');
+    return Math.round((b-a)/86400000)+1;
+  }
+  function retorno(fim){ return fmtBR(addDays(fim,1)); }
+
+  // Monta períodos
+  let periodoTexto = '';
+  if(c.p1ini && c.p1fim){
+    const dias = diasEntre(c.p1ini, c.p1fim);
+    periodoTexto += `${fmtBR(c.p1ini)} a ${fmtBR(c.p1fim)} (${dias} dias), com retorno previsto em ${retorno(c.p1fim)}`;
+  }
+  if(c.p2ini && c.p2fim){
+    const dias = diasEntre(c.p2ini, c.p2fim);
+    periodoTexto += `; e ${fmtBR(c.p2ini)} a ${fmtBR(c.p2fim)} (${dias} dias), com retorno previsto em ${retorno(c.p2fim)}`;
+  }
+
+  const hoje = new Date();
+  const dataDoc = `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`;
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<title>Comunicado de Férias — ${c.nome}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Arial&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;background:#f0f0f0;display:flex;justify-content:center;padding:30px}
+  .page{width:595px;background:white;box-shadow:0 4px 24px rgba(0,0,0,.18)}
+  .header{
+    position:relative;height:190px;overflow:hidden;
+    background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80') center/cover no-repeat;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.18)}
+  .logo-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .logo-line{width:44px;height:3px;background:#F0C040;border-radius:2px}
+  .logo-circle{
+    width:82px;height:82px;border-radius:50%;
+    background:#1E2761;border:3px solid rgba(255,255,255,.3);
+    display:flex;align-items:center;justify-content:center;
+    color:white;font-size:22px;font-weight:900;letter-spacing:1px;
+    font-family:Arial Black,Arial,sans-serif;
+  }
+  .body{padding:32px 40px 28px}
+  .title{font-size:17px;font-weight:900;letter-spacing:1.5px;color:#1E2761;margin-bottom:6px;text-transform:uppercase}
+  .recipient{font-size:13px;color:#333;margin-bottom:22px}
+  .content{font-size:12.5px;line-height:1.75;color:#333;text-align:justify}
+  .content p{margin-bottom:14px}
+  .sign{margin-top:28px;font-size:12px;color:#555}
+  .sign strong{color:#1E2761}
+  .footer{
+    background:#1E2761;color:white;text-align:center;
+    padding:14px;font-size:12px;letter-spacing:4px;font-weight:700;
+    text-transform:uppercase;margin-top:auto
+  }
+  .print-btn{
+    display:block;margin:18px auto 0;padding:10px 28px;
+    background:#1E2761;color:white;border:none;border-radius:6px;
+    font-size:13px;cursor:pointer;letter-spacing:.5px;font-weight:600
+  }
+  @media print{
+    body{background:none;padding:0}
+    .page{box-shadow:none;width:100%}
+    .print-btn{display:none}
+    *{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="logo-wrap">
+      <div class="logo-line"></div>
+      <div class="logo-circle">JCA</div>
+      <div class="logo-line"></div>
+    </div>
+  </div>
+  <div class="body">
+    <div class="title">Comunicado de Férias</div>
+    <div class="recipient">Prezado(a) ${c.nome}</div>
+    <div class="content">
+      <p>Informamos que, a partir do dia <strong>${fmtBR(c.p1ini)}</strong> entrará em gozo de férias referente ao período de ${periodoTexto}.</p>
+      <p>Pedimos que alinhe todos os processos e transfira todas as atividades do período supracitado para os profissionais que ficarão responsáveis pelas mesmas, conforme orientação do analista ponta de célula e supervisão.</p>
+      <p>Comunicamos também que, durante este período, todos os seus e-mails serão direcionados automaticamente para o analista ponta de célula, supervisão e coordenação, para que os atendimentos aos clientes sejam mantidos com excelência.</p>
+      <p>Informamos ainda que, durante este período, todos os acessos aos nossos sistemas e rede estarão bloqueados.</p>
+      <p><strong>Desejamos excelentes férias!</strong></p>
+    </div>
+    <div class="sign">
+      <p>Niterói, ${dataDoc}</p>
+      <p style="margin-top:6px"><strong>Departamento Pessoal Interno — JCA Contadores</strong></p>
+    </div>
+  </div>
+  <div class="footer">JCA Contadores</div>
+</div>
+<button class="print-btn" onclick="window.print()">🖨️ Salvar como PDF / Imprimir</button>
+</body>
+</html>`;
+
+  const w = window.open('','_blank','width=680,height=820');
+  w.document.write(html);
+  w.document.close();
+}
 let historicoFiltro="Todos";
 function renderHistorico(){
   const cfg=getCurrentCfg();
