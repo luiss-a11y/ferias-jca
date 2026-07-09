@@ -2267,6 +2267,14 @@ const FERIADOS=[
   {d:"2028-12-25",nome:"Natal"},
 ];
 const FERIADO_SET=new Set(FERIADOS.map(f=>f.d));
+// ── HELPERS GLOBAIS ───────────────────────────────────────────
+function overlapsMonth(ini, fim, y, m) {
+  if(!ini||!fim) return false;
+  const ms=new Date(y,m,1), me=new Date(y,m+1,0);
+  const fs=new Date(ini+'T00:00:00'), fe=new Date(fim+'T00:00:00');
+  return fs<=me && fe>=ms;
+}
+
 // ── JANELAS DE FÉRIAS ─────────────────────────────────────────
 // Dias úteis de início de cada janela (configurável pelo DP em Bloqueios)
 let JANELAS_CONFIG = [
