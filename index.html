@@ -1456,6 +1456,20 @@ tbody td{padding:13px 16px;font-size:13px;color:var(--text)}
       <div class="page-header">
         <div><div class="page-title">Períodos Bloqueados & Feriados</div><div class="page-sub" id="bloqueiosSub">Referência de impedimentos</div></div>
       </div>
+
+      <!-- Janelas de Férias (DP only) -->
+      <div id="janelasConfigWrap" style="display:none;margin-bottom:20px">
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title">Janelas de Início de Férias</span>
+            <span style="font-size:11px;color:var(--muted)">Dias úteis do mês em que os gestores podem indicar início</span>
+          </div>
+          <table>
+            <thead><tr><th>Janela</th><th>Intervalo de dias úteis</th><th>Datas no mês atual (exemplo)</th></tr></thead>
+            <tbody id="janelasConfigBody"></tbody>
+          </table>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div class="table-wrap">
           <div class="table-header"><span class="table-title" id="bloqueiosTitleLabel">Períodos Bloqueados</span></div>
@@ -1491,8 +1505,23 @@ tbody td{padding:13px 16px;font-size:13px;color:var(--text)}
     <div class="modal-sub" id="modalDatasName">—</div>
     <div class="form-info" id="modalDatasInfo"></div>
     <div id="modalRejectionBox"></div>
+
+    <!-- Sugestão de menor impacto -->
+    <div id="impactoSugestao" style="display:none;margin-bottom:14px;padding:9px 13px;background:var(--blue-bg);border:1px solid var(--azul-11);border-radius:8px;font-size:12px;color:var(--azul-5);display:flex;align-items:center;gap:7px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="impactoSugestaoTxt"></span>
+    </div>
+
+    <!-- Seletor de janela P1 -->
     <div class="period-block">
       <div class="period-block-title"><span class="period-tag" style="background:var(--accent)">1º Período</span> 15 dias corridos</div>
+      <div style="margin-bottom:12px">
+        <label class="form-label" style="margin-bottom:6px">Selecionar mês e janela de início</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select id="p1MesSel" onchange="renderJanelasP1()" style="padding:7px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:12px;cursor:pointer;outline:none"></select>
+          <div id="janelasP1" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+        </div>
+      </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Início</label>
           <input type="date" class="form-input" id="p1ini" oninput="onP1IniChange()"/>
@@ -1501,8 +1530,17 @@ tbody td{padding:13px 16px;font-size:13px;color:var(--text)}
           <input type="date" class="form-input" id="p1fim" readonly style="background:var(--bg);cursor:not-allowed"/></div>
       </div>
     </div>
+
+    <!-- Seletor de janela P2 -->
     <div class="period-block">
       <div class="period-block-title"><span class="period-tag" style="background:var(--verde-2)">2º Período</span> 15 dias corridos</div>
+      <div style="margin-bottom:12px">
+        <label class="form-label" style="margin-bottom:6px">Selecionar mês e janela de início</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select id="p2MesSel" onchange="renderJanelasP2()" style="padding:7px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:12px;cursor:pointer;outline:none"></select>
+          <div id="janelasP2" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+        </div>
+      </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Início</label>
           <input type="date" class="form-input" id="p2ini" oninput="onP2IniChange()"/>
@@ -2229,6 +2267,56 @@ const FERIADOS=[
   {d:"2028-12-25",nome:"Natal"},
 ];
 const FERIADO_SET=new Set(FERIADOS.map(f=>f.d));
+// ── JANELAS DE FÉRIAS ─────────────────────────────────────────
+// Dias úteis de início de cada janela (configurável pelo DP em Bloqueios)
+let JANELAS_CONFIG = [
+  { id:'A', label:'Janela A', du_ini:1,  du_fim:3  },
+  { id:'B', label:'Janela B', du_ini:13, du_fim:15 },
+  { id:'C', label:'Janela C', du_ini:17, du_fim:19 },
+];
+
+// Retorna a data ISO do N-ésimo dia útil de um mês (1-indexed)
+function getNthBusinessDay(year, month0, n) {
+  let count = 0;
+  for (let day = 1; day <= 31; day++) {
+    const dt = new Date(year, month0, day);
+    if (dt.getMonth() !== month0) break;
+    const dow = dt.getDay();
+    const iso = `${year}-${String(month0+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    if (dow !== 0 && dow !== 6 && !isHoliday(iso)) {
+      count++;
+      if (count === n) return iso;
+    }
+  }
+  return null;
+}
+
+// Retorna as datas reais de cada janela para um dado mês
+function getJanelasDates(year, month0) {
+  return JANELAS_CONFIG.map(j => ({
+    ...j,
+    ini: getNthBusinessDay(year, month0, j.du_ini),
+    fim: getNthBusinessDay(year, month0, j.du_fim),
+  }));
+}
+
+// Retorna o mês futuro (próximos 12) com menor número de férias simultâneas — empresa toda
+function getMesMenorImpacto(dept, colabId) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const candidatos = [];
+  for (let i = 1; i <= 12; i++) {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
+    const y = d.getFullYear(), m = d.getMonth();
+    const count = colaboradores.filter(c =>
+      c.id !== colabId && c.p1ini &&
+      (overlapsMonth(c.p1ini, c.p1fim, y, m) || overlapsMonth(c.p2ini, c.p2fim, y, m))
+    ).length;
+    candidatos.push({ year:y, month:m, count, label:`${MESES_NOME[m]} de ${y}` });
+  }
+  candidatos.sort((a,b) => a.count - b.count || a.year - b.year || a.month - b.month);
+  return candidatos[0];
+}
+
 const BLOCKED=[
   {dept:"FISCAL MATRIZ",ini:"2027-01-10",fim:"2027-01-20",motivo:"Obrigações competência dez/2026"},
   {dept:"FISCAL MATRIZ",ini:"2027-02-10",fim:"2027-02-20",motivo:"SPED/EFD competência jan"},
@@ -7098,6 +7186,10 @@ function renderEquilibrioWarn(colab){
         <div style="font-size:11px;color:var(--muted)">Limite mensal: <strong>${fmtBRL(alertas[0].limite)}</strong> (provisão média + 10%)</div>
         ${detalhes}
         ${temAlerta ? sugestoesHtml(colab, f.tot, alertas[0].limite, alertas[0].media) : ''}
+        ${temAlerta ? `<div style="margin-top:12px;padding:8px 12px;background:rgba(255,255,255,.5);border-radius:6px;font-size:12px;display:flex;align-items:center;gap:7px;color:var(--azul-5)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Mês com menor impacto para a empresa: <strong>${getMesMenorImpacto(colab.dept, colab.id)?.label||'—'}</strong></span>
+        </div>` : ''}
       </div>
     </div>
   </div>`;
@@ -7495,10 +7587,43 @@ function renderFeriados(){
   }).join("");
 }
 
+function renderJanelasConfig(){
+  const el = document.getElementById('janelasConfigBody');
+  if(!el) return;
+  el.innerHTML = JANELAS_CONFIG.map((j, idx) => `
+    <tr>
+      <td style="font-weight:700;color:var(--heading);padding:10px 12px">${j.label}</td>
+      <td style="padding:10px 12px">
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+          <span style="color:var(--muted)">DU</span>
+          <input type="number" value="${j.du_ini}" min="1" max="23" onchange="updateJanela(${idx},'du_ini',+this.value)"
+            style="width:52px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:12px;text-align:center">
+          <span style="color:var(--muted)">até DU</span>
+          <input type="number" value="${j.du_fim}" min="1" max="23" onchange="updateJanela(${idx},'du_fim',+this.value)"
+            style="width:52px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:12px;text-align:center">
+        </div>
+      </td>
+      <td style="padding:10px 12px;font-size:11px;color:var(--muted)">
+        Ex: mês atual → ${getNthBusinessDay(new Date().getFullYear(),new Date().getMonth(),j.du_ini)||'—'} a ${getNthBusinessDay(new Date().getFullYear(),new Date().getMonth(),j.du_fim)||'—'}
+      </td>
+    </tr>`).join('');
+}
+function updateJanela(idx, field, val){
+  if(val<1||val>23) return;
+  JANELAS_CONFIG[idx][field]=val;
+  renderJanelasConfig();
+  showToast('Janela atualizada','success');
+}
+
 function renderBloqueios(){
   const cfg = getCurrentCfg();
   const dept = cfg?.dept;
   const isDP = !dept;
+
+  // Mostra janelas de férias só para o DP
+  const janelasWrap = document.getElementById('janelasConfigWrap');
+  if(janelasWrap){ janelasWrap.style.display = isDP ? 'block' : 'none'; }
+  if(isDP) renderJanelasConfig();
 
   // Bloqueios — DP vê tudo, gestor só vê o próprio departamento
   const bloqueiosFiltrados = isDP ? BLOCKED : BLOCKED.filter(b=>b.dept===dept);
@@ -7567,6 +7692,47 @@ function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalend
 function calToday(){const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();renderCalendario();}
 
 // ── MODAL INDICAR DATAS ──────────────────────────────────────
+function populateMesSel(selId, startFromPaFim) {
+  const sel = document.getElementById(selId);
+  if(!sel) return;
+  sel.innerHTML = '';
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const start = startFromPaFim ? new Date(startFromPaFim+'T00:00:00') : hoje;
+  for (let i = 0; i < 18; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+    const y = d.getFullYear(), m = d.getMonth();
+    const opt = document.createElement('option');
+    opt.value = `${y}-${m}`;
+    opt.textContent = `${MESES_NOME[m]} ${y}`;
+    sel.appendChild(opt);
+  }
+}
+
+function renderJanelasBtn(containerId, inputId, accentColor) {
+  const sel = document.getElementById(containerId === 'janelasP1' ? 'p1MesSel' : 'p2MesSel');
+  if(!sel || !sel.value) return;
+  const [y, m] = sel.value.split('-').map(Number);
+  const janelas = getJanelasDates(y, m);
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML = janelas.map(j => {
+    const label = j.ini && j.fim
+      ? `${j.label}<br><small style="font-weight:400;opacity:.8">${fmtDate(j.ini)} – ${fmtDate(j.fim)}</small>`
+      : `${j.label}<br><small style="opacity:.5">Sem dias úteis</small>`;
+    const disabled = !j.ini ? 'disabled style="opacity:.4;cursor:not-allowed"' : '';
+    return `<button ${disabled} onclick="applyJanela('${inputId}','${j.ini}')" style="padding:7px 12px;border-radius:8px;border:1.5px solid ${accentColor};background:transparent;color:${accentColor};font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;text-align:left;line-height:1.4;min-width:90px">${label}</button>`;
+  }).join('');
+}
+
+function renderJanelasP1(){ renderJanelasBtn('janelasP1','p1ini','var(--accent)'); }
+function renderJanelasP2(){ renderJanelasBtn('janelasP2','p2ini','var(--verde-2)'); }
+
+function applyJanela(inputId, dateIso) {
+  if(!dateIso) return;
+  const input = document.getElementById(inputId);
+  if(input){ input.value = dateIso; input.dispatchEvent(new Event('input')); }
+}
+
 function openDatasModal(id){
   tirarSnapshot();
   currentColab=colaboradores.find(c=>c.id===id);const c=currentColab;
@@ -7581,6 +7747,22 @@ function openDatasModal(id){
   document.getElementById("p2ini").value=c.statusP2==="Recusado"?"":c.p2ini||"";document.getElementById("p2fim").value=c.statusP2==="Recusado"?"":c.p2fim||"";
   document.getElementById("inputObs").value=c.obs||"";
   ["msgP1","msgP2","msgGeral"].forEach(i=>{const e=document.getElementById(i);e.className="validation-msg";e.textContent="";});
+
+  // Preenche seletores de mês (a partir do fim do P.A.)
+  const startRef = c.pa_fim || null;
+  populateMesSel('p1MesSel', startRef);
+  populateMesSel('p2MesSel', startRef);
+  renderJanelasP1(); renderJanelasP2();
+
+  // Sugestão de menor impacto
+  const sugestao = getMesMenorImpacto(c.dept, c.id);
+  const sugEl = document.getElementById('impactoSugestao');
+  const sugTxt = document.getElementById('impactoSugestaoTxt');
+  if(sugEl && sugTxt && sugestao){
+    sugEl.style.display = 'flex';
+    sugTxt.textContent = `Mês com menor impacto para a empresa: ${sugestao.label}`;
+  } else if(sugEl){ sugEl.style.display = 'none'; }
+
   openModal("modalDatas");
 }
 function onP1IniChange(){
