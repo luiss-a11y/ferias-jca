@@ -669,7 +669,7 @@ tbody td{padding:13px 16px;font-size:13px;color:var(--text)}
   <!-- Mobile nav menu -->
   <div class="mobile-nav" id="mobileNav"></div>
   <!-- Banner offline -->
-  <div id="offlineBanner" style="display:none;background:#2A1A0A;border-bottom:1px solid #4A2C0A;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+  <div id="offlineBanner" style="display:none;background:#2A1A0A;border-bottom:1px solid #4A2C0A;padding:8px 24px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
     <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#D4904A">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       <span><strong>Modo Offline</strong> — Visualização disponível. Alterações salvas localmente e sincronizadas ao reconectar.</span>
@@ -2977,7 +2977,14 @@ function setPainelPag(p) { _painelPag = p; renderPainelBody(document.getElementB
 function setAlertasPag(p) { _alertasPag = p; renderAlertasBody(getCriticos()); scrollToTable('alertasBody'); }
 function setValidarPag(p){ _validarPag=p; renderValidar(); scrollToTable('validarBody'); }
 function setAprovadasPag(p){ _aprovadasPag=p; renderAprovadas(); scrollToTable('aprovadasBody'); }
-function setHistoricoPag(p){ _historicoPag=p; const cfg=getCurrentCfg(); renderHistoricoBody(colaboradores.filter(c=>c.dept===cfg.dept),cfg.dept); scrollToTable('historicoBody'); }
+function setHistoricoPag(p){
+  _historicoPag=p;
+  const cfg=getCurrentCfg();
+  const dept=cfg?.dept;
+  const list=dept ? colaboradores.filter(c=>c.dept===dept) : colaboradores;
+  renderHistoricoBody(list, dept||'Todos');
+  scrollToTable('historicoBody');
+}
 
 // ── FILTRO CALENDÁRIO (DP) ────────────────────────────────────
 let _calDeptFiltro = '';
@@ -4691,12 +4698,12 @@ function renderPorMes(){
 let historicoFiltro="Todos";
 function renderHistorico(){
   const cfg=getCurrentCfg();
-  const dept=cfg.dept;
-  const list=colaboradores.filter(c=>c.dept===dept);
+  const dept=cfg?.dept||null;
+  const list=dept ? colaboradores.filter(c=>c.dept===dept) : colaboradores;
   const total=list.reduce((a,c)=>a+(c.hist||[]).length,0);
   const recusas=list.reduce((a,c)=>a+(c.hist||[]).filter(h=>h.acao.includes("Recusado")).length,0);
   const validacoes=list.reduce((a,c)=>a+(c.hist||[]).filter(h=>h.acao.includes("Validado")).length,0);
-  document.getElementById("historicoSub").textContent=`Registro de movimentações — ${dept}`;
+  document.getElementById("historicoSub").textContent=`Registro de movimentações${dept?' — '+dept:' — Todos os departamentos'}`;
   document.getElementById("historicoCards").innerHTML=`
     <div class="stat-card"><div class="stat-label" style="display:flex;align-items:center;gap:6px"><span class="icon-box" style="width:12px;height:12px"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='3.3' width='16' height='17.4' rx='1.4'/><line x1='7.3' y1='8' x2='16.7' y2='8'/><line x1='7.3' y1='12' x2='16.7' y2='12'/><line x1='7.3' y1='16' x2='13.5' y2='16'/></svg></span>Total Registros</div><div class="stat-value">${total}</div><div class="stat-sub">no histórico</div></div>
     <div class="stat-card green"><div class="stat-label" style="display:flex;align-items:center;gap:6px"><span class="icon-box" style="width:12px;height:12px">${ICON_CHECK}</span>Validações</div><div class="stat-value">${validacoes}</div><div class="stat-sub">aprovadas pelo DP</div></div>
@@ -4734,9 +4741,11 @@ let _histDateFrom='', _histDateTo='', _histSearch='';
 function applyHistoricoFilters(){
   _histDateFrom=document.getElementById('histFrom')?.value||'';
   _histDateTo=document.getElementById('histTo')?.value||'';
-  const cfg=getCurrentCfg(); if(!cfg) return;
+  const cfg=getCurrentCfg();
+  const dept=cfg?.dept;
   _historicoPag=1;
-  renderHistoricoBody(colaboradores.filter(c=>c.dept===cfg.dept),cfg.dept);
+  const list=dept ? colaboradores.filter(c=>c.dept===dept) : colaboradores;
+  renderHistoricoBody(list, dept||'Todos');
 }
 function clearHistoricoDateFilter(){
   _histDateFrom=''; _histDateTo='';
@@ -4746,10 +4755,12 @@ function clearHistoricoDateFilter(){
 }
 function filterHistorico(q){
   _histSearch=q||'';
-  const cfg=getCurrentCfg();const dept=cfg.dept;
-  const list=colaboradores.filter(c=>c.dept===dept&&(!q||c.nome.toLowerCase().includes(q.toLowerCase())));
+  const cfg=getCurrentCfg();
+  const dept=cfg?.dept;
+  const base=dept ? colaboradores.filter(c=>c.dept===dept) : colaboradores;
+  const list=q ? base.filter(c=>c.nome.toLowerCase().includes(q.toLowerCase())) : base;
   _historicoPag=1;
-  renderHistoricoBody(list,dept);
+  renderHistoricoBody(list, dept||'Todos');
 }
 function exportHistoricoCSV(){
   const cfg=getCurrentCfg(); if(!cfg) return;
